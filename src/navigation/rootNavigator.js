@@ -7,11 +7,19 @@ import SignUp from "../screens/Authenthication/SignUp";
 import forgotePassword from "../screens/Authenthication/forgote";
 import MainScreen from "../screens/MainScreen/MainScreen";
 import notificationScreen from "../components/notificationScreen";
-import profileScreen from "../components/profileScreen";
-import ledgerScreen from "../screens/MainScreen/LedgerScreen";
-import impactScreen from "../screens/MainScreen/ImpactScreen";
-import groupScreen from "../screens/MainScreen/groupScreen";
-import learnScreen from "../screens/MainScreen/learnScreen";
+import themeSwithcheScreen from "../components/themeSwithcheScreen";
+import DashBoardScreen from "../screens/MainScreen/DashBoardScreen";
+import CalculatorScreen from "../screens/MainScreen/CalculatorScreen";
+import groupSettle from "../screens/MainScreen/groupSettle";
+import resourceScreen from "../screens/MainScreen/resourceScreen";
+import ProfileScreen from "../screens/MainScreen/ProfileScreen";
+import LedgerTab from "../screens/MainScreen/tabs/LedgerTab";
+import WishlistTab from "../screens/MainScreen/tabs/Wishlisttab";
+import ComparisonTab from "../screens/MainScreen/tabs/Comparisontab";
+import groupDetails from "../screens/MainScreen/groupDetails";
+import VideosScreen from "../screens/MainScreen/learnTabs/Videos";
+import founderScreen from "../screens/MainScreen/learnTabs/founders";
+import ArticleScreen from "../screens/MainScreen/learnTabs/Arricles";
 
 const RootNavigator = () => {
     const Stack = createStackNavigator();
@@ -24,11 +32,19 @@ const RootNavigator = () => {
             <Stack.Screen name="forgotePassword" component={forgotePassword} />
             <Stack.Screen name="MainScreen" component={MainScreen} />
             <Stack.Screen name="notificationScreen" component={notificationScreen} />
-            <Stack.Screen name="profileScreen" component={profileScreen} />
-            <Stack.Screen name="ledgerScreen" component={ledgerScreen} />
-            <Stack.Screen name="impactScreen" component={impactScreen} />
-            <Stack.Screen name="groupScreen" component={groupScreen} />
-            <Stack.Screen name="learnScreen" component={learnScreen} />
+            <Stack.Screen name="themeSwithcheScreen" component={themeSwithcheScreen} />
+            <Stack.Screen name="CalculatorScreen" component={CalculatorScreen} />
+            <Stack.Screen name="groupSettle" component={groupSettle} />
+            <Stack.Screen name="groupScreen" component={resourceScreen} />
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+            <Stack.Screen name="DashBoardScreen" component={DashBoardScreen} />
+            <Stack.Screen name="LedgerTab" component={LedgerTab} />
+            <Stack.Screen name="WishlistTab" component={WishlistTab} />
+            <Stack.Screen name="ComparisonTab" component={ComparisonTab} />
+            <Stack.Screen name="groupDetails" component={groupDetails} />
+            <Stack.Screen name="VideosScreen" component={VideosScreen} />
+            <Stack.Screen name="founderScreen" component={founderScreen} />
+            <Stack.Screen name="ArticleScreen" component={ArticleScreen} />
         </Stack.Navigator>
     )
 };

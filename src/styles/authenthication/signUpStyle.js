@@ -9,7 +9,7 @@ const signUpStyle = StyleSheet.create ({
     },
     title: {
         fontSize: 28,
-        color: "#C68CF5",
+        color: "#7C3BEC",
         fontWeight: "700",
         marginBottom: 20,
         textAlign: "center",
@@ -53,19 +53,19 @@ const signUpStyle = StyleSheet.create ({
         color: "#fff",
     },
     btn: {
-        backgroundColor: "#C68CF5",
+        backgroundColor: "#7C3BEC",
         padding: 15,
         borderRadius: 12,
         alignItems: "center",
         marginTop: 10,
     },
     btnText: {
-        color: "#0D0D0D",
+        color: "#ffffff",
         fontWeight: "bold",
         fontSize: 17,
     },
     loginText: {
-        color: "#C68CF5",
+        color: "#7C3BEC",
         marginTop: 15,
         textAlign: "center",
         fontWeight: "600",

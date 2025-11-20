@@ -15,7 +15,7 @@ const signInStyle = StyleSheet.create ({
     },
     tagline: {
         fontSize: 22,
-        color: "#C68CF5",
+        color: "#7C3BEC",
         fontWeight: "600",
         letterSpacing: 1,
         // marginTop: 10,
@@ -34,19 +34,19 @@ const signInStyle = StyleSheet.create ({
         borderColor: "#333",
     },
     btn: {
-        backgroundColor: "#C68CF5",
+        backgroundColor: "#7C3BEC",
         padding: 15,
         borderRadius: 12,
         alignItems: "center",
         marginTop: 10,
     },
     btnText: {
-        color: "#0D0D0D",
+        color: "#ffffff",
         fontWeight: "bold",
         fontSize: 17,
     },
     forgot: {
-        color: "#C68CF5",
+        color: "#7C3BEC",
         fontWeight: 600,
         marginTop: 10,
         textAlign: "center",

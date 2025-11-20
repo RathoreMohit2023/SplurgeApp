@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import { Bell, User } from "lucide-react-native";
+import { Bell, Sun } from "lucide-react-native";
 import headerStyle from "../styles/Components/headerStyle";
 import { MainLogo } from "../Assets/Images/index";
 
@@ -17,13 +17,13 @@ const AppHeader = ({ navigation }) => {
       {/* Notification + Profile */}
       <View style={headerStyle.rightSection}>
         <TouchableOpacity 
-            onPress={() => navigation.navigate("notificationScreen")}>
-          <Bell color="#C68CF5" size={28} style={{ marginRight: 15 }} />
+            onPress={() => navigation.navigate("themeSwithcheScreen")}>
+          <Sun color="#7C3BEC" size={28} style={{ marginRight: 15 }} />
         </TouchableOpacity>
 
         <TouchableOpacity 
-            onPress={() => navigation.navigate("profileScreen")}>
-          <User color="#C68CF5" size={28} />
+            onPress={() => navigation.navigate("notificationScreen")}>
+          <Bell color="#7C3BEC" size={28} />
         </TouchableOpacity>
       </View>
 

@@ -15,7 +15,7 @@ const splashStyle = StyleSheet.create({
     },
     tagline: {
         fontSize: 22,
-        color: "#C68CF5",
+        color: "#7C3BEC",
         fontWeight: "600",
         letterSpacing: 1,
         marginTop: 10,

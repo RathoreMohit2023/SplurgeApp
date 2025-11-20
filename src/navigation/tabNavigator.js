@@ -2,18 +2,17 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { 
     Home,
-    Wallet,
     Calculator,
     Users,
-    BookOpen
+    BookOpen,
+    User
 } from "lucide-react-native";
 
-import MainScreen from "../screens/MainScreen/MainScreen";
-import LedgerScreen from "../screens/MainScreen/LedgerScreen";
-import ImpactScreen from "../screens/MainScreen/ImpactScreen";
-import GrouScreen from "../screens/MainScreen/groupScreen";
-import LearnScreen from "../screens/MainScreen/learnScreen";
-import { Color } from "react-native/types_generated/Libraries/Animated/AnimatedExports";
+import DashBoardScreen from "../screens/MainScreen/DashBoardScreen";
+import CalculatorScreen from "../screens/MainScreen/CalculatorScreen";
+import groupSettle from "../screens/MainScreen/groupSettle";
+import resourceScreen from "../screens/MainScreen/resourceScreen";
+import ProfileScreen from "../screens/MainScreen/ProfileScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -28,13 +27,13 @@ const TabNavigator = () => {
                     height: 60,
                     paddingBottom: 8,
                 },
-                tabBarActiveTintColor: "#C68CF5",
+                tabBarActiveTintColor: "#7C3BEC",
                 tabBarInactiveTintColor: "#777",
             }}>
 
                 <Tab.Screen 
-                    name="Home"
-                    component={MainScreen}
+                    name="DashBoard"
+                    component={DashBoardScreen}
                     options={{
                         tabBarIcon: ({ color }) => <Home  color={color} size={24}/>
                     }}
@@ -42,35 +41,35 @@ const TabNavigator = () => {
 
 
                 <Tab.Screen 
-                    name="Ledgers"
-                    component={LedgerScreen}
-                    options={{
-                        tabBarIcon: ({ color }) => <Wallet  color={color} size={24}/>
-                    }}
-                />
-
-                <Tab.Screen 
-                    name="Impact"
-                    component={ImpactScreen}
+                    name="Calculator"
+                    component={CalculatorScreen}
                     options={{
                         tabBarIcon: ({ color }) => <Calculator  color={color} size={24}/>
                     }}
                 />
 
-
                 <Tab.Screen 
-                    name="Groups"
-                    component={GrouScreen}
+                    name="Settle"
+                    component={groupSettle}
                     options={{
                         tabBarIcon: ({ color }) => <Users  color={color} size={24}/>
                     }}
                 />
 
+
                 <Tab.Screen 
-                    name="Learn"
-                    component={LearnScreen}
+                    name="Resources"
+                    component={resourceScreen}
                     options={{
                         tabBarIcon: ({ color }) => <BookOpen  color={color} size={24}/>
+                    }}
+                />
+
+                <Tab.Screen 
+                    name="Profile"
+                    component={ProfileScreen}
+                    options={{
+                        tabBarIcon: ({ color }) => <User  color={color} size={24}/>
                     }}
                 />
             </Tab.Navigator>

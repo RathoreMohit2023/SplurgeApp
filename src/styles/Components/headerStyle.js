@@ -24,7 +24,7 @@ const  headerStyle = StyleSheet.create({
     
       tagline: {
         fontSize: 14,
-        color: "#C68CF5",
+        color: "#7C3BEC",
         fontWeight: "600",
         letterSpacing: 0.5,
       },
