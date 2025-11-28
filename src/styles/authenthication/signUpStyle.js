@@ -1,75 +1,108 @@
 import { StyleSheet } from "react-native";
 
-const signUpStyle = StyleSheet.create ({
-    container: {
-        flex: 1,
-        backgroundColor: "#0D0D0D",
-        paddingHorizontal: 25,
-        justifyContent: "center",
-    },
-    title: {
-        fontSize: 28,
-        color: "#7C3BEC",
-        fontWeight: "700",
-        marginBottom: 20,
-        textAlign: "center",
-    },
-    input: {
-        backgroundColor: "#1A1A1A",
-        padding: 15,
-        borderRadius: 12,
-        color: "#fff",
-        fontSize: 16,
-        borderWidth: 1,
-        borderColor: "#333",
-        marginBottom: 15,
-    },
-    dropdown: {
-        backgroundColor: "#1A1A1A",
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "#333",
-        marginBottom: 15,
-        maxHeight: 150,
-    },
-    dropdownItem: {
-        padding: 12,
-        borderBottomColor: "#333",
-        borderBottomWidth: 1,
-    },
-    passwordWrapper: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "#1A1A1A",
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "#333",
-        paddingHorizontal: 15,
-        marginBottom: 15,
-    },
-    passwordInput: {
-        flex: 1,
-        padding: 15,
-        color: "#fff",
-    },
-    btn: {
-        backgroundColor: "#7C3BEC",
-        padding: 15,
-        borderRadius: 12,
-        alignItems: "center",
-        marginTop: 10,
-    },
-    btnText: {
-        color: "#ffffff",
-        fontWeight: "bold",
-        fontSize: 17,
-    },
-    loginText: {
-        color: "#7C3BEC",
-        marginTop: 15,
-        textAlign: "center",
-        fontWeight: "600",
-    },
+const getSignUpStyle = (colors) => StyleSheet.create({
+  // Screen Container
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.background 
+  },
+  scrollContainer: { 
+    flexGrow: 1, 
+    paddingHorizontal: 24, 
+    paddingBottom: 40 
+  },
+
+  // Header
+  header: { 
+    marginTop: 20, 
+    marginBottom: 30 
+  },
+  backButton: { 
+    width: 40, 
+    height: 40, 
+    justifyContent: 'center', 
+    marginBottom: 20, 
+    marginTop: 8 
+  },
+  title: { 
+    fontSize: 32, 
+    fontWeight: "bold", 
+    color: colors.text, 
+    marginBottom: 5 
+  },
+  subtitle: { 
+    fontSize: 16, 
+    color: colors.textSecondary 
+  },
+
+  // Form
+  formContainer: { 
+    width: "100%" 
+  },
+  
+  // Dropdown Trigger Styles
+  dropdownContainer: { 
+    marginBottom: 12 
+  },
+  dropdownTrigger: {
+    height: 58,
+    backgroundColor: colors.background, // Input background color
+    borderRadius: 12,
+    borderWidth: 1,
+    // Default border color logic component mein handle hogi (error vs normal)
+    borderColor: colors.border, 
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 14,
+  },
+  dropdownText: { 
+    fontSize: 16,
+    // Color logic component mein dynamic hogi (placeholder vs selected)
+  },
+  errorText: { 
+    color: colors.error, 
+    fontSize: 12, 
+    marginTop: 4, 
+    marginLeft: 12 
+  },
+  
+  // Buttons
+  primaryBtn: {
+    backgroundColor: colors.theme,
+    height: 56,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    shadowColor: colors.theme,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  primaryBtnText: { 
+    color: "#fff", 
+    fontSize: 18, 
+    fontWeight: "bold" 
+  },
+
+  // Footer
+  footer: { 
+    flexDirection: "row", 
+    justifyContent: "center", 
+    alignItems: "center", 
+    marginTop: 24 
+  },
+  footerText: { 
+    color: colors.textSecondary, 
+    fontSize: 14 
+  },
+  linkText: { 
+    color: colors.theme, 
+    fontWeight: "bold", 
+    fontSize: 14 
+  },
 });
 
-export default signUpStyle;
+export default getSignUpStyle;

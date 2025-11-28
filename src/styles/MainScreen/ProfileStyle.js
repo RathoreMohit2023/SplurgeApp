@@ -1,165 +1,197 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
-const ProfileStyle = StyleSheet.create({
+const getProfileStyle = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#0D0D0D",
-      },
-      inner: {
-        padding: 16,
-      },
-    
-      headerRow: {
-        marginBottom: 6,
-      },
-      heading: {
-        color: "#fff",
-        fontSize: 24,
-        fontWeight: "700",
-      },
-      subheading: {
-        color: "#aaa",
-        marginTop: 4,
-      },
-    
-      profileCard: {
-        backgroundColor: "#1A1A1A",
-        borderRadius: 12,
-        marginBottom: 12,
-      },
-      profileCardContent: {
-        paddingVertical: 12,
-        paddingHorizontal: 12,
-      },
-      row: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 12,
-      },
-      avatar: {
-        backgroundColor: "#7C3BEC",
-      },
-      profileInfo: {
-        flex: 1,
-        marginLeft: 12,
-      },
-      name: {
-        color: "#fff",
-        fontSize: 18,
-        fontWeight: "700",
-      },
-      rankBadge: {
-        backgroundColor: "#7C3BEC",
-        color: "#fff",
-      },
-      contactRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-        marginTop: 6,
-      },
-      contactText: {
-        color: "#aaa",
-        marginLeft: 6,
-      },
-      code: {
-        backgroundColor: "rgba(255,255,255,0.03)",
-        color: "#fff",
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        borderRadius: 8,
-        fontFamily: "monospace",
-        fontSize: 12,
-        alignSelf: "flex-start",
-      },
-    
-      /* Stats grid */
-      statsGrid: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        marginVertical: 8,
-        gap: 8,
-      },
-      statCard: {
-        width: "48%",
-        backgroundColor: "#25202C",
-        borderRadius: 12,
-        marginBottom: 8,
-      },
-      statContent: {
-        paddingVertical: 12,
-        paddingHorizontal: 10,
-        alignItems: "center",
-        justifyContent: "center",
-      },
-      statValue: {
-        color: "#fff",
-        fontWeight: "700",
-        marginTop: 8,
-      },
-      statLabel: {
-        color: "#aaa",
-        fontSize: 12,
-        marginTop: 4,
-      },
-    
-      /* generic card */
-      card: {
-        backgroundColor: "#1A1A1A",
-        borderRadius: 12,
-        marginBottom: 12,
-      },
-      cardTitle: {
-        color: "#fff",
-        fontWeight: "700",
-        fontSize: 16,
-      },
-    
-      menuRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingVertical: 10,
-      },
-      menuLeft: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 12,
-      },
-      menuLabel: {
-        color: "#fff",
-        fontSize: 15,
-      },
-      menuIcon: {
-        margin: 0,
-        backgroundColor: "transparent",
-      },
-    
-      aboutRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-      },
-      aboutLabel: {
-        color: "#aaa",
-      },
-      aboutValue: {
-        color: "#fff",
-        fontWeight: "700",
-      },
-    
-      linkRow: {
-        paddingVertical: 8,
-      },
-      linkText: {
-        color: "#7C3BEC",
-        fontWeight: "600",
-      },
-    
-      logoutBtn: {  
-        marginTop: 8,
-        backgroundColor: "#FF3B30",
+        backgroundColor: colors.background, // Dynamic Background
+    },
+    scrollContent: {
+        paddingHorizontal: 20,
+    },
+
+    // --- Header ---
+    headerContainer: {
+        marginBottom: 24,
+    },
+    profileHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    avatarContainer: {
+        position: 'relative',
+    },
+    avatar: {
+        backgroundColor: colors.tintedThemeColor,
+        borderWidth: 2,
+        borderColor: colors.border,
+    },
+    avatarLabel: {
+        color: colors.theme,
+        fontWeight: '700',
+        fontSize: 28,
+    },
+    rankBadge: {
+        position: 'absolute',
+        bottom: -6,
+        alignSelf: 'center',
+        backgroundColor: colors.theme,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
         borderRadius: 10,
-      },
+        borderWidth: 2,
+        borderColor: colors.background,
+    },
+    rankText: {
+        color: "#FFFFFF", // Fixed White
+        fontSize: 10,
+        fontWeight: '700',
+    },
+    userInfo: {
+        flex: 1,
+        marginLeft: 20,
+    },
+    userName: {
+        color: colors.text,
+        fontSize: 22,
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    userHandle: {
+        color: colors.theme,
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 8,
+    },
+    contactRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    contactText: {
+        color: colors.textSecondary,
+        fontSize: 13,
+    },
+    editButton: {
+        padding: 10,
+        backgroundColor: colors.tintedThemeColor,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+
+    // --- Stats Grid ---
+    statsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        gap: 12,
+        marginBottom: 32,
+    },
+    statCard: {
+        width: '48%',
+        backgroundColor: colors.theme, // Always Purple
+        borderRadius: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: colors.border, // Optional: Can match theme or transparent
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    iconBox: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    statValue: {
+        color: "#FFFFFF", // Fixed White
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    statLabel: {
+        color: "rgba(255,255,255,0.7)", // Fixed Light Gray
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+
+    // --- Menu Sections ---
+    section: {
+        marginBottom: 24,
+    },
+    sectionTitle: {
+        color: colors.textSecondary,
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 12,
+        marginLeft: 4,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    menuCard: {
+        backgroundColor: colors.tintedThemeColor, // Changed to Surface for better contrast
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: colors.border,
+        overflow: 'hidden',
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 16,
+        paddingHorizontal: 16,
+    },
+    menuLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 14,
+    },
+    menuIconBox: {
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        backgroundColor: colors.background, // Inset look
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    menuLabel: {
+        color: colors.text,
+        fontSize: 15,
+        fontWeight: '500',
+    },
+    divider: {
+        backgroundColor: colors.border,
+        height: 1,
+        marginLeft: 62, 
+    },
+
+    // --- Footer ---
+    footer: {
+        alignItems: 'center',
+        marginTop: 10,
+        marginBottom: 20,
+    },
+    versionText: {
+        color: colors.textSecondary,
+        fontSize: 12,
+        marginBottom: 16,
+    },
+    logoutButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: "rgba(255, 59, 48, 0.1)", // Light Red tint usually works on both
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+        gap: 8,
+    },
+    logoutText: {
+        color: colors.error,
+        fontSize: 15,
+        fontWeight: '600',
+    },
 });
 
-export default ProfileStyle;
+export default getProfileStyle;

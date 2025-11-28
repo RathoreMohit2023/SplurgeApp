@@ -1,17 +1,27 @@
-import React from 'react'
-import { View } from 'react-native';
-import AppHeader from "../../components/Header";
-import TabNavigator from "../../navigation/tabNavigator";
+import React, { useContext, useEffect } from 'react';
+import { Alert, View } from 'react-native';
+import AppHeader from '../../components/Header';
+import TabNavigator from '../../navigation/tabNavigator';
+import { ThemeContext } from '../../components/ThemeContext';
 
-const MainScreen = ({navigation}) => {
+const MainScreen = ({ navigation }) => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+ 
+  const handleThemeToggle = () => {
+    toggleTheme();
+    
+  }
   return (
-    <View style={{ flex: 1, backgroundColor: "#0D0D0D" }}>
-      
-      <AppHeader navigation={navigation} />
+    <>
+      <AppHeader
+        showThemeToggle={false}
+        navigation={navigation}
+        onThemeTogglePress={handleThemeToggle}
+      />
 
       <TabNavigator />
-    </View>
+    </>
   );
-}
+};
 
-export default MainScreen
+export default MainScreen;

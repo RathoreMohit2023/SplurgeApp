@@ -1,25 +1,27 @@
 import { StyleSheet } from "react-native";
 
-const calculatorStyle = StyleSheet.create ({
-    container: {
-        flex: 1
-    },
-    HeaderContainer: {
-        backgroundColor: "#0D0D0D", 
-        flexDirection: "column", 
-        alignItems: "flex-start", 
-        paddingHorizontal: 16, 
-    },
-    title:{
-        color: "#fff", 
-        fontSize: 22, 
-        fontWeight: "bold"
-    },
-    subtitle: {
-        color: "#fff", 
-        fontSize: 14, 
-        marginTop: 2,
-    },
+const getCalculatorStyles = (colors) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background, // Dynamic Background
+  },
+  headerContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 5,
+    backgroundColor: colors.background,
+    // Optional: Add top padding for Android if not using SafeAreaView inside
+    paddingTop: 10, 
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: colors.text, // Dynamic Text
+  },
+  subtitle: {
+    fontSize: 14,
+    color: colors.textSecondary, // Dynamic Secondary Text
+    marginTop: 4,
+  },
 });
 
-export default calculatorStyle;
+export default getCalculatorStyles;

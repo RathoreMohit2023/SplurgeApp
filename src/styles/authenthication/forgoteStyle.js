@@ -1,75 +1,105 @@
 import { StyleSheet } from "react-native";
 
-const forgoteStyle = StyleSheet.create ({
-    container: {
-        flex: 1,
-        backgroundColor: "#0D0D0D",
-        paddingHorizontal: 25,
-        justifyContent: "center",
-    },
-    title: {
-        fontSize: 28,
-        color: "#7C3BEC",
-        fontWeight: "700",
-        marginBottom: 20,
-        textAlign: "center",
-    },
-    input: {
-        backgroundColor: "#1A1A1A",
-        padding: 15,
-        borderRadius: 12,
-        color: "#fff",
-        fontSize: 16,
-        borderWidth: 1,
-        borderColor: "#333",
-        marginBottom: 15,
-    },
-    dropdown: {
-        backgroundColor: "#1A1A1A",
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "#333",
-        marginBottom: 15,
-        maxHeight: 150,
-    },
-    dropdownItem: {
-        padding: 12,
-        borderBottomColor: "#333",
-        borderBottomWidth: 1,
-    },
-    passwordWrapper: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "#1A1A1A",
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "#333",
-        paddingHorizontal: 15,
-        marginBottom: 15,
-    },
-    passwordInput: {
-        flex: 1,
-        padding: 15,
-        color: "#fff",
-    },
-    btn: {
-        backgroundColor: "#7C3BEC",
-        padding: 15,
-        borderRadius: 12,
-        alignItems: "center",
-        marginTop: 10,
-    },
-    btnText: {
-        color: "#ffffff",
-        fontWeight: "bold",
-        fontSize: 17,
-    },
-    loginText: {
-        color: "#7C3BEC",
-        marginTop: 15,
-        textAlign: "center",
-        fontWeight: "600",
-    },
+const getForgotPasswordStyle = (colors) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background, // Dynamic Background
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+  },
+  backButton: {
+    marginTop: 20,
+    alignSelf: 'flex-start',
+    padding: 8,
+    marginLeft: -8, 
+  },
+  content: {
+    flex: 1,
+    alignItems: "center",
+    marginTop: 40,
+  },
+  // Icon Styles
+  iconContainer: {
+    width: 100,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 30,
+    position: 'relative',
+  },
+  iconGlow: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.theme, // Dynamic Theme Color
+    opacity: 0.15, 
+  },
+  // Text Styles
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: colors.text, // Dynamic Text
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 15,
+    color: colors.textSecondary, // Dynamic Secondary Text
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 30,
+    width: "90%",
+  },
+  // Form Styles
+  form: {
+    width: "100%",
+  },
+  primaryBtn: {
+    backgroundColor: colors.theme,
+    height: 56,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    shadowColor: colors.theme,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    width: '100%',
+  },
+  primaryBtnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  // Success View Specifics
+  emailHighlight: {
+    backgroundColor: colors.surface, // Dynamic Surface (Card color)
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: colors.border, // Dynamic Border
+  },
+  emailText: {
+    color: colors.text,
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  resendBtn: {
+    marginTop: 24,
+  },
+  resendText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    textAlign: 'center',
+  }
 });
 
-export default forgoteStyle;
+export default getForgotPasswordStyle;

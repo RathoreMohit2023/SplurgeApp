@@ -1,58 +1,90 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import {
   View,
   ScrollView,
   TouchableOpacity,
   Alert,
+  StatusBar
 } from "react-native";
 import {
-  Card,
   Text,
   Avatar,
-  Button,
-  Divider,
-  Badge,
   Snackbar,
-  IconButton,
+  Divider,
 } from "react-native-paper";
 import {
   User,
   Mail,
-  Phone,
-  Award,
-  Settings,
-  LogOut,
   Bell,
-  Lock,
+  ChevronRight,
+  CreditCard,
+  Shield,
+  HelpCircle,
+  Settings,
+  LogOut
 } from "lucide-react-native";
-import ProfileStyle from "../../styles/MainScreen/ProfileStyle";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import getProfileStyle from "../../styles/MainScreen/ProfileStyle"; 
+import { ThemeContext } from "../../components/ThemeContext";
 
 const ProfileScreen = ({ navigation }) => {
+  
+  const { colors, themeType } = useContext(ThemeContext);
+  const styles = useMemo(() => getProfileStyle(colors), [colors]);
+
   const [snack, setSnack] = useState({ visible: false, message: "" });
+  const insets = useSafeAreaInsets();
 
   const user = {
     name: "Arjun Patel",
-    email: "arjun.patel@email.com",
+    email: "arjun.patel@gmail.com",
     phone: "+91 98765 43210",
     code: "SPL-2K4X9",
     points: 1200,
     rank: 3,
     totalFriends: 8,
-    totalGroups: 2,
+    spent: "₹45,230",
   };
 
   const stats = [
-    { label: "Total Spent", value: "₹45,230", icon: Award },
-    { label: "Friends", value: user.totalFriends, icon: User },
-    { label: "Points", value: user.points, icon: Award },
-    { label: "Rank", value: `#${user.rank}`, icon: Award },
+    { label: "Total Spent", value: user.spent, icon: CreditCard, color: "#FFD700" },
+    { label: "Friends", value: user.totalFriends, icon: User, color: "#4FB6FF" },
   ];
 
-  const menuItems = [
-    { icon: Bell, label: "Notifications", onPress: () => setSnack({ visible: true, message: "Notifications (placeholder)" }) },
-    { icon: Lock, label: "Privacy & Security", onPress: () => setSnack({ visible: true, message: "Privacy (placeholder)" }) },
-    { icon: Settings, label: "Settings", onPress: () => setSnack({ visible: true, message: "Settings (placeholder)" }) },
+  const menuSections = [
+    {
+      title: "Account",
+      items: [
+        {
+          icon: User,
+          label: "Personal Information",
+          onPress: () => navigation.navigate("PersonalInfoScreen")
+        },
+        {
+          icon: Bell,
+          label: "Notifications",
+          onPress: () => navigation.navigate("notificationScreen")
+        }
+      ]
+    },
+    {
+      title: "Support",
+      items: [
+        {
+          icon: HelpCircle,
+          label: "Help & Support",
+          onPress: () => navigation.navigate("HelpSupport")
+        },
+        {
+          icon: Shield,
+          label: "Terms & Policies",
+          onPress: () => navigation.navigate("TermsPolicies")
+        },
+      ]
+    }
   ];
+  
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -60,144 +92,119 @@ const ProfileScreen = ({ navigation }) => {
       {
         text: "Logout",
         style: "destructive",
-        onPress: () => setSnack({ visible: true, message: "Logged out (placeholder)" }),
+        onPress: () => {
+          navigation.navigate("signIn");
+        },
       },
     ]);
   };
 
   return (
-    <>
-      <ScrollView style={ProfileStyle.container} contentContainerStyle={ProfileStyle.inner}>
-        <View style={ProfileStyle.headerRow}>
-          <Text style={ProfileStyle.heading}>Profile</Text>
-          <Text style={ProfileStyle.subheading}>Manage your account</Text>
+    <View style={styles.container}>
+      <StatusBar 
+        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
+        backgroundColor={colors.background} 
+      />
+
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 80 }]}
+      >
+        <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
+            <View style={styles.profileHeader}>
+                <View style={styles.avatarContainer}>
+                    <Avatar.Text
+                        size={80}
+                        label={user.name.split(" ").map((n) => n[0]).join("")}
+                        style={styles.avatar}
+                        labelStyle={styles.avatarLabel}
+                    />
+                    {/* <View style={styles.rankBadge}>
+                        <Text style={styles.rankText}>#{user.rank}</Text>
+                    </View> */}
+                </View>
+
+                <View style={styles.userInfo}>
+                    <Text style={styles.userName}>{user.name}</Text>
+                    <Text style={styles.userHandle}>{user.code}</Text>
+                    
+                    <View style={styles.contactRow}>
+                        <Mail size={14} color={colors.textSecondary} />
+                        <Text style={styles.contactText}>{user.email}</Text>
+                    </View>
+                </View>
+
+                {/* <TouchableOpacity style={styles.editButton}>
+                    <Settings size={20} color={colors.text} />
+                </TouchableOpacity> */}
+            </View>
         </View>
 
-        <Card style={ProfileStyle.profileCard}>
-          <Card.Content style={ProfileStyle.profileCardContent}>
-            <View style={ProfileStyle.row}>
-              <Avatar.Text
-                size={74}
-                label={user.name.split(" ").map((n) => n[0]).join("")}
-                style={ProfileStyle.avatar}
-                color="#000"
-              />
-              <View style={ProfileStyle.profileInfo}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                  <Text style={ProfileStyle.name} numberOfLines={1}>{user.name}</Text>
-                  <Badge style={ProfileStyle.rankBadge}>Rank #{user.rank}</Badge>
-                </View>
-
-                <View style={ProfileStyle.contactRow}>
-                  <Mail width={14} height={14} color="#aaa" />
-                  <Text style={ProfileStyle.contactText} numberOfLines={1}>{user.email}</Text>
-                </View>
-
-                <View style={ProfileStyle.contactRow}>
-                  <Phone width={14} height={14} color="#aaa" />
-                  <Text style={ProfileStyle.contactText}>{user.phone}</Text>
-                </View>
-
-                <View style={{ marginTop: 8 }}>
-                  <Text style={ProfileStyle.code}>{user.code}</Text>
-                </View>
-              </View>
-            </View>
-          </Card.Content>
-        </Card>
-
         {/* Stats Grid */}
-        <View style={ProfileStyle.statsGrid}>
+        <View style={styles.statsContainer}>
           {stats.map((s, idx) => {
             const Icon = s.icon;
             return (
-              <Card key={idx} style={ProfileStyle.statCard}>
-                <Card.Content style={ProfileStyle.statContent}>
-                  <Icon width={20} height={20} color="#7C3BEC" />
-                  <Text style={ProfileStyle.statValue}>{s.value}</Text>
-                  <Text style={ProfileStyle.statLabel}>{s.label}</Text>
-                </Card.Content>
-              </Card>
+              <View key={idx} style={styles.statCard}>
+                <View style={[styles.iconBox, { backgroundColor: '#000000' }]}>
+                    <Icon size={20} color={s.color} />
+                </View>
+                <View>
+                    <Text style={styles.statValue}>{s.value}</Text>
+                    <Text style={styles.statLabel}>{s.label}</Text>
+                </View>
+              </View>
             );
           })}
         </View>
 
-        {/* Account Settings */}
-        <Card style={ProfileStyle.card}>
-          <Card.Content>
-            <Text style={ProfileStyle.cardTitle}>Account Settings</Text>
-
-            <View style={{ marginTop: 8 }}>
-              {menuItems.map((m, i) => {
-                const Icon = m.icon;
-                return (
-                  <View key={i}>
-                    <TouchableOpacity
-                      onPress={m.onPress}
-                      style={ProfileStyle.menuRow}
-                      activeOpacity={0.7}
-                    >
-                      <View style={ProfileStyle.menuLeft}>
-                        <Icon width={18} height={18} color="#aaa" />
-                        <Text style={ProfileStyle.menuLabel}>{m.label}</Text>
-                      </View>
-                      <IconButton
-                        icon={() => <Settings width={16} height={16} color="#777" />}
-                        size={20}
-                        onPress={m.onPress}
-                        style={ProfileStyle.menuIcon}
-                      />
-                    </TouchableOpacity>
-                    {i < menuItems.length - 1 && <Divider />}
-                  </View>
-                );
-              })}
+        
+        {menuSections.map((section, index) => (
+            <View key={index} style={styles.section}>
+                <Text style={styles.sectionTitle}>{section.title}</Text>
+                <View style={styles.menuCard}>
+                    {section.items.map((item, i) => (
+                        <View key={i}>
+                            <TouchableOpacity 
+                                style={styles.menuItem} 
+                                activeOpacity={0.7}
+                                onPress={item.onPress}
+                            >
+                                <View style={styles.menuLeft}>
+                                    <View style={styles.menuIconBox}>
+                                        <item.icon size={18} color={colors.text} />
+                                    </View>
+                                    <Text style={styles.menuLabel}>{item.label}</Text>
+                                </View>
+                                <ChevronRight size={18} color={colors.textSecondary} />
+                            </TouchableOpacity>
+                            {i < section.items.length - 1 && <Divider style={styles.divider} />}
+                        </View>
+                    ))}
+                </View>
             </View>
-          </Card.Content>
-        </Card>
+        ))}
 
-        {/* About */}
-        <Card style={ProfileStyle.card}>
-          <Card.Content>
-            <Text style={ProfileStyle.cardTitle}>About</Text>
+        <View style={styles.footer}>
+            {/* <Text style={styles.versionText}>Version 1.0.0 • Build 2024</Text> */}
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                <LogOut size={18} color={colors.error} />
+                <Text style={styles.logoutText}>Log Out</Text>
+            </TouchableOpacity>
+        </View>
 
-            <View style={{ marginTop: 10 }}>
-              <View style={ProfileStyle.aboutRow}>
-                <Text style={ProfileStyle.aboutLabel}>Version</Text>
-                <Text style={ProfileStyle.aboutValue}>1.0.0</Text>
-              </View>
-              <Divider style={{ marginVertical: 8 }} />
-              <TouchableOpacity onPress={() => setSnack({ visible: true, message: "Terms (placeholder)" })} style={ProfileStyle.linkRow}>
-                <Text style={ProfileStyle.linkText}>Terms of Service</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setSnack({ visible: true, message: "Privacy (placeholder)" })} style={ProfileStyle.linkRow}>
-                <Text style={ProfileStyle.linkText}>Privacy Policy</Text>
-              </TouchableOpacity>
-            </View>
-          </Card.Content>
-        </Card>
-
-        <Button
-          mode="contained"
-          onPress={handleLogout}
-          contentStyle={{ flexDirection: "row", justifyContent: "center" }}
-          style={ProfileStyle.logoutBtn}
-          icon={() => <LogOut width={18} height={18} color="#fff" />}
-        >
-          Log Out
-        </Button>
-
-        <View style={{ height: 40 }} />
       </ScrollView>
 
       <Snackbar
         visible={snack.visible}
         onDismiss={() => setSnack({ visible: false, message: "" })}
         duration={2000}
+        style={{ backgroundColor: colors.surface, marginBottom: insets.bottom + 10 }}
+        action={{ label: "OK", textColor: colors.theme, onPress: () => setSnack({ visible: false, message: "" }) }}
       >
-        {snack.message}
+        <Text style={{color: colors.text}}>{snack.message}</Text>
       </Snackbar>
-    </>
+    </View>
   );
 };
 

@@ -1,176 +1,251 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
-const groupDetailsStyle = StyleSheet.create({
+const getGroupDetailsStyle = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#0D0D0D",
-      },
-      inner: {
-        padding: 16,
-      },
-    
-      headerRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 12,
-      },
-      backBtn: {
+        backgroundColor: colors.background, // Dynamic Background
+    },
+    scrollContainer: {
+        paddingHorizontal: 16,
+    },
+
+    // --- Header ---
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingBottom: 16,
+        backgroundColor: colors.background,
+    },
+    iconButton: {
         padding: 8,
-        marginRight: 8,
-        backgroundColor: "rgba(255,255,255,0.03)",
-        borderRadius: 10,
-      },
-      titleWrap: {
-        flex: 1,
-      },
-      title: {
-        color: "#fff",
-        fontSize: 20,
-        fontWeight: "700",
-      },
-      subtitle: {
-        color: "#999",
-        marginTop: 4,
-      },
-    
-      card: {
-        backgroundColor: "#25202C",
+        backgroundColor: colors.tintedThemeColor,
         borderRadius: 12,
-        marginBottom: 14,
-      },
-      budgetRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 8,
-      },
-      budgetLabel: {
-        color: "#aaa",
-        fontSize: 14,
-      },
-      budgetValue: {
-        color: "#fff",
-        fontWeight: "700",
-        fontFamily: Platform.OS === "android" ? "monospace" : "Menlo",
-      },
-      progress: {
-        height: 8,
-        borderRadius: 6,
-        backgroundColor: "#111",
-        marginTop: 6,
-      },
-      budgetMeta: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 8,
-      },
-      smallMuted: {
-        color: "#999",
-        fontSize: 12,
-      },
-    
-      section: {
-        marginBottom: 14,
-      },
-      sectionHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 8,
-      },
-      sectionTitleWrap: {
-        flexDirection: "row",
-        alignItems: "center",
-      },
-      sectionTitle: {
-        color: "#fff",
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    headerTitle: {
+        color: colors.text, // Dynamic Text
         fontSize: 18,
-        fontWeight: "700",
-      },
-      actionBtn: {
-        backgroundColor: "#7C3BEC",
-      },
-    
-      list: {
-        marginTop: 6,
-      },
-    
-      memberCard: {
-        marginBottom: 10,
-        backgroundColor: "#25202C",
-        borderRadius: 12,
-      },
-      memberRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-      },
-      memberLeft: {
-        flexDirection: "row",
-        alignItems: "center",
-      },
-      avatar: {
-        backgroundColor: "#7C3BEC",
-      },
-      memberName: {
-        color: "#fff",
-        fontWeight: "700",
-      },
-      memberRole: {
-        color: "#999",
+        fontWeight: '700',
+        flex: 1,
+        textAlign: 'center',
+        marginHorizontal: 10,
+    },
+
+    // --- Hero Card ---
+    heroCard: {
+        backgroundColor: colors.theme, // Always Purple
+        borderRadius: 24,
+        padding: 20,
+        marginTop: 10,
+        marginBottom: 16,
+        shadowColor: colors.theme,
+        shadowOpacity: 0.4,
+        shadowRadius: 10,
+        elevation: 8,
+    },
+    heroRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 20,
+    },
+    heroLabel: {
+        color: "rgba(255,255,255,0.8)", // Always Light because bg is Purple
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 4,
+    },
+    heroValue: {
+        color: "#FFFFFF", // Fixed White
+        fontSize: 32,
+        fontWeight: '800',
+        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    },
+    circularIcon: {
+        backgroundColor: colors.background, // Dynamic: White in Light, Black in Dark
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    // Progress Container inside Hero
+    progressContainer: {
+        backgroundColor: colors.background, // Dynamic: Matches circular icon
+        borderRadius: 16,
+        padding: 12,
+    },
+    progressLabels: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    progressText: {
+        color: colors.text, 
         fontSize: 12,
-      },
-      memberRight: {
-        alignItems: "flex-end",
-        justifyContent: "center",
-      },
-      badge: {
-        backgroundColor: "#222",
-        color: "#fff",
-        paddingHorizontal: 6,
-        paddingVertical: 4,
-      },
-    
-      expenseCard: {
-        marginBottom: 10,
-        backgroundColor: "#25202C",
-        borderRadius: 12,
-      },
-      expenseRow: {
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-      },
-      expenseTitle: {
-        color: "#fff",
-        fontWeight: "700",
-      },
-      expenseMeta: {
-        color: "#999",
-        fontSize: 12,
-        marginTop: 6,
-      },
-      expenseRight: {
-        alignItems: "flex-end",
-        marginLeft: 12,
-      },
-      expenseAmount: {
-        color: "#fff",
-        fontWeight: "700",
-      },
-      expenseSplit: {
-        color: "#999",
-        fontSize: 12,
-        marginTop: 6,
-      },
-      expenseActions: {
-        flexDirection: "row",
-        marginTop: 6,
-      },
-    
-      splitInfo: {
+        fontWeight: '600',
+    },
+    progressBar: {
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: colors.border, 
+    },
+    totalBudgetLabel: {
+        color:  colors.text, 
+        fontSize: 11,
         marginTop: 8,
-      },
+        textAlign: 'right'
+    },
+
+    description: {
+        color: colors.textSecondary,
+        fontSize: 14,
+        marginBottom: 20,
+        lineHeight: 20,
+    },
+
+    // --- Sections ---
+    sectionContainer: {
+        marginBottom: 24,
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    sectionTitle: {
+        color: colors.text,
+        fontSize: 18,
+        fontWeight: '700',
+    },
+    smallBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        // backgroundColor: colors.tintedThemeColor,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: colors.theme,
+    },
+    smallBtnText: {
+        color: colors.theme,
+        fontWeight: '600',
+        fontSize: 12,
+        marginLeft: 4,
+    },
+    addButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        // backgroundColor: colors.tintedThemeColor,
+        borderWidth: 1,
+        borderColor: colors.theme,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 20,
+        gap: 4
+    },
+    addButtonText: {
+        color: colors.theme,
+        fontWeight: '600',
+        fontSize: 12,
+    },
+
+    // --- Members List ---
+    listContainer: {
+        backgroundColor: colors.tintedThemeColor, // Changed to tintedThemeColor for better Light mode contrast
+        borderRadius: 16,
+        paddingHorizontal: 16,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    memberRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 14,
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    avatar: {
+        backgroundColor: colors.background,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    avatarLabel: {
+        color: colors.theme,
+        fontWeight: '700',
+    },
+    memberName: {
+        color: colors.text,
+        fontSize: 15,
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    adminBadge: {
+        backgroundColor: colors.tintedThemeColor,
+        alignSelf: 'flex-start',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+    },
+    adminText: {
+        color: colors.theme,
+        fontSize: 10,
+        fontWeight: '700',
+    },
+    divider: {
+        backgroundColor: colors.border,
+        height: 1,
+    },
+
+    // --- Expenses List ---
+    expenseCard: {
+        backgroundColor: colors.tintedThemeColor, // Changed to tintedThemeColor
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    expenseIconBox: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: colors.background,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    expenseTitle: {
+        color: colors.text,
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 4,
+    },
+    expenseSub: {
+        color: colors.textSecondary,
+        fontSize: 12,
+    },
+    expenseAmount: {
+        color: colors.text,
+        fontSize: 16,
+        fontWeight: '700',
+        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    },
+    splitText: {
+        color: colors.textSecondary,
+        fontSize: 11,
+        marginTop: 2,
+    },
 });
 
-export default groupDetailsStyle;
+export default getGroupDetailsStyle;

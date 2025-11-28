@@ -1,9 +1,18 @@
-import React, { useEffect, useRef } from "react";
-import { View, Text, Animated } from "react-native";
+import React, { useEffect, useRef, useContext, useMemo } from "react";
+import { View, Animated, StatusBar } from "react-native";
 import { MainLogo } from "../../Assets/Images";
-import splashStyle from "../../styles/Splashstyle/splashStyle";
+
+// Imports
+import getSplashStyles from "../../styles/Splashstyle/splashStyle";
+import { ThemeContext } from "../../components/ThemeContext";
 
 const SplashScreen = ({ navigation }) => {
+    // Context se Colors aur ThemeType lein
+    const { colors, themeType } = useContext(ThemeContext);
+    
+    // Styles generate karein
+    const styles = useMemo(() => getSplashStyles(colors), [colors]);
+
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const slideAnim = useRef(new Animated.Value(20)).current;
 
@@ -22,23 +31,30 @@ const SplashScreen = ({ navigation }) => {
         ]).start();
 
         const timer = setTimeout(() => {
-            navigation.replace("signIn");
+            // Yahan check kar sakte hain user logged in hai ya nahi
+            navigation.replace("signIn"); 
         }, 3000);
 
         return () => clearTimeout(timer);
     }, []);
 
     return (
-        <View style={splashStyle.container}>
+        <View style={styles.container}>
+            {/* Status Bar ko Theme ke hisab se adjust karein */}
+            <StatusBar 
+                barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
+                backgroundColor={colors.background} 
+            />
+
             <Animated.Image
                 source={MainLogo}
-                style={[splashStyle.logo, { opacity: fadeAnim }]}
+                style={[styles.logo, { opacity: fadeAnim }]}
                 resizeMode="contain"
             />
 
             <Animated.Text
                 style={[
-                    splashStyle.tagline,
+                    styles.tagline,
                     {
                         opacity: fadeAnim,
                         transform: [{ translateY: slideAnim }],

@@ -2,11 +2,11 @@ import React from "react";
 // import { createStackNavigator } from "@react-navigation/stack";
 import { createStackNavigator } from "@react-navigation/stack"
 import SplashSCreen from "../screens/SplashScreen/SplashScreen";
-import SignIn from "../screens/Authenthication/SignIn";
+import SignIn from "../screens/Authenthication/Login";
 import SignUp from "../screens/Authenthication/SignUp";
-import forgotePassword from "../screens/Authenthication/forgote";
+import forgotePassword from "../screens/Authenthication/forgotPassword";
 import MainScreen from "../screens/MainScreen/MainScreen";
-import notificationScreen from "../components/notificationScreen";
+import notificationScreen from "../screens/MainScreen/notificationScreen";
 import themeSwithcheScreen from "../components/themeSwithcheScreen";
 import DashBoardScreen from "../screens/MainScreen/DashBoardScreen";
 import CalculatorScreen from "../screens/MainScreen/CalculatorScreen";
@@ -20,6 +20,9 @@ import groupDetails from "../screens/MainScreen/groupDetails";
 import VideosScreen from "../screens/MainScreen/learnTabs/Videos";
 import founderScreen from "../screens/MainScreen/learnTabs/founders";
 import ArticleScreen from "../screens/MainScreen/learnTabs/Arricles";
+import TermsAndPolicies from "../screens/MainScreen/TermsAndPolicies";
+import HelpSupport from "../screens/MainScreen/HelpSupport";
+import PersonalInfoScreen from "../screens/MainScreen/PersonalInfoScreen";
 
 const RootNavigator = () => {
     const Stack = createStackNavigator();
@@ -32,7 +35,7 @@ const RootNavigator = () => {
             <Stack.Screen name="forgotePassword" component={forgotePassword} />
             <Stack.Screen name="MainScreen" component={MainScreen} />
             <Stack.Screen name="notificationScreen" component={notificationScreen} />
-            <Stack.Screen name="themeSwithcheScreen" component={themeSwithcheScreen} />
+            <Stack.Screen name="themeSwithc heScreen" component={themeSwithcheScreen} />
             <Stack.Screen name="CalculatorScreen" component={CalculatorScreen} />
             <Stack.Screen name="groupSettle" component={groupSettle} />
             <Stack.Screen name="groupScreen" component={resourceScreen} />
@@ -45,6 +48,9 @@ const RootNavigator = () => {
             <Stack.Screen name="VideosScreen" component={VideosScreen} />
             <Stack.Screen name="founderScreen" component={founderScreen} />
             <Stack.Screen name="ArticleScreen" component={ArticleScreen} />
+            <Stack.Screen name="TermsPolicies" component={TermsAndPolicies} />
+            <Stack.Screen name="HelpSupport" component={HelpSupport} />
+            <Stack.Screen name="PersonalInfoScreen" component={PersonalInfoScreen} />
         </Stack.Navigator>
     )
 };

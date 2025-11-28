@@ -1,45 +1,65 @@
-import React from 'react'
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
-import founderStyle from "../../../styles/MainScreen/learnTabs/founderStyle";
-import { Play, Clock, CheckCircle2 } from 'lucide-react-native';
+import React, { useContext, useMemo } from 'react';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { PlayCircle, Clock, CheckCircle2 } from 'lucide-react-native';
+
+// Imports
+import getFoundersStyle from "../../../styles/MainScreen/learnTabs/founderStyle"; // Import Style Function
+import { ThemeContext } from "../../../components/ThemeContext"; // Import Context
 
 const founderSeries = [
-  { id: "1", title: "Why We Built Splurge", duration: "18:30", watched: true, points: 100 },
-  { id: "2", title: "The Psychology of Student Spending", duration: "22:15", watched: false, points: 100 },
-  { id: "3", title: "Financial Freedom in Your 20s", duration: "25:45", watched: false, points: 100 },
+  { id: "1", title: "Why We Built Splurge", duration: "18:30", watched: true },
+  { id: "2", title: "The Psychology of Student Spending", duration: "22:15", watched: false },
+  { id: "3", title: "Financial Freedom in Your 20s", duration: "25:45", watched: false },
+  { id: "4", title: "Interview with FinTech CEO", duration: "45:00", watched: false },
 ];
 
-const founders = () => {
+const Founders = () => {
+  const insets = useSafeAreaInsets();
+  
+  // 1. Context
+  const { colors } = useContext(ThemeContext);
+  
+  // 2. Memoize Styles
+  const styles = useMemo(() => getFoundersStyle(colors), [colors]);
+
   return (
-    <ScrollView style={founderStyle.tabArea}>
-    {founderSeries.map((v) => (
-      <TouchableOpacity key={v.id} style={founderStyle.videoCard}>
-        <View style={founderStyle.founderThumb}>
-          <Play size={32} color="#ffffff" />
-        </View>
-
-        <View style={{ flex: 1 }}>
-          <Text style={founderStyle.titleText}>{v.title}</Text>
-
-          <View style={founderStyle.row}>
-            <View style={founderStyle.row}>
-              <Clock size={14} color="#aaa" />
-              <Text style={founderStyle.subText}>{v.duration}</Text>
+    <View style={styles.tabContainer}>
+      <FlatList
+        data={founderSeries}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 80 }]}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.itemCard} activeOpacity={0.7}>
+            {/* Large Thumbnail for Founders */}
+            <View style={styles.largeThumbnail}>
+              {/* Changed to Theme color to contrast against tinted background */}
+              <PlayCircle size={32} color={colors.theme} />
             </View>
-            <Text style={founderStyle.subText}>+{v.points} pts</Text>
-          </View>
 
-          {v.watched && (
-            <View style={founderStyle.badge}>
-              <CheckCircle2 size={14} color="#fff" />
-              <Text style={founderStyle.badgeText}>Watched</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.titleText} numberOfLines={2}>{item.title}</Text>
+
+              <View style={styles.row}>
+                <View style={styles.metaRow}>
+                  <Clock size={12} color={colors.textSecondary} />
+                  <Text style={styles.subText}>{item.duration}</Text>
+                </View>
+
+                {/* {item.watched && (
+                    <View style={styles.badge}>
+                    <CheckCircle2 size={14} color={colors.success} />
+                    <Text style={styles.badgeText}>Watched</Text>
+                    </View>
+                )} */}
+              </View>
             </View>
-          )}
-        </View>
-      </TouchableOpacity>
-    ))}
-  </ScrollView>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   )
 }
 
-export default founders
+export default Founders;

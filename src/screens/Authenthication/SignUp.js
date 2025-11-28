@@ -1,168 +1,236 @@
-import React, {useState, useEffect, useRef} from "react";
-import { View, Text, TextInput, TouchableOpacity, Animated, FlatList,KeyboardAvoidingView, ScrollView, Platform } from "react-native";
-import { Eye, EyeOff } from "lucide-react-native";
-import SignUpStyle from "../../styles/authenthication/signUpStyle";
-import { storeData } from "../../Redux/storage";
+import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  ScrollView,
+  Alert,
+  StatusBar
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { storeData } from "../../Redux/storage";
+import CustomInput from "../../components/CustomInput";
+import SelectionModal from "../../components/SelectionModal";
+import { ThemeContext } from "../../components/ThemeContext";
+import getSignUpStyle from "../../styles/authenthication/signUpStyle";
+import MultiSelectionModal from "../../Modals/MultiSelectionModal";
 const interestsList = [
-    "Fashion",
-    "Gaming",
-    "Fitness",
-    "Technology",
-    "Travel",
-    "Music",
-    "Movies",
-    "Books",
-    "Sports",
+  "Fashion", "Gaming", "Fitness", "Technology",
+  "Travel", "Music", "Movies", "Books", "Sports", 
+  "Art", "Cooking", "Finance", "Education"
 ];
 
-const SignUp = ({navigation}) => {
-        const fade = useRef(new Animated.Value(0)).current;
+const SignUp = ({ navigation }) => {
+  const { colors, themeType } = useContext(ThemeContext);
+  
+  const styles = useMemo(() => getSignUpStyle(colors), [colors]);
 
-        const [showPass, setShowPass] = useState(false);
-        const [showConfirmPass, setShowConfirmPass] = useState(false);
-        const [showInterestList, setShowInterestList] = useState(false);
-    
-        const [userData, setUserData] = useState({
-            username: "",
-            mobile: "",
-            email: "",
-            interest: "",
-            password: "",
-            confirmPassword: "",
-        });
-    
-        useEffect(() => {
-            Animated.timing(fade, {
-                toValue: 1,
-                duration: 900,
-                useNativeDriver: true,
-            }).start();
-        }, []);
-    
-        const registerUser = async () => {
-            if (userData.password !== userData.confirmPassword) {
-                alert("Passwords do not match");
-                return;
-            }
-    
-            await storeData("user", userData);
-    
-            alert("Account created successfully!");
-            navigation.replace("signIn");
-        };
-    
-    return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{flex: 1}}
-        >
-            <ScrollView
-                contentContainerStyle={{ flexGrow: 1 }}
-                keyboardShouldPersistTaps="handled"
+  const fade = useRef(new Animated.Value(0)).current;
+  const slide = useRef(new Animated.Value(50)).current;
+  const insets = useSafeAreaInsets();
+
+  const [isInterestModalVisible, setInterestModalVisible] = useState(false);
+  const [userData, setUserData] = useState({
+    username: "",
+    mobile: "",
+    email: "",
+    interest: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 800, useNativeDriver: true }),
+      Animated.timing(slide, { toValue: 0, duration: 800, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
+  const handleOnChange = (key, value) => {
+    setUserData((prev) => ({ ...prev, [key]: value }));
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
+  };
+
+  const registerUser = async () => {
+    let valid = true;
+    let tempErrors = {};
+
+    if (!userData.username) { tempErrors.username = "Username is required"; valid = false; }
+    if (!userData.mobile) { tempErrors.mobile = "Mobile number is required"; valid = false; }
+    if (!userData.email || !userData.email.includes("@")) { tempErrors.email = "Valid email is required"; valid = false; }
+    if (!userData.interest.length) {
+      tempErrors.interest = "Select at least 1 interest";
+      valid = false;
+    }
+    if (!userData.password || userData.password.length < 6) { tempErrors.password = "Password min 6 chars"; valid = false; }
+    if (userData.password !== userData.confirmPassword) { tempErrors.confirmPassword = "Passwords do not match"; valid = false; }
+
+    setErrors(tempErrors);
+
+    if (valid) {
+      try {
+        await storeData("user", userData);
+        Alert.alert("Success", "Account created!", [{ text: "OK", onPress: () => navigation.replace("signIn") }]);
+      } catch (error) {
+        Alert.alert("Error", "Failed to save data");
+      }
+    }
+  };
+
+  return (
+    <KeyboardAwareScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        paddingHorizontal: 24,
+        paddingBottom: 40 + insets.bottom,
+        backgroundColor: colors.background,
+      }}
+      enableOnAndroid={true}
+      keyboardShouldPersistTaps="handled"
+      style={{ backgroundColor: colors.background }}
+    >
+      <StatusBar 
+        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
+        backgroundColor={colors.background} 
+      />
+
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Icon name="arrow-left" size={28} color={colors.text} />
+          </TouchableOpacity>
+          <Animated.View style={{ opacity: fade, transform: [{ translateY: slide }] }}>
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Sign up to get started!</Text>
+          </Animated.View>
+        </View>
+
+        {/* Form */}
+        <Animated.View style={[styles.formContainer, { opacity: fade, transform: [{ translateY: slide }] }]}>
+          <CustomInput
+            label="Username"
+            leftIcon="account-outline"
+            value={userData.username}
+            onChangeText={(val) => handleOnChange("username", val)}
+            error={errors.username}
+            // Pass colors props agar CustomInput support karta hai
+          />
+          <CustomInput
+            label="Mobile Number"
+            leftIcon="phone-outline"
+            keyboardType="phone-pad"
+            value={userData.mobile}
+            onChangeText={(val) => handleOnChange("mobile", val)}
+            error={errors.mobile}
+          />
+          <CustomInput
+            label="Email"
+            leftIcon="email-outline"
+            keyboardType="email-address"
+            value={userData.email}
+            onChangeText={(val) => handleOnChange("email", val)}
+            error={errors.email}
+          />
+
+          {/* === REUSABLE MODAL TRIGGER === */}
+          <View style={styles.dropdownContainer}>
+            <TouchableOpacity
+              style={[
+                styles.dropdownTrigger,
+                { 
+                    // Dynamic Border Color Logic
+                    borderColor: errors.interest ? colors.error : colors.border 
+                }
+              ]}
+              onPress={() => setInterestModalVisible(true)}
+              activeOpacity={0.8}
             >
-                <View style={SignUpStyle.container}>
-                    <Animated.Text style={[SignUpStyle.title, { opacity: fade }]}>
-                    Create Your Account
-                    </Animated.Text>
-    
-                    <Animated.View style={{ width: "100%", opacity: fade }}>
-    
-                        <TextInput
-                            placeholder="Username"
-                            placeholderTextColor="#888"
-                            style={SignUpStyle.input}
-                            onChangeText={(val) => setUserData({ ...userData, username: val })}
-                        />
-    
-                        <TextInput
-                            placeholder="Mobile Number"
-                            placeholderTextColor="#888"
-                            keyboardType="phone-pad"
-                            style={SignUpStyle.input}
-                            onChangeText={(val) => setUserData({ ...userData, mobile: val })}
-                        />
-    
-                        <TextInput
-                            placeholder="Email"
-                            placeholderTextColor="#888"
-                            keyboardType="email-address"
-                            style={SignUpStyle.input}
-                            onChangeText={(val) => setUserData({ ...userData, email: val })}
-                        />
-    
-                        {/* Interest Dropdown */}
-                        <TouchableOpacity
-                            style={SignUpStyle.input}
-                            onPress={() => setShowInterestList(!showInterestList)}
-                        >
-                            <Text style={{ color: userData.interest ? "#fff" : "#888" }}>
-                                {userData.interest || "Select Your Interest"}
-                            </Text>
-                        </TouchableOpacity>
-    
-                        {showInterestList && (
-                            <FlatList
-                                data={interestsList}
-                                style={SignUpStyle.dropdown}
-                                keyExtractor={(item) => item}
-                                renderItem={({ item }) => (
-                                    <TouchableOpacity
-                                        style={SignUpStyle.dropdownItem}
-                                        onPress={() => {
-                                            setUserData({ ...userData, interest: item });
-                                            setShowInterestList(false);
-                                        }}
-                                    >
-                                        <Text style={{ color: "#fff" }}>{item}</Text>
-                                    </TouchableOpacity>
-                                )}
-                            />
-                        )}
-    
-                        {/* Password */}
-                        <View style={SignUpStyle.passwordWrapper}>
-                            <TextInput
-                                placeholder="Create Password"
-                                placeholderTextColor="#888"
-                                secureTextEntry={!showPass}
-                                style={SignUpStyle.passwordInput}
-                                onChangeText={(val) => setUserData({ ...userData, password: val })}
-                            />
-                            
-                            <TouchableOpacity onPress={() => setShowPass(!showPass)}>
-                                {showPass ? <EyeOff color="#fff" /> : <Eye color="#fff" />}
-                            </TouchableOpacity>
-                        </View>
-    
-                        {/* Confirm Password */}
-                        <View style={SignUpStyle.passwordWrapper}>
-                            <TextInput
-                                placeholder="Confirm Password"
-                                placeholderTextColor="#888"
-                                secureTextEntry={!showConfirmPass}
-                                style={SignUpStyle.passwordInput}
-                                onChangeText={(val) =>
-                                    setUserData({ ...userData, confirmPassword: val })
-                                }
-                            />
-                            <TouchableOpacity onPress={() => setShowConfirmPass(!showConfirmPass)}>
-                                {showConfirmPass ? <EyeOff color="#fff" /> : <Eye color="#fff" />}
-                            </TouchableOpacity>
-                        </View>
-    
-                        <TouchableOpacity style={SignUpStyle.btn} onPress={registerUser}>
-                            <Text style={SignUpStyle.btnText}>Sign Up</Text>
-                        </TouchableOpacity>
-    
-                        <TouchableOpacity onPress={() => navigation.navigate("signIn")}>
-                            <Text style={SignUpStyle.loginText}>Already have an account? Sign in</Text>
-                        </TouchableOpacity>
-                    </Animated.View>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
-    );
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Icon 
+                  name="heart-outline" 
+                  size={24} 
+                  // Dynamic Icon Color
+                  color={errors.interest ? colors.error : colors.textDisabled} 
+                  style={{ marginRight: 12 }}
+                />
+                <Text
+  style={[
+    styles.dropdownText,
+    {
+      color: userData.interest.length
+        ? colors.text
+        : colors.textDisabled,
+    },
+  ]}
+>
+  {userData.interest.length
+    ? userData.interest.join(", ")
+    : "Select Interests"}
+</Text>
+              </View>
+              <Icon name="chevron-down" size={24} color={colors.textDisabled} />
+            </TouchableOpacity>
+            {errors.interest && <Text style={styles.errorText}>{errors.interest}</Text>}
+          </View>
+
+          <CustomInput
+            label="Password"
+            leftIcon="lock-outline"
+            password
+            value={userData.password}
+            onChangeText={(val) => handleOnChange("password", val)}
+            error={errors.password}
+          />
+          <CustomInput
+            label="Confirm Password"
+            leftIcon="lock-check-outline"
+            password
+            value={userData.confirmPassword}
+            onChangeText={(val) => handleOnChange("confirmPassword", val)}
+            error={errors.confirmPassword}
+          />
+
+          <TouchableOpacity
+            style={[styles.primaryBtn, { marginBottom: insets.bottom }]}
+            onPress={registerUser}
+          >
+            <Text style={styles.primaryBtnText}>Sign Up</Text>
+          </TouchableOpacity>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("signIn")}>
+              <Text style={styles.linkText}>Sign In</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </ScrollView>
+
+      {/* === REUSABLE MODAL COMPONENT === */}
+      <MultiSelectionModal
+  visible={isInterestModalVisible}
+  title="Choose Interests"
+  data={interestsList}
+  selectedItems={userData.interest}
+  onClose={() => setInterestModalVisible(false)}
+  onSelect={(items) => handleOnChange("interest", items)}
+/>
+
+
+    </KeyboardAwareScrollView>
+  );
 };
 
 export default SignUp;

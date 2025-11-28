@@ -1,70 +1,108 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
-const VideoStyle = StyleSheet.create({
-    tabArea: {
-        padding: 12,
-        backgroundColor: "#0D0D0D",
-      },
-       /* Cards inside tabs */
-       videoCard: {
-        flexDirection: "row",
-        backgroundColor: "#1A1A1A",
-        padding: 12,
-        borderRadius: 12,
-        marginBottom: 14,
-        gap: 12,
-      },
-    
-      founderThumb: {
-        width: 70,
-        height: 70,
-        borderRadius: 12,
-        backgroundColor: "rgba(198,140,245,0.2)",
-        alignItems: "center",
-        justifyContent: "center",
-      },
-    
-      thumbnail: {
-        width: 70,
-        height: 70,
-        borderRadius: 12,
-        backgroundColor: "#7C3BEC",
-        alignItems: "center",
-        justifyContent: "center",
-      },
-    
-      titleText: {
-        color: "#fff",
-        fontSize: 15,
-        fontWeight: "600",
-      },
-    
-      subText: {
-        color: "#aaa",
-        fontSize: 12,
-      },
-      row: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-        marginVertical: 3,
-      },
-    
-      badge: {
-        flexDirection: "row",
-        backgroundColor: "#7C3BEC",
-        borderRadius: 6,
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        alignItems: "center",
-        gap: 4,
-        alignSelf: "flex-start",
-      },
-      badgeText: {
-        color: "#ffffff",
-        fontSize: 11,
-        fontWeight: "600",
-      },
-});
+const getVideoTabStyles = (colors, isDark = false) => {
 
-export default VideoStyle;
+  const shadowStyle = Platform.select({
+    ios: {
+      shadowColor: isDark ? "rgba(255,255,255,0.2)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: isDark ? 0.25 : 0.20,
+      shadowRadius: isDark ? 6 : 5,
+    },
+    android: {
+      // Android shadow = elevation only
+      elevation: isDark ? 6 : 3,
+    },
+  });
+
+  return StyleSheet.create({
+    tabContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+
+    listContent: {
+      padding: 16,
+      paddingTop: 20,
+    },
+
+    itemCard: {
+      flexDirection: 'row',
+      backgroundColor: colors.tintedThemeColor,
+      borderRadius: 16,
+      padding: 14,
+      marginBottom: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center',
+    },
+
+    thumbnailBox: {
+      width: 50,
+      height: 50,
+      borderRadius: 14,
+      backgroundColor: colors.background,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+
+    largeThumbnail: {
+      width: 100,
+      height: 70,
+      borderRadius: 12,
+      backgroundColor: colors.background,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+
+    titleText: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: 6,
+      lineHeight: 22,
+    },
+
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+
+    metaRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginRight: 12,
+      backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)",
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 6,
+    },
+
+    subText: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      marginLeft: 6,
+    },
+
+    badge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginLeft: 'auto',
+    },
+
+    badgeText: {
+      color: colors.success,
+      fontSize: 11,
+      fontWeight: '600',
+      marginLeft: 4,
+    }
+  });
+};
+
+export default getVideoTabStyles;

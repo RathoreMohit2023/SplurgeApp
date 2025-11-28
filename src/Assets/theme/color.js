@@ -1,64 +1,91 @@
-export const LightTheme = {
-    background: "#FFFFFF",
-    foreground: "#171717",
-    border: "#E8E8E8",
-    card: "#FAFAFA",
-    cardForeground: "#171717",
-    cardBorder: "#F2F2F2",
-    sidebar: "#F5F5F5",
-    sidebarForeground: "#171717",
-    sidebarBorder: "#EBEBEB",
-    primary: "hsl(262, 83%, 23%)",
-    primaryForeground: "hsl(262, 83%, 98%)",
-    secondary: "hsl(0, 0%, 90%)",
-    secondaryForeground: "hsl(0, 0%, 9%)",
-    accent: "hsl(262, 8%, 93%)",
-    accentForeground: "hsl(262, 8%, 12%)",
-    muted: "hsl(262, 6%, 92%)",
-    mutedForeground: "hsl(262, 6%, 35%)",
-    destructive: "hsl(0, 84%, 32%)",
-    destructiveForeground: "hsl(0, 84%, 98%)",
-    input: "hsl(0, 0%, 75%)",
-    ring: "hsl(262, 83%, 23%)",
-  
-    // Custom extras (useful in RN UI)
-    tabBar: "#1A1A1A",
-    tabActive: "#C68CF5",
-    tabInactive: "#777777",
-  
-    elevate1: "rgba(0,0,0,0.03)",
-    elevate2: "rgba(0,0,0,0.08)",
-  };
-  
-  export const DarkTheme = {
-    background: "#000000",
-    foreground: "#FAFAFA",
-    border: "hsl(262, 30%, 15%)",
-    card: "hsl(262, 20%, 8%)",
-    cardForeground: "#FAFAFA",
-    cardBorder: "hsl(262, 30%, 12%)",
-    sidebar: "hsl(262, 20%, 8%)",
-    sidebarForeground: "#FAFAFA",
-    sidebarBorder: "hsl(262, 30%, 14%)",
-    primary: "hsl(262, 83%, 58%)",
-    primaryForeground: "#FFFFFF",
-    secondary: "hsl(262, 20%, 16%)",
-    secondaryForeground: "#FFFFFF",
-    accent: "hsl(262, 50%, 18%)",
-    accentForeground: "#FFFFFF",
-    muted: "hsl(262, 15%, 15%)",
-    mutedForeground: "hsl(262, 15%, 65%)",
-    destructive: "hsl(0, 84%, 32%)",
-    destructiveForeground: "#FFFFFF",
-    input: "hsl(0, 0%, 30%)",
-    ring: "hsl(262, 83%, 58%)",
-  
-    // Custom extras
-    tabBar: "#0D0D0D",
-    tabActive: "#C68CF5",
-    tabInactive: "#777777",
-  
-    elevate1: "rgba(255,255,255,0.04)",
-    elevate2: "rgba(255,255,255,0.09)",
-  };
-  
+const commonColors = {
+  primary: "#6200ee",
+  theme: "#7015EEFF",
+  error: "#cf6679",
+  success: "#00e676",
+  warning: "#ffb74d",
+  info: "#29b6f6",
+  white: "#FFFFFFFF",
+  black: "#000000",
+  blue : "#0000FF",
+
+  // 🔵 Basic Shades
+  red: "#FF0000",
+  green: "#00FF00",
+  yellow: "#FFFF00",
+  orange: "#FFA500",
+  purple: "#800080",
+  pink: "#FF69B4",
+  teal: "#008080",
+  cyan: "#00FFFF",
+
+  // 🔥 Neutral & UI Grays
+  gray50: "#FAFAFA",
+  gray100: "#F5F5F5",
+  gray200: "#EEEEEE",
+  gray300: "#E0E0E0",
+  gray400: "#BDBDBD",
+  gray500: "#9E9E9E",
+  gray600: "#757575",
+  gray700: "#616161",
+  gray800: "#424242",
+  gray900: "#212121",
+
+  // 🎨 Branding / Utility Colors
+  lightPrimary: "#BB86FC",
+  darkPrimary: "#3700B3",
+
+  lightTheme: "#A06CFFFF",
+  darkTheme: "#4B0FADFF",
+
+  overlayDark: "rgba(0,0,0,0.5)",
+  overlayLight: "rgba(255,255,255,0.5)",
+
+  border: "#E5E7EB",
+  mutedText: "#6B7280",
+
+  // 🌈 Pastel Colors
+  pastelBlue: "#AEC6CF",
+  pastelGreen: "#77DD77",
+  pastelPink: "#FFB7CE",
+  pastelPurple: "#C3B1E1",
+  pastelYellow: "#FDFD96",
+
+  // 🧊 Transparent Variants
+  transparent: "transparent",
+  white50: "rgba(255,255,255,0.5)",
+  black50: "rgba(0,0,0,0.5)",
+};
+
+const Colors = {
+  light: {
+    ...commonColors,
+    background: "#F4F6F9",
+    surface: "#FFFFFF",
+    card: "#FFFFFF",
+    text: "#121212",
+    textSecondary: "#666666",
+    textDisabled: "#9e9e9e",
+    border: "#E0E0E0",
+    separator: "#F0F0F0",
+    tintedThemeColor: "rgba(112, 21, 238, 0.10)",
+    iconDefault: "#333333",
+    shadow: "#000",
+  },
+  dark: {
+    ...commonColors,
+    background: "#080808",
+    surface: "#1e1e1e",
+    card: "#2c2c2c",
+    text: "#ffffff",
+    textSecondary: "#b0b0b0",
+    textDisabled: "#6e6e6e",
+    border: "#333333",
+    separator: "#252525",
+    tintedThemeColor: "rgba(124, 59, 236, 0.10)",
+    iconDefault: "#ffffff",
+    shadow: "#000",
+  },
+};
+
+export default Colors;

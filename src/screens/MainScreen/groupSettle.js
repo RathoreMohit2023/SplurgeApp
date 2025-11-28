@@ -1,27 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import {
   View,
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Platform,
+  StatusBar,
 } from "react-native";
-import { Card, Text, Button, Avatar, Badge, Dialog, Portal, Paragraph, Snackbar, ProgressBar } from "react-native-paper";
+import { Text, Avatar, Snackbar, ProgressBar } from "react-native-paper";
 import Clipboard from "@react-native-clipboard/clipboard";
-import { Copy, Users, UserPlus, Plus, TrendingUp, TrendingDown, UserPlus2 } from "lucide-react-native";
-import groupSettleStyle from "../../styles/MainScreen/groupSettleStyle";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { 
+    Copy, 
+    Users, 
+    TrendingUp, 
+    TrendingDown, 
+    UserPlus2, 
+    ArrowUpRight, 
+    History,
+    Bell,       
+    CheckCircle,
+} from "lucide-react-native";
+import AddPaymentLogModal from "../../Modals/AddPaymentLogModal";
+import CreateGroupModal from "../../Modals/CreateGroupModal";
+import SettleUpModal from "../../Modals/SettleUpModal";
+import getGroupSettleStyle from "../../styles/MainScreen/groupSettleStyle"; 
+import { ThemeContext } from "../../components/ThemeContext"; 
 
 const GroupSettle = ({ navigation }) => {
+  const { colors, themeType } = useContext(ThemeContext);
+  const styles = useMemo(() => getGroupSettleStyle(colors), [colors]);
+  const insets = useSafeAreaInsets();
+
   const [paymentFormOpen, setPaymentFormOpen] = useState(false);
   const [groupFormOpen, setGroupFormOpen] = useState(false);
+  const [settleModalOpen, setSettleModalOpen] = useState(false); 
+  
+  const [selectedFriend, setSelectedFriend] = useState(null); 
+
   const [friendCode, setFriendCode] = useState("");
   const [snack, setSnack] = useState({ visible: false, message: "" });
 
-  const friends = [
+  const [friends, setFriends] = useState([
     { id: "1", name: "Alex Kumar", points: 850, owes: 0, owed: 250 },
     { id: "2", name: "Priya Sharma", points: 1200, owes: 400, owed: 0 },
-    { id: "3", name: "Rahul Verma", points: 650, owes: 0, owed: 150 },
-  ];
+    { id: "3", name: "Rahul Verma", points: 650, owes: 0, owed: 150 }, 
+  ]);
 
   const groups = [
     { id: "1", name: "Weekend Trip", members: 4, budget: 10000, spent: 6500 },
@@ -32,7 +55,6 @@ const GroupSettle = ({ navigation }) => {
     { id: "1", friendId: "2", friendName: "Priya Sharma", amount: 400, description: "Movie tickets", type: "owe" },
     { id: "2", friendId: "1", friendName: "Alex Kumar", amount: 250, description: "Lunch", type: "owed" },
   ];
-
   const userCode = "SPL-2K4X9";
   const shareableLink = "https://splurge.app/invite/2K4X9";
 
@@ -40,12 +62,12 @@ const GroupSettle = ({ navigation }) => {
 
   const handleCopyCode = () => {
     Clipboard.setString(userCode);
-    showSnack("Code copied to clipboard");
+    showSnack("Code copied!");
   };
 
   const handleCopyLink = () => {
     Clipboard.setString(shareableLink);
-    showSnack("Link copied to clipboard");
+    showSnack("Link copied!");
   };
 
   const handleAddFriend = () => {
@@ -53,227 +75,303 @@ const GroupSettle = ({ navigation }) => {
       showSnack("Enter a valid friend code");
       return;
     }
-    // TODO: call API or add to state
-    showSnack(`Friend request sent to ${friendCode}`);
+    showSnack(`Request sent to ${friendCode}`);
     setFriendCode("");
   };
 
   const handleViewGroup = (groupId) => {
-    // navigate to group detail if you have a screen
-    navigation.navigate("groupDetails", { id: groupId })
-    showSnack(`Open group ${groupId}`);
+    try {
+        navigation.navigate("groupDetails", { id: groupId });
+    } catch (e) {
+        console.log("Navigation error: ", e);
+        showSnack(`Open group ${groupId}`);
+    }
+  };
+  const handleCreateGroup = (data) => {
+    setGroupFormOpen(false);
+  };
+
+
+  const handleRemind = (friend) => {
+    showSnack(`Reminder sent to ${friend.name} for ₹${friend.owes}`);
+  };
+
+  const handleOpenSettle = (friend) => {
+    setSelectedFriend(friend);
+    setSettleModalOpen(true);
+  };
+
+  const handleSettleUpSave = (data) => {
+    
+    const updatedFriends = friends.map(f => {
+        if(f.id === data.friendId) {
+            return { ...f, owes: 0, owed: 0 };
+        }
+        return f;
+    });
+    setFriends(updatedFriends);
+
+    showSnack("Settlement recorded successfully!");
   };
 
   return (
-    <>
-      <ScrollView style={groupSettleStyle.container} contentContainerStyle={{ paddingBottom: 60 }}>
-        <View style={groupSettleStyle.inner}>
+    <View style={styles.container}>
+      <StatusBar 
+        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
+        backgroundColor={colors.background} 
+      />
+      
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 90, paddingTop: 20 }}
+      >
+        <View style={styles.inner}>
 
-          {/* Header */}
-          <View style={groupSettleStyle.header}>
-            <Text style={groupSettleStyle.title}>Group Settle</Text>
-            <Text style={groupSettleStyle.subtitle}>Track and settle shared expenses</Text>
+          <View style={styles.header}>
+            <View>
+                <Text style={styles.title}>Group Settle</Text>
+                <Text style={styles.subtitle}>Split bills, not friendships.</Text>
+            </View>
+            <TouchableOpacity style={styles.headerIconBtn}>
+                <History size={22} color={colors.textSecondary} />
+            </TouchableOpacity>
           </View>
 
-          {/* Friend Code Card */}
-          <Card style={groupSettleStyle.cardGradient}>
-            <Card.Content style={groupSettleStyle.cardContent}>
-              <View style={groupSettleStyle.codeRow}>
-                <Text style={groupSettleStyle.cardTitle}>Your Friend Code</Text>
+          <View style={styles.heroCard}>
+            <View style={styles.heroTopRow}>
+                <Text style={styles.heroLabel}>Your Splurge ID</Text>
+                <TouchableOpacity onPress={handleCopyLink} style={styles.shareBadge}>
+                    <Text style={styles.shareText}>Share Link</Text>
+                    <ArrowUpRight size={14} color={colors.text} />
+                </TouchableOpacity>
+            </View>
 
-                <View style={groupSettleStyle.codeBoxRow}>
-                  <Text style={groupSettleStyle.codeBox}>{userCode}</Text>
+            <View style={styles.codeContainer}>
+                <Text style={styles.codeText}>{userCode}</Text>
+                <TouchableOpacity onPress={handleCopyCode} style={styles.copyBtn}>
+                    <Copy size={18} color="#FFFFFF" />
+                </TouchableOpacity>
+            </View>
+          </View>
 
-                  <TouchableOpacity onPress={handleCopyCode} style={groupSettleStyle.iconBtnSmall}>
-                    <Copy width={18} height={18} color="#fff" />
-                  </TouchableOpacity>
+          <View style={styles.inputCard}>
+             <View style={styles.inputRow}>
+                <View style={styles.inputIcon}>
+                    <UserPlus2 size={20} color={colors.textSecondary} />
                 </View>
-
-                <View style={groupSettleStyle.copyLinkRow}>
-                  <Button mode="outlined" onPress={handleCopyLink} compact style={groupSettleStyle.copyLinkBtn}>
-                    <Copy width={16} height={16} color="#C68CF5" />
-                    <Text style={groupSettleStyle.copyLinkText}>  Copy Link</Text>
-                  </Button>
-                </View>
-              </View>
-            </Card.Content>
-          </Card>
-
-          {/* Add Friend */}
-          <Card style={groupSettleStyle.card}>
-            <Card.Content>
-              <View style={groupSettleStyle.addFriendRow}>
-                <Text style={groupSettleStyle.cardTitle}>Add Friend</Text>
-              </View>
-
-              <View style={groupSettleStyle.addFriendInputRow}>
                 <TextInput
-                  placeholder="Enter friend code (e.g., SPL-XXXXX)"
-                  placeholderTextColor="#999"
+                  placeholder="Enter friend code (e.g., SPL-X9)"
+                  placeholderTextColor={colors.textDisabled}
                   value={friendCode}
                   onChangeText={setFriendCode}
-                  style={groupSettleStyle.input}
+                  style={styles.textInput}
                   autoCapitalize="characters"
                 />
-                {/* <Button mode="contained" onPress={handleAddFriend} style={groupSettleStyle.addFriendBtn}>
-                  <UserPlus2 width={16} height={16} color="#fff" />
-                </Button> */}
-                <TouchableOpacity
-                  onPress={handleAddFriend}
-                  style={groupSettleStyle.addFriendBtn}
-                >
-                  <UserPlus2 size={18} color="#fff" />
+                <TouchableOpacity onPress={handleAddFriend} style={styles.addBtn}>
+                  <Text style={styles.addBtnText}>Add</Text>
                 </TouchableOpacity>
+             </View>
+          </View>
 
-              </View>
-            </Card.Content>
-          </Card>
-
-          {/* Friends List */}
-          <View style={groupSettleStyle.section}>
-            <View style={groupSettleStyle.sectionHeader}>
-              <Text style={groupSettleStyle.sectionTitle}>Friends</Text>
-              <Button mode="outlined" onPress={() => setPaymentFormOpen(true)} compact style={groupSettleStyle.sectionActionBtn}>
-                <Plus width={14} height={14} color="#ffffff" /> <Text style={groupSettleStyle.sectionActionText}> Add Payment</Text>
-              </Button>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Friends</Text>
+              <TouchableOpacity style={styles.linkBtn} onPress={() => setPaymentFormOpen(true)}>
+                <Text style={styles.linkText}>+ Add Log</Text>
+              </TouchableOpacity>
             </View>
 
             {friends.map((friend) => (
-              <Card key={friend.id} style={groupSettleStyle.cardFriend}>
-                <Card.Content style={groupSettleStyle.friendRow}>
-                  <View style={groupSettleStyle.friendLeft}>
-                    <Avatar.Text size={44} label={friend.name.split(" ").map(n => n[0]).join("")} color="#fff" style={groupSettleStyle.avatar} />
-                    <View style={{ marginLeft: 12, flex: 1 }}>
-                      <Text style={groupSettleStyle.friendName}>{friend.name}</Text>
-                      <Text style={groupSettleStyle.friendPoints}>{friend.points} points</Text>
+              <View key={friend.id} style={[styles.friendCard, { paddingBottom: 12 }]}>
+                <View style={styles.row}>
+                    <Avatar.Text 
+                        size={48} 
+                        label={friend.name.split(" ").map(n => n[0]).join("")} 
+                        style={styles.avatar} 
+                        labelStyle={styles.avatarLabel}
+                    />
+                    <View style={styles.friendInfo}>
+                      <Text style={styles.friendName}>{friend.name}</Text>
+                      {friend.owed === 0 && friend.owes === 0 ? (
+                          <Text style={styles.settledText}>All settled up</Text>
+                      ) : (
+                          <View style={styles.statusRow}>
+                              {friend.owes > 0 && (
+                                <Text style={[styles.statusText, {color: colors.success}]}>
+                                    Owes you ₹{friend.owes}
+                                </Text>
+                              )}
+                              {friend.owed > 0 && (
+                                <Text style={[styles.statusText, {color: colors.error}]}>
+                                    You owe ₹{friend.owed}
+                                </Text>
+                              )}
+                          </View>
+                      )}
                     </View>
-                  </View>
+                    
+                    <View style={styles.actionIcon}>
+                       {friend.owes > 0 ? <TrendingUp size={20} color={colors.success} /> : 
+                        friend.owed > 0 ? <TrendingDown size={20} color={colors.error} /> : 
+                        <Users size={20} color={colors.textDisabled} />}
+                    </View>
+                </View>
 
-                  <View style={groupSettleStyle.friendRight}>
-                    {friend.owed > 0 ? (
-                      <View style={groupSettleStyle.owedRow}>
-                        <TrendingUp width={16} height={16} color="#4CAF50" />
-                        <Text style={groupSettleStyle.owedText}> ₹{friend.owed}</Text>
-                      </View>
-                    ) : null}
+                {(friend.owes > 0 || friend.owed > 0) && (
+                    <View style={{ 
+                        flexDirection: 'row', 
+                        marginTop: 15, 
+                        borderTopWidth: 1, 
+                        borderTopColor: colors.border,
+                        paddingTop: 10,
+                        justifyContent: 'flex-end'
+                    }}>
+                        {friend.owes > 0 && (
+                            <TouchableOpacity 
+                                onPress={() => handleRemind(friend)}
+                                style={{ 
+                                    flexDirection: 'row', 
+                                    alignItems: 'center', 
+                                    marginRight: 15,
+                                    paddingVertical: 5
+                                }}
+                            >
+                                <Bell size={16} color={colors.theme} style={{ marginRight: 6 }} />
+                                <Text style={{ color: colors.theme, fontSize: 13, fontWeight: '600' }}>Remind</Text>
+                            </TouchableOpacity>
+                        )}
 
-                    {friend.owes > 0 ? (
-                      <View style={groupSettleStyle.owesRow}>
-                        <TrendingDown width={16} height={16} color="#FF3B30" />
-                        <Text style={groupSettleStyle.owesText}> ₹{friend.owes}</Text>
-                      </View>
-                    ) : null}
-
-                    {friend.owed === 0 && friend.owes === 0 ? (
-                      <Badge style={groupSettleStyle.badge}>Settled</Badge>
-                    ) : null}
-                  </View>
-                </Card.Content>
-              </Card>
+                        <TouchableOpacity 
+                             onPress={() => handleOpenSettle(friend)}
+                             style={{ 
+                                flexDirection: 'row', 
+                                alignItems: 'center', 
+                                backgroundColor: colors.background,
+                                paddingHorizontal: 12,
+                                paddingVertical: 6,
+                                borderRadius: 20,
+                                borderWidth: 1,
+                                borderColor: colors.theme
+                            }}
+                        >
+                            <CheckCircle size={16} color={colors.text} style={{ marginRight: 6 }} />
+                            <Text style={{ color: colors.text, fontSize: 13, fontWeight: 'bold' }}>Settle Up</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+              </View>
             ))}
           </View>
 
-          {/* Groups */}
-          <View style={groupSettleStyle.section}>
-            <View style={groupSettleStyle.sectionHeader}>
-              <Text style={groupSettleStyle.sectionTitle}>Groups</Text>
-              <Button mode="contained" onPress={() => setGroupFormOpen(true)} compact style={groupSettleStyle.sectionActionBtn}>
-                <Users width={14} height={14} color="#fff" /> <Text style={groupSettleStyle.sectionActionTextLight}>  Create</Text>
-              </Button>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Active Groups</Text>
+              <TouchableOpacity style={styles.linkBtn} onPress={() => setGroupFormOpen(true)}>
+                <Text style={styles.linkText}>Create New</Text>
+              </TouchableOpacity>
             </View>
 
             {groups.map((group) => {
               const percentage = Math.min(100, (group.spent / group.budget) * 100);
               return (
-                <TouchableOpacity key={group.id} onPress={() => handleViewGroup(group.id)}>
-                  <Card style={groupSettleStyle.cardGroup}>
-                    <Card.Content>
-                      <View style={groupSettleStyle.groupTop}>
-                        <View>
-                          <Text style={groupSettleStyle.groupName}>{group.name}</Text>
-                          <Text style={groupSettleStyle.groupMembers}>{group.members} members</Text>
+                <TouchableOpacity 
+                    key={group.id} 
+                    activeOpacity={0.7}
+                    onPress={() => handleViewGroup(group.id)}
+                >
+                  <View style={styles.groupCard}>
+                    <View style={styles.rowBetween}>
+                        <View style={styles.row}>
+                           <View style={styles.groupIconBg}>
+                               <Users size={18} color={colors.theme} />
+                           </View>
+                           <View>
+                               <Text style={styles.groupName}>{group.name}</Text>
+                               <Text style={styles.groupMembers}>{group.members} members</Text>
+                           </View>
                         </View>
-                        <Users width={20} height={20} color="#999" />
-                      </View>
+                        <Text style={styles.amountText}>₹{group.spent.toLocaleString()}</Text>
+                    </View>
 
-                      <View style={{ marginTop: 10 }}>
-                        <View style={groupSettleStyle.budgetRow}>
-                          <Text style={groupSettleStyle.mutedText}>Budget</Text>
-                          <Text style={groupSettleStyle.monoText}>₹{group.spent.toLocaleString()} / ₹{group.budget.toLocaleString()}</Text>
-                        </View>
-
-                        <ProgressBar progress={percentage / 100} color="#7C3BEC" style={groupSettleStyle.progress} />
-                        <Text style={groupSettleStyle.smallMuted}>{percentage.toFixed(0)}% of budget used</Text>
-                      </View>
-                    </Card.Content>
-                  </Card>
+                    <View style={styles.progressContainer}>
+                         <View style={styles.rowBetween}>
+                            <Text style={styles.progressLabel}>Budget Used</Text>
+                            <Text style={styles.progressLabel}>{percentage.toFixed(0)}%</Text>
+                         </View>
+                        <ProgressBar progress={percentage / 100} color={colors.theme} style={styles.progressBar} />
+                    </View>
+                  </View>
                 </TouchableOpacity>
               );
             })}
           </View>
 
-          {/* Recent Activity */}
-          <View style={groupSettleStyle.section}>
-            <Text style={groupSettleStyle.sectionTitle}>Recent Activity</Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Recent Activity</Text>
             {paymentLogs.map((log) => (
-              <Card key={log.id} style={groupSettleStyle.cardLog}>
-                <Card.Content style={groupSettleStyle.logRow}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={groupSettleStyle.friendName}>{log.friendName}</Text>
-                    <Text style={groupSettleStyle.smallMuted}>{log.description}</Text>
-                  </View>
-
-                  <View style={{ alignItems: "flex-end" }}>
-                    <Text style={[groupSettleStyle.monoText, { color: log.type === "owed" ? "#4CAF50" : "#FF3B30" }]}>
-                      {log.type === "owed" ? "+" : "-"}₹{log.amount}
-                    </Text>
-                    <Text style={groupSettleStyle.smallMuted}>{log.type === "owed" ? "owes you" : "you owe"}</Text>
-                  </View>
-                </Card.Content>
-              </Card>
+              <View key={log.id} style={styles.logCard}>
+                 <View style={styles.row}>
+                    <View style={[
+                        styles.logIcon, 
+                        { backgroundColor: log.type === "owed" ? "rgba(0, 230, 118, 0.1)" : "rgba(207, 102, 121, 0.1)" }
+                    ]}>
+                        {log.type === 'owed' ? <TrendingUp size={16} color={colors.success} /> : <TrendingDown size={16} color={colors.error} />}
+                    </View>
+                    <View>
+                        <Text style={styles.logTitle}>
+                            {log.type === 'owed' ? `${log.friendName} owes you` : `You owe ${log.friendName}`}
+                        </Text>
+                        <Text style={styles.logDesc}>{log.description}</Text>
+                    </View>
+                 </View>
+                 <Text style={[styles.logAmount, { color: log.type === "owed" ? colors.success : colors.error }]}>
+                    {log.type === "owed" ? "+" : "-"}₹{log.amount}
+                 </Text>
+              </View>
             ))}
           </View>
+
         </View>
       </ScrollView>
 
-      {/* PaymentLogForm - simple dialog */}
-      <Portal>
-        <Dialog visible={paymentFormOpen} onDismiss={() => setPaymentFormOpen(false)}>
-          <Dialog.Title>Add Payment</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph>Payment form placeholder — implement fields here.</Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setPaymentFormOpen(false)}>Cancel</Button>
-            <Button onPress={() => { setPaymentFormOpen(false); showSnack("Payment saved"); }}>Save</Button>
-          </Dialog.Actions>
-        </Dialog>
-
-        {/* GroupForm - simple dialog */}
-        <Dialog visible={groupFormOpen} onDismiss={() => setGroupFormOpen(false)}>
-          <Dialog.Title>Create Group</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph>Group form placeholder — implement fields here.</Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setGroupFormOpen(false)}>Cancel</Button>
-            <Button onPress={() => { setGroupFormOpen(false); showSnack("Group created"); }}>Create</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      <AddPaymentLogModal
+        visible={paymentFormOpen}
+        onClose={() => setPaymentFormOpen(false)}
+        friends={friends}
+        onSave={(data) => {
+            console.log("Payment Log Saved:", data);
+            setPaymentFormOpen(false);
+        }}
+      />
+      <CreateGroupModal
+        visible={groupFormOpen}
+        onClose={() => setGroupFormOpen(false)}
+        onSubmit={handleCreateGroup}
+      />
+      
+      <SettleUpModal
+        visible={settleModalOpen}
+        onClose={() => setSettleModalOpen(false)}
+        friend={selectedFriend}
+        onSave={handleSettleUpSave}
+      />
 
       <Snackbar
         visible={snack.visible}
         onDismiss={() => setSnack({ visible: false, message: "" })}
         duration={2000}
+        style={{backgroundColor: colors.card, marginBottom: insets.bottom + 80}}
+        theme={{ colors: { inversePrimary: colors.theme } }}
         action={{
           label: "OK",
+          textColor: colors.theme,
           onPress: () => setSnack({ visible: false, message: "" }),
         }}
       >
-        {snack.message}
+        <Text style={{color: colors.text}}>{snack.message}</Text>
       </Snackbar>
-    </>
+    </View>
   );
 };
 

@@ -1,27 +1,24 @@
 import { StyleSheet } from "react-native";
 
-const splashStyle = StyleSheet.create({
+const getSplashStyles = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#0D0D0D",
+        backgroundColor: colors.background, // Dynamic Background (Dark: #080808, Light: #F4F6F9)
         justifyContent: "center",
         alignItems: "center",
-        paddingHorizontal: 20,
     },
     logo: {
-        width: 200,
+        width: 200, // Apne hisab se adjust karein
         height: 200,
-        marginBottom: 10,
+        marginBottom: 20,
     },
     tagline: {
-        fontSize: 22,
-        color: "#7C3BEC",
+        fontSize: 18,
+        color: colors.theme, // Tagline color usually branding color (Purple) hona chahiye
         fontWeight: "600",
-        letterSpacing: 1,
-        marginTop: 10,
+        letterSpacing: 1.2,
         textAlign: "center",
-        opacity: 0.8,
     },
-})
+});
 
-export default splashStyle;
+export default getSplashStyles;

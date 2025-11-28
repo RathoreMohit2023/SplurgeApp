@@ -1,35 +1,63 @@
-import React from "react";
-import { View } from "react-native";
-import { Text, Appbar } from "react-native-paper";
+import React, { useContext, useMemo } from "react";
+import { View, StatusBar } from "react-native";
+import { Text } from "react-native-paper";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import calculatorStyle from "../../styles/MainScreen/calculatorStyle";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+// Imports
 import LedgerTab from "./tabs/LedgerTab";
 import WishlistTab from "./tabs/Wishlisttab";
 import ComparisonTab from "./tabs/Comparisontab";
+import { ThemeContext } from "../../components/ThemeContext"; // Path adjust karein
+import getCalculatorStyles from "../../styles/MainScreen/calculatorStyle"
 
 const Tab = createMaterialTopTabNavigator();
 
 const CalculatorScreen = () => {
+  const insets = useSafeAreaInsets();
+  const { colors, themeType } = useContext(ThemeContext);
+  const styles = useMemo(() => getCalculatorStyles(colors), [colors]);
+  const bottomPadding = insets.bottom + 60;
+
   return (
-    <View style={calculatorStyle.container}>
-      <Appbar.Header style={calculatorStyle.HeaderContainer}>
-           <Text style={calculatorStyle.title}>
-              Impact Calculator
-            </Text>
-            <Text style={calculatorStyle.subtitle}>
-            See what your spending could buy
-            </Text>
-      </Appbar.Header>
+    <View style={[styles.container, { paddingBottom: bottomPadding }]}>
+      <StatusBar 
+        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
+        backgroundColor={colors.background} 
+      />
+      
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Impact Calculator</Text>
+        <Text style={styles.subtitle}>See what your spending could buy</Text>
+      </View>
 
       <Tab.Navigator
         screenOptions={{
-          tabBarActiveTintColor: "#7C3BEC",
-          tabBarInactiveTintColor: "#999",
-          tabBarStyle: { backgroundColor: "#25202C", borderRadius:10, padding: 5, marginLeft: 15, marginRight: 15  },
-          tabBarIndicatorStyle: { backgroundColor: "#0D0D0D", padding: 20, margin: 5 },
+          // Dynamic Colors for Tabs
+          tabBarActiveTintColor: colors.theme,
+          tabBarInactiveTintColor: colors.textSecondary,
+          
+          tabBarStyle: {
+            backgroundColor: colors.background,
+            elevation: 0, // Remove shadow on Android
+            shadowOpacity: 0, // Remove shadow on iOS
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border,
+          },
+          tabBarIndicatorStyle: {
+            backgroundColor: colors.theme,
+            height: 3,
+            borderRadius: 3,
+          },
+          tabBarLabelStyle: {
+            fontWeight: "700",
+            textTransform: "capitalize",
+            fontSize: 14,
+          },
+          // Optional: Ripple color for Android
+          tabBarPressColor: colors.tintedThemeColor,
         }}
-        style={{backgroundColor: "#0D0D0D"}}
+        style={{ backgroundColor: colors.background }}
       >
         <Tab.Screen name="Ledger" component={LedgerTab} />
         <Tab.Screen name="Wishlist" component={WishlistTab} />

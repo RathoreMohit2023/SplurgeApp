@@ -1,253 +1,350 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
-const groupSettleStyle = StyleSheet.create({
+const getGroupSettleStyle = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#0D0D0D",
-      },
-      inner: {
-        padding: 16,
-      },
-    
-      header: {
-        marginBottom: 12,
-      },
-      title: {
-        color: "#fff",
-        fontSize: 22,
-        fontWeight: "700",
-      },
-      subtitle: {
-        color: "#999",
-        marginTop: 4,
-      },
-    
-      // Friend code card
-      cardGradient: {
-        backgroundColor: "#1E1724", // subtle dark gradient feel
-        marginBottom: 12,
-        borderRadius: 12,
-        overflow: "hidden",
-      },
-      cardContent: {
-        paddingVertical: 12,
-        paddingHorizontal: 12,
-      },
-      codeRow: {
-        gap: 10,
-      },
-      cardTitle: {
-        color: "#ffffff",
-        fontWeight: "700",
-        marginBottom: 8,
-      },
-      codeBoxRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-      },
-      codeBox: {
-        backgroundColor: "rgba(255,255,255,0.03)",
-        color: "#fff",
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-        borderRadius: 8,
-        fontFamily: Platform.OS === "android" ? "monospace" : "Menlo",
-        fontSize: 16,
-        fontWeight: "700",
-      },
-      iconBtnSmall: {
-        backgroundColor: "#7C3BEC",
-        padding: 10,
-        borderRadius: 10,
-        marginLeft: 8,
-      },
-      copyLinkRow: {
-        marginTop: 10,
-      },
-      copyLinkBtn: {
-        borderColor: "#2a2430",
-        borderWidth: 1,
-      },
-      copyLinkText: {
-        color: "#ffffff",
-      },
-    
-      // Add friend
-      card: {
-        backgroundColor: "#1A1A1A",
-        marginBottom: 12,
-        borderRadius: 12,
-      },
-      addFriendRow: {
-        marginBottom: 8,
-      },
-      addFriendInputRow: {
-        flexDirection: "row",
-        gap: 8,
-        alignItems: "center",
-        marginTop: 6,
-      },
-      input: {
+        backgroundColor: colors.background,
+    },
+    scrollView: {
         flex: 1,
-        backgroundColor: "#111",
-        color: "#fff",
+    },
+    inner: {
+        paddingHorizontal: 16,
+    },
+
+    // --- Header ---
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    title: {
+        color: colors.text,
+        fontSize: 26,
+        fontWeight: "700",
+    },
+    subtitle: {
+        color: colors.textSecondary,
+        fontSize: 14,
+        marginTop: 2,
+    },
+    headerIconBtn: {
         padding: 10,
-        borderRadius: 8,
+        backgroundColor: colors.tintedThemeColor,
+        borderRadius: 12,
         borderWidth: 1,
-        borderColor: "#222",
-      },
-      addFriendBtn: {
-        marginLeft: 8,
-        backgroundColor: "#7C3BEC",
-        padding: 8,
-        borderRadius: 8,
-      },
-    
-      // sections
-      section: {
-        marginBottom: 14,
-      },
-      sectionHeader: {
+        borderColor: colors.border,
+    },
+
+    // --- Hero Card ---
+    heroCard: {
+        backgroundColor: colors.tintedThemeColor,
+        borderRadius: 20,
+        padding: 20,
+        marginBottom: 24,
+        borderWidth: 1,
+        borderColor: colors.theme,
+    },
+    heroTopRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    heroLabel: {
+        color: colors.textSecondary,
+        fontSize: 12,
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    shareBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.surface,
+        paddingVertical: 4,
+        paddingHorizontal: 10,
+        borderRadius: 20,
+        gap: 4,
+        borderWidth: 1,
+        borderColor: colors.border
+    },
+    shareText: {
+        color: colors.text,
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    codeContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: colors.background,
+        borderRadius: 14,
+        padding: 4,
+        paddingLeft: 16,
+        borderWidth: 1,
+        borderColor: "rgba(112, 21, 238, 0.1)",
+    },
+    codeText: {
+        color: colors.text,
+        fontSize: 22,
+        fontWeight: '700',
+        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+        letterSpacing: 1,
+    },
+    copyBtn: {
+        backgroundColor: colors.theme,
+        padding: 12,
+        borderRadius: 10,
+    },
+
+    // --- Input Card ---
+    inputCard: {
+        backgroundColor: colors.tintedThemeColor,
+        borderRadius: 16,
+        padding: 6,
+        marginBottom: 24,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    inputRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    inputIcon: {
+        paddingLeft: 12,
+    },
+    textInput: {
+        flex: 1,
+        color: colors.text,
+        paddingHorizontal: 12,
+        fontSize: 16,
+        height: 50,
+    },
+    addBtn: {
+        backgroundColor: colors.text,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 12,
+        marginRight: 2,
+    },
+    addBtnText: {
+        color: colors.background,
+        fontWeight: '700',
+        fontSize: 14,
+    },
+
+    // --- Sections ---
+    section: {
+        marginBottom: 24,
+    },
+    sectionHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: 8,
-      },
-      sectionTitle: {
-        color: "#fff",
+        marginBottom: 12,
+    },
+    sectionTitle: {
+        color: colors.text,
         fontSize: 18,
         fontWeight: "700",
-      },
-      sectionActionBtn: {
-        borderColor: "#2a2430",
+    },
+    linkText: {
+        color: colors.theme,
+        fontSize: 14,
+        fontWeight: "600",
+    },
+    linkBtn: {
+        backgroundColor : "transparent",
+        padding: 8,
+        borderRadius: 12,
         borderWidth: 1,
-        backgroundColor: "#7C3BEC"
-      },
-      sectionActionText: {
-        color: "#ffffff",
-      },
-      sectionActionTextLight: {
-        color: "#fff",
-      },
-    
-      // Friends card
-      cardFriend: {
-        marginBottom: 10,
-        backgroundColor: "#25202C",
-        borderRadius: 12,
-      },
-      friendRow: {
-        justifyContent: "space-between",
-      },
-      friendLeft: {
-        flexDirection: "row",
-        alignItems: "center",
-      },
-      avatar: {
-        backgroundColor: "#7C3BEC",
-      },
-      friendName: {
-        color: "#fff",
-        fontWeight: "700",
-      },
-      friendPoints: {
-        color: "#999",
+        borderColor: colors.theme
+    },
+
+    // --- Friends List (FIXED LAYOUT) ---
+    friendCard: {
+        flexDirection: 'column', // Changed from row to column
+        backgroundColor: colors.tintedThemeColor,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    friendCardTop: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    avatar: {
+        backgroundColor: colors.background,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    avatarLabel: {
+        color: colors.theme,
+        fontWeight: '700',
+    },
+    friendInfo: {
+        marginLeft: 12,
+    },
+    friendName: {
+        color: colors.text,
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    settledText: {
+        color: colors.textSecondary,
         fontSize: 12,
-      },
-      friendRight: {
-        alignItems: "flex-end",
-        justifyContent: "center",
-        minWidth: 80,   
-      },
-      owedRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "rgba(76, 175, 80, 0.08)",
-        paddingVertical: 4,
-        paddingHorizontal: 8,
-        borderRadius: 6,
-        marginBottom: 4,
-      },
-      owesRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "rgba(255, 59, 48, 0.08)",
-        paddingVertical: 4,
-        paddingHorizontal: 8,
-        borderRadius: 6,
-      },
-      owedText: {
-        color: "#4CAF50",
-        fontWeight: "700",
-        marginLeft: 4,
-      },
-      owesText: {
-        color: "#FF3B30",
-        fontWeight: "700",
-        marginLeft: 4,
-      },      
-      badge: {
-        backgroundColor: "#222",
-        color: "#fff",
-        paddingHorizontal: 6,
-        paddingVertical: 4,
-      },
+    },
+    statusRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    statusText: {
+        fontSize: 13,
+        fontWeight: '600',
+    },
+    actionIcon: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: colors.background,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
     
-      // Groups
-      cardGroup: {
-        marginBottom: 10,
-        backgroundColor: "#25202C",
-        borderRadius: 12,
-      },
-      groupTop: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-      },
-      groupName: {
-        color: "#fff",
-        fontWeight: "700",
-      },
-      groupMembers: {
-        color: "#999",
+    // --- Friend Footer (New Styles) ---
+    friendFooter: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        marginTop: 12,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: colors.border,
+        gap: 12,
+    },
+    actionBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        backgroundColor: colors.background, // Slight contrast
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    settleBtn: {
+        backgroundColor: colors.text, // High visibility
+        borderColor: colors.text,
+    },
+    actionBtnText: {
         fontSize: 12,
-      },
-      budgetRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-      },
-      mutedText: {
-        color: "#999",
-      },
-      monoText: {
-        color: "#fff",
-        fontFamily: Platform.OS === "android" ? "monospace" : "Menlo",
-        fontWeight: "700",
-      },
-      progress: {
-        height: 8,
-        borderRadius: 6,
-        marginTop: 8,
-        backgroundColor: "#111",
-      },
-      smallMuted: {
-        color: "#999",
-        fontSize: 12,
-        marginTop: 6,
-      },
-    
-      // Logs
-      cardLog: {
-        marginBottom: 10,
-        backgroundColor: "#25202C",
+        fontWeight: '600',
+        marginLeft: 6,
+        color: colors.text,
+    },
+    settleBtnText: {
+        color: colors.background,
+        borderWidth: 1,
+        borderColor: colors.theme,
+
+    },
+
+    // --- Groups ---
+    groupCard: {
+        backgroundColor: colors.tintedThemeColor,
+        borderRadius: 18,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    groupIconBg: {
+        width: 40,
+        height: 40,
         borderRadius: 12,
-      },
-      logRow: {
-        flexDirection: "row",
-        alignItems: "center",
-      },
+        backgroundColor: colors.background,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    rowBetween: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    groupName: {
+        color: colors.text,
+        fontWeight: '700',
+        fontSize: 16,
+    },
+    groupMembers: {
+        color: colors.textSecondary,
+        fontSize: 12,
+    },
+    amountText: {
+        color: colors.text,
+        fontWeight: '700',
+        fontSize: 16,
+        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    },
+    progressContainer: {
+        marginTop: 16,
+    },
+    progressLabel: {
+        color: colors.textSecondary,
+        fontSize: 11,
+        marginBottom: 6,
+    },
+    progressBar: {
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: colors.background,
+    },
+
+    // --- Logs ---
+    logCard: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+    },
+    logIcon: {
+        width: 36,
+        height: 36,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    logTitle: {
+        color: colors.text,
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    logDesc: {
+        color: colors.textSecondary,
+        fontSize: 12,
+    },
+    logAmount: {
+        fontWeight: '700',
+        fontSize: 14,
+        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    }
 });
 
-export default groupSettleStyle;
+export default getGroupSettleStyle;
