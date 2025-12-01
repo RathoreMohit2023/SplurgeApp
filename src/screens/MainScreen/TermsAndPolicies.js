@@ -10,21 +10,17 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// Imports
 import AppHeader from '../../components/Header';
-import getTermsAndPoliciesStyle from "../../styles/MainScreen/TermsAndPoliciesStyle"; // Import Style Function
-import { ThemeContext } from "../../components/ThemeContext"; // Import Context
+import getTermsAndPoliciesStyle from "../../styles/MainScreen/TermsAndPoliciesStyle";
+import { ThemeContext } from "../../components/ThemeContext";
 
 const TermsAndPolicies = ({ navigation }) => {
-  // 1. Context Hook
   const { colors, themeType } = useContext(ThemeContext);
 
-  // 2. Styles Memoization
   const styles = useMemo(() => getTermsAndPoliciesStyle(colors), [colors]);
 
   const insets = useSafeAreaInsets();
 
-  // Data structure
   const policies = [
     {
       id: 1,
@@ -57,7 +53,6 @@ const TermsAndPolicies = ({ navigation }) => {
         backgroundColor={colors.background} 
       />
       
-      {/* Header */}
       <AppHeader
         showThemeToggle={false}
         navigation={navigation}
@@ -69,7 +64,6 @@ const TermsAndPolicies = ({ navigation }) => {
         showsVerticalScrollIndicator={false} 
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Title Section */}
         <View style={styles.headerSection}>
           <Text style={styles.mainTitle}>Terms & Policies</Text>
           <Text style={styles.subTitle}>
@@ -80,7 +74,6 @@ const TermsAndPolicies = ({ navigation }) => {
           </Text>
         </View>
 
-        {/* Policy Cards */}
         <View style={styles.cardsContainer}>
           {policies.map((item) => (
             <View key={item.id} style={styles.card}>
@@ -89,7 +82,6 @@ const TermsAndPolicies = ({ navigation }) => {
                   <MaterialCommunityIcons 
                     name={item.icon} 
                     size={24} 
-                    // Dynamic Icon Color
                     color={colors.theme} 
                   />
                 </View>
@@ -100,7 +92,6 @@ const TermsAndPolicies = ({ navigation }) => {
           ))}
         </View>
 
-        {/* Contact / Support Section */}
         <View style={styles.contactSection}>
           <Text style={styles.contactHeader}>Have Questions?</Text>
           <TouchableOpacity 

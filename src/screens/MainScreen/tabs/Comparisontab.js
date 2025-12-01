@@ -1,40 +1,43 @@
-import React, { useContext, useMemo } from "react";
-import { View, FlatList } from "react-native";
-import { Text } from "react-native-paper";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Sparkles } from "lucide-react-native";
+import React, { useContext, useMemo } from 'react';
+import { View, FlatList } from 'react-native';
+import { Text } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Sparkles } from 'lucide-react-native';
 
-// Imports
-import { ThemeContext } from "../../../components/ThemeContext"; 
-import getComparisonStyles from "../../../styles/MainScreen/tabs/ComparisonStyle"; 
+import { ThemeContext } from '../../../components/ThemeContext';
+import getComparisonStyles from '../../../styles/MainScreen/tabs/ComparisonStyle';
 
 const comparisons = [
-  { id: "1", spent: 1200, item: "Travis Scott Ticket", price: 1500, emoji: "🎫" },
-  { id: "2", spent: 800, item: "3 Movie Tickets", price: 900, emoji: "🎬" },
-  { id: "3", spent: 1500, item: "Gym Membership", price: 1800, emoji: "💪" },
-  { id: "4", spent: 4000, item: "Flight to Goa", price: 3500, emoji: "✈️" },
+  {
+    id: '1',
+    spent: 1200,
+    item: 'Travis Scott Ticket',
+    price: 1500,
+    emoji: '🎫',
+  },
+  { id: '2', spent: 800, item: '3 Movie Tickets', price: 900, emoji: '🎬' },
+  { id: '3', spent: 1500, item: 'Gym Membership', price: 1800, emoji: '💪' },
+  { id: '4', spent: 4000, item: 'Flight to Goa', price: 3500, emoji: '✈️' },
 ];
 
 const ComparisonTab = () => {
-  // 1. Context se Colors lein
   const { colors } = useContext(ThemeContext);
 
-  // 2. Styles Memoize karein
   const styles = useMemo(() => getComparisonStyles(colors), [colors]);
-  
+
   const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.container}>
-      {/* AI Insight Hero Card */}
       <View style={styles.heroCard}>
         <View style={styles.heroHeader}>
-            <Sparkles size={20} color="#FFD700" />
-            <Text style={styles.heroTitle}>AI Insight</Text>
+          <Sparkles size={20} color="#FFD700" />
+          <Text style={styles.heroTitle}>AI Insight</Text>
         </View>
         <Text style={styles.heroText}>
-          You spent <Text style={styles.heroHighlight}>₹1,200</Text> on snacks this week. 
-          That’s almost enough for a <Text style={styles.heroHighlight}>Concert Ticket!</Text>
+          You spent <Text style={styles.heroHighlight}>₹1,200</Text> on snacks
+          this week. That’s almost enough for a{' '}
+          <Text style={styles.heroHighlight}>Concert Ticket!</Text>
         </Text>
       </View>
 
@@ -42,7 +45,7 @@ const ComparisonTab = () => {
 
       <FlatList
         data={comparisons}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
         renderItem={({ item }) => {
@@ -55,26 +58,30 @@ const ComparisonTab = () => {
 
               <View style={styles.centerInfo}>
                 <Text style={styles.itemName}>{item.item}</Text>
-                <Text style={styles.itemPrice}>Price: ₹{item.price.toLocaleString()}</Text>
+                <Text style={styles.itemPrice}>
+                  Price: ₹{item.price.toLocaleString()}
+                </Text>
               </View>
 
-              <View style={[
-                  styles.badge, 
-                  { 
-                    // Badge background dynamic opacity based logic
-                    backgroundColor: isAffordable 
-                        ? "rgba(0, 230, 118, 0.1)" 
-                        : "rgba(255, 183, 77, 0.1)" 
-                  }
-              ]}>
-                <Text style={[
+              <View
+                style={[
+                  styles.badge,
+                  {
+                    backgroundColor: isAffordable
+                      ? 'rgba(0, 230, 118, 0.1)'
+                      : 'rgba(255, 183, 77, 0.1)',
+                  },
+                ]}
+              >
+                <Text
+                  style={[
                     styles.badgeText,
-                    { 
-                        // Colors from Context
-                        color: isAffordable ? colors.success : colors.warning 
-                    }
-                ]}>
-                    {isAffordable ? "Affordable" : "Close"}
+                    {
+                      color: isAffordable ? colors.success : colors.warning,
+                    },
+                  ]}
+                >
+                  {isAffordable ? 'Affordable' : 'Close'}
                 </Text>
               </View>
             </View>
