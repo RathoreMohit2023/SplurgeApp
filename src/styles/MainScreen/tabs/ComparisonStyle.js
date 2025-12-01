@@ -22,7 +22,8 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     gap: 8 
   },
   heroTitle: { 
-    color: "#FFD700", // Gold color stays for the "Sparkle" effect
+    // color: "#FFD700", // Gold color stays for the "Sparkle" effect
+    color: "#B89600",
     fontWeight: "700", 
     fontSize: 14, 
     textTransform: "uppercase" 

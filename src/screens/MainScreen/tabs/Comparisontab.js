@@ -29,7 +29,7 @@ const ComparisonTab = () => {
       {/* AI Insight Hero Card */}
       <View style={styles.heroCard}>
         <View style={styles.heroHeader}>
-            <Sparkles size={20} color="#FFD700" />
+            <Sparkles size={20} color="#B89600" />
             <Text style={styles.heroTitle}>AI Insight</Text>
         </View>
         <Text style={styles.heroText}>
@@ -66,17 +66,17 @@ const ComparisonTab = () => {
                         ? "rgba(0, 230, 118, 0.1)" 
                         : "rgba(255, 183, 77, 0.1)" 
                   }
-              ]}>
-                <Text style={[
+              ]}>  
+                <Text style={[                         
                     styles.badgeText,
-                    { 
+                    {
                         // Colors from Context
                         color: isAffordable ? colors.success : colors.warning 
                     }
                 ]}>
                     {isAffordable ? "Affordable" : "Close"}
                 </Text>
-              </View>
+              </View> 
             </View>
           );
         }}
