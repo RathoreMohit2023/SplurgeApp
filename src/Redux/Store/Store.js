@@ -11,15 +11,19 @@ import {
 } from "redux-persist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginReducer from "../Slice/LoginSlice"
-
+import SignUpReducer from "../Slice/SignUpSlice"
+import ForgoteReducer from "../Slice/ForgoteSlice"
+ 
 const rootReducer = combineReducers({
   Login: LoginReducer,
+  SignUp: SignUpReducer,
+  Forgote: ForgoteReducer
 });
 
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
-  whitelist: [""],
+  whitelist: ['Login', 'SignUp', 'Forgote'],
   // blacklist: ["QuotationList", "ScheduleList"],
 };
 
