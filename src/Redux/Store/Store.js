@@ -8,21 +8,11 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-<<<<<<< HEAD
 } from "redux-persist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginReducer from "../Slice/LoginSlice"
 import SignUpReducer from "../Slice/SignUpSlice"
 import ForgoteReducer from "../Slice/ForgoteSlice"
- 
-const rootReducer = combineReducers({
-  Login: LoginReducer,
-  SignUp: SignUpReducer,
-  Forgote: ForgoteReducer
-=======
-} from 'redux-persist';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import LoginReducer from '../Slice/LoginSlice';
 import AddTransactionReducer from '../Slice/AddTransactionSlice';
 import AddWishlistReducer from '../Slice/AddWishlistSlice';
 import EditWishlistReducer from '../Slice/EditWishlistSlice';
@@ -39,6 +29,8 @@ import AddGroupReducer from '../Slice/AddGroupSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
+  SignUp: SignUpReducer,
+  Forgote: ForgoteReducer,
   AddTransaction: AddTransactionReducer,
   AddWishlist: AddWishlistReducer,
   Editwishlist: EditWishlistReducer,
@@ -52,17 +44,29 @@ const rootReducer = combineReducers({
   GetPaymentLog : GetPaymentLogReducer,
   AddFriend : AddFriendReducer,
   AddGroup : AddGroupReducer
->>>>>>> ce5563a5464f3f6ed8bf9a43f6fc41ebbe70a045
 });
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-<<<<<<< HEAD
-  whitelist: ['Login', 'SignUp', 'Forgote'],
-=======
-  whitelist: ['Login', 'AddTransaction', 'AddWishlist', 'Editwishlist'],
->>>>>>> ce5563a5464f3f6ed8bf9a43f6fc41ebbe70a045
+  whitelist: [
+    'Login', 
+    'SignUp', 
+    'Forgote', 
+    'AddTransaction', 
+    'AddWishlist', 
+    'Editwishlist',
+    'DeleteWishlist',
+    'GetTransaction',
+    'GetWishlist',
+    'GetUserDetails',
+    'GetFriends',
+    'GetGroups',
+    'AddPaymentLog',
+    'GetPaymentLog',
+    'AddFriend',
+    'AddGroup',
+  ],
   // blacklist: ["QuotationList", "ScheduleList"],
 };
 
