@@ -26,6 +26,9 @@ import AddPaymentLogReducer from '../Slice/AddPaymentLogSlice';
 import GetPaymentLogReducer from '../Slice/GetPaymentLogSlice';
 import AddFriendReducer from '../Slice/AddFriendSlice';
 import AddGroupReducer from '../Slice/AddGroupSlice';
+import GetVideoReducer from '../Slice/GetVideoSlice';
+import GetFounderReducer from '../Slice/GetFounderSlice';
+import GetArticleReducer from '../Slice/GetArticleSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
@@ -40,10 +43,13 @@ const rootReducer = combineReducers({
   GetUserDetails : GetUserDetailsReducer,
   GetFriends : GetFriendsReducer,
   GetGroups : GetGroupsReducer,
-  AddPaymentLog : AddPaymentLogReducer,
+  AddPaymentLog : AddPaymentLogReducer, 
   GetPaymentLog : GetPaymentLogReducer,
   AddFriend : AddFriendReducer,
-  AddGroup : AddGroupReducer
+  AddGroup : AddGroupReducer,
+  GetVideo : GetVideoReducer,
+  GetFounder : GetFounderReducer, 
+  GetArticle : GetArticleReducer,
 });
 
 const persistConfig = {
@@ -63,7 +69,7 @@ const persistConfig = {
     'GetFriends',
     'GetGroups',
     'AddPaymentLog',
-    'GetPaymentLog',
+    'GetPaymentLog',    
     'AddFriend',
     'AddGroup',
   ],
