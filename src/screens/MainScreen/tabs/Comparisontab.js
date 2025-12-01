@@ -31,8 +31,13 @@ const ComparisonTab = () => {
     <View style={styles.container}>
       <View style={styles.heroCard}>
         <View style={styles.heroHeader}>
+<<<<<<< HEAD
+            <Sparkles size={20} color="#B89600" />
+            <Text style={styles.heroTitle}>AI Insight</Text>
+=======
           <Sparkles size={20} color="#FFD700" />
           <Text style={styles.heroTitle}>AI Insight</Text>
+>>>>>>> 21ffb23d356e33a51874458b51674c32e4af2dee
         </View>
         <Text style={styles.heroText}>
           You spent <Text style={styles.heroHighlight}>₹1,200</Text> on snacks
@@ -63,6 +68,25 @@ const ComparisonTab = () => {
                 </Text>
               </View>
 
+<<<<<<< HEAD
+              <View style={[
+                  styles.badge, 
+                  { 
+                    // Badge background dynamic opacity based logic
+                    backgroundColor: isAffordable 
+                        ? "rgba(0, 230, 118, 0.1)" 
+                        : "rgba(255, 183, 77, 0.1)" 
+                  }
+              ]}>  
+                <Text style={[                         
+                    styles.badgeText,
+                    {
+                        // Colors from Context
+                        color: isAffordable ? colors.success : colors.warning 
+                    }
+                ]}>
+                    {isAffordable ? "Affordable" : "Close"}
+=======
               <View
                 style={[
                   styles.badge,
@@ -82,8 +106,9 @@ const ComparisonTab = () => {
                   ]}
                 >
                   {isAffordable ? 'Affordable' : 'Close'}
+>>>>>>> 21ffb23d356e33a51874458b51674c32e4af2dee
                 </Text>
-              </View>
+              </View> 
             </View>
           );
         }}
