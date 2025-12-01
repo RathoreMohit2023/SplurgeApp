@@ -9,23 +9,16 @@ import {
   StatusBar
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
-// Imports
 import { MainLogo } from "../../Assets/Images";
 import { getData } from "../../Redux/storage"; 
 import CustomInput from "../../components/CustomInput"; 
-import getLoginStyle from "../../styles/authenthication/LoginStyle"; // Function Import
+import getLoginStyle from "../../styles/authenthication/LoginStyle";
 import { ThemeContext } from "../../components/ThemeContext";
 
 const SignInScreen = ({ navigation }) => {
-  // Context Hooks
   const { colors, themeType } = useContext(ThemeContext);
-  
-  // Style Memoization
   const styles = useMemo(() => getLoginStyle(colors), [colors]);
-
   const fade = useRef(new Animated.Value(0)).current;
-  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -63,10 +56,10 @@ const SignInScreen = ({ navigation }) => {
 
   return (
     <KeyboardAwareScrollView
-      contentContainerStyle={styles.container} // Dynamic Container
+      contentContainerStyle={styles.container}
       enableOnAndroid={true}
       extraScrollHeight={20}
-      style={{ backgroundColor: colors.background }} // Ensure outer view bg matches
+      style={{ backgroundColor: colors.background }}
     >
       <StatusBar 
         barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
@@ -80,12 +73,10 @@ const SignInScreen = ({ navigation }) => {
       >
         <Animated.View style={{ width: "100%", opacity: fade, alignItems: "center" }}>
           
-          {/* Logo */}
           <Image source={MainLogo} style={styles.logo} resizeMode="contain" />
           <Text style={styles.welcomeText}>Welcome Back!</Text>
           <Text style={styles.tagline}>Spend smarter. Live better.</Text>
 
-          {/* Form */}
           <View style={styles.formContainer}>
             <CustomInput
               label="Email"
@@ -97,8 +88,6 @@ const SignInScreen = ({ navigation }) => {
               leftIcon="email-outline"
               keyboardType="email-address"
               error={emailError}
-              // Agar CustomInput prop support karta hai toh colors pass karein
-              // themeColors={colors} 
             />
 
             <CustomInput
@@ -111,7 +100,6 @@ const SignInScreen = ({ navigation }) => {
               leftIcon="lock-outline"
               password={true}
               error={passwordError}
-              // themeColors={colors}
             />
 
             <TouchableOpacity 

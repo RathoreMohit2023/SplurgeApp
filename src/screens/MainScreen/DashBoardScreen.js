@@ -20,7 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getDashBoardStyles from '../../styles/MainScreen/DashboardStyle';
 import { ThemeContext } from '../../components/ThemeContext';
 import AddWishListModal from '../../Modals/AddWishListModal';
-import  AllTransactionsModal from '../../Modals/AllTransactionsModal';
+import AllTransactionsModal from '../../Modals/AllTransactionsModal';
 
 const DashBoardScreen = () => {
   const { colors, themeType, toggleTheme } = useContext(ThemeContext);
@@ -28,7 +28,6 @@ const DashBoardScreen = () => {
   const [wishlistModal, setWishlistModal] = useState(false);
   const insets = useSafeAreaInsets();
   const DashBoardStyle = useMemo(() => getDashBoardStyles(colors), [colors]);
-
 
   const monthlySpending = 32500;
   const weeklyAverage = 7506;
@@ -93,7 +92,6 @@ const DashBoardScreen = () => {
         backgroundColor={colors.background}
       />
 
-      {/* HEADER */}
       <View style={DashBoardStyle.header}>
         <View>
           <Text style={DashBoardStyle.greetingText}>Good Morning,</Text>
@@ -197,9 +195,8 @@ const DashBoardScreen = () => {
         <View style={DashBoardStyle.rowBetween}>
           <Text style={DashBoardStyle.sectionTitle}>Transactions</Text>
           <TouchableOpacity onPress={() => setShowTransactions(true)}>
-  <Text style={DashBoardStyle.linkText}>See All</Text>
-</TouchableOpacity>
-
+            <Text style={DashBoardStyle.linkText}>See All</Text>
+          </TouchableOpacity>
         </View>
         {recentTransactions.map(item => {
           const IconComponent = item.icon;
@@ -292,11 +289,10 @@ const DashBoardScreen = () => {
         }}
       />
       <AllTransactionsModal
-  visible={showTransactions}
-  onClose={() => setShowTransactions(false)}
-  data={recentTransactions}
-/>
-
+        visible={showTransactions}
+        onClose={() => setShowTransactions(false)}
+        data={recentTransactions}
+      />
 
       <View style={{ height: 100 }} />
     </ScrollView>

@@ -1,15 +1,13 @@
-import React, { useContext, useMemo } from "react";
-import { View, StatusBar } from "react-native";
-import { Text } from "react-native-paper";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-// Imports
-import LedgerTab from "./tabs/LedgerTab";
-import WishlistTab from "./tabs/Wishlisttab";
-import ComparisonTab from "./tabs/Comparisontab";
-import { ThemeContext } from "../../components/ThemeContext"; // Path adjust karein
-import getCalculatorStyles from "../../styles/MainScreen/calculatorStyle"
+import React, { useContext, useMemo } from 'react';
+import { View, StatusBar } from 'react-native';
+import { Text } from 'react-native-paper';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LedgerTab from './tabs/LedgerTab';
+import WishlistTab from './tabs/Wishlisttab';
+import ComparisonTab from './tabs/Comparisontab';
+import { ThemeContext } from '../../components/ThemeContext';
+import getCalculatorStyles from '../../styles/MainScreen/calculatorStyle';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -21,11 +19,11 @@ const CalculatorScreen = () => {
 
   return (
     <View style={[styles.container, { paddingBottom: bottomPadding }]}>
-      <StatusBar 
-        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
-        backgroundColor={colors.background} 
+      <StatusBar
+        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
       />
-      
+
       <View style={styles.headerContainer}>
         <Text style={styles.title}>Impact Calculator</Text>
         <Text style={styles.subtitle}>See what your spending could buy</Text>
@@ -33,14 +31,13 @@ const CalculatorScreen = () => {
 
       <Tab.Navigator
         screenOptions={{
-          // Dynamic Colors for Tabs
           tabBarActiveTintColor: colors.theme,
           tabBarInactiveTintColor: colors.textSecondary,
-          
+
           tabBarStyle: {
             backgroundColor: colors.background,
-            elevation: 0, // Remove shadow on Android
-            shadowOpacity: 0, // Remove shadow on iOS
+            elevation: 0,
+            shadowOpacity: 0,
             borderBottomWidth: 1,
             borderBottomColor: colors.border,
           },
@@ -50,11 +47,10 @@ const CalculatorScreen = () => {
             borderRadius: 3,
           },
           tabBarLabelStyle: {
-            fontWeight: "700",
-            textTransform: "capitalize",
+            fontWeight: '700',
+            textTransform: 'capitalize',
             fontSize: 14,
           },
-          // Optional: Ripple color for Android
           tabBarPressColor: colors.tintedThemeColor,
         }}
         style={{ backgroundColor: colors.background }}

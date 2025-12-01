@@ -10,16 +10,13 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// Imports
 import AppHeader from '../../components/Header';
 import getHelpSupportStyle from "../../styles/MainScreen/HelpSupportStyle"; 
 import { ThemeContext } from "../../components/ThemeContext"; 
 
 const HelpSupport = ({ navigation }) => {
-  // 1. Context Hook
   const { colors, themeType } = useContext(ThemeContext);
 
-  // 2. Styles Memoization
   const styles = useMemo(() => getHelpSupportStyle(colors), [colors]);
 
   const insets = useSafeAreaInsets();
