@@ -10,14 +10,14 @@ const GetArticleSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder.GetCase(GetArticleApi.pending, (state, action) => {
+    builder.addCase(GetArticleApi.pending, (state, action) => {
       state.GetArticleloading = true;
     });
-    builder.GetCase(GetArticleApi.fulfilled, (state, action) => {
+    builder.addCase(GetArticleApi.fulfilled, (state, action) => {
       state.GetArticleloading = false;
       state.GetArticleData = action.payload;
     });
-    builder.GetCase(GetArticleApi.rejected, (state, action) => {
+    builder.addCase(GetArticleApi.rejected, (state, action) => {
       state.GetArticleloading = false;
       state.isError = true;
     });

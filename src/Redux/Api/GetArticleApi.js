@@ -5,8 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const url = `${BASE_URL}${GetArticle_Url}`;
 
-export const GetFounderApi = createAsyncThunk(
-  'GetFounderApi',
+export const GetArticleApi = createAsyncThunk(
+  'GetArticleApi',
   async (PostData) => {
     
     const token = await AsyncStorage.getItem('Token');
@@ -19,12 +19,12 @@ export const GetFounderApi = createAsyncThunk(
       const response = await axios.post(url, PostData, {
         headers
       });
-      console.log("Response from GetFounderApi:", response.data);
+      console.log("Response from GetArticleApi:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.log('Error in GetFounderApi:', error.response.data);
+      console.log('Error in GetArticleApi:', error.response.data);
     }
   }
 );

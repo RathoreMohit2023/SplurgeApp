@@ -10,14 +10,14 @@ const GetUserDetailsSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder.GetCase(GetUserDetailsApi.pending, (state, action) => {
+    builder.addCase(GetUserDetailsApi.pending, (state, action) => {
       state.GetUserDetailsLoading = true;
     });
-    builder.GetCase(GetUserDetailsApi.fulfilled, (state, action) => {
+    builder.addCase(GetUserDetailsApi.fulfilled, (state, action) => {
       state.GetUserDetailsLoading = false;
       state.GetUserDetailsData = action.payload;
     });
-    builder.GetCase(GetUserDetailsApi.rejected, (state, action) => {
+    builder.addCase(GetUserDetailsApi.rejected, (state, action) => {
       state.GetUserDetailsLoading = false;
       state.isError = true;
     });

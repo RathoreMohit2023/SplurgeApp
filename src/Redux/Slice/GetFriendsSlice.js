@@ -10,14 +10,14 @@ const GetFriendsSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder.GetCase(GetFriendsApi.pending, (state, action) => {
+    builder.addCase(GetFriendsApi.pending, (state, action) => {
       state.GetFriendsLoading = true;
     });
-    builder.GetCase(GetFriendsApi.fulfilled, (state, action) => {
+    builder.addCase(GetFriendsApi.fulfilled, (state, action) => {
       state.GetFriendsLoading = false;
       state.GetFriendsData = action.payload;
     });
-    builder.GetCase(GetFriendsApi.rejected, (state, action) => {
+    builder.addCase(GetFriendsApi.rejected, (state, action) => {
       state.GetFriendsLoading = false;
       state.isError = true;
     });

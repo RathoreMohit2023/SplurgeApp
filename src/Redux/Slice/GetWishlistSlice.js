@@ -10,14 +10,14 @@ const GetWishlistSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder.GetCase(GetWishlistApi.pending, (state, action) => {
+    builder.addCase(GetWishlistApi.pending, (state, action) => {
       state.GetWishlistLoading = true;
     });
-    builder.GetCase(GetWishlistApi.fulfilled, (state, action) => {
+    builder.addCase(GetWishlistApi.fulfilled, (state, action) => {
       state.GetWishlistLoading = false;
       state.GetWishlistData = action.payload;
     });
-    builder.GetCase(GetWishlistApi.rejected, (state, action) => {
+    builder.addCase(GetWishlistApi.rejected, (state, action) => {
       state.GetWishlistLoading = false;
       state.isError = true;
     });

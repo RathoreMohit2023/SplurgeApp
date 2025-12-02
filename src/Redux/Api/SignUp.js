@@ -1,15 +1,9 @@
-import { createAsyncThunk } from "node_modules/@reduxjs/toolkit/dist";
-import axios from "node_modules/axios";
+import axios from "axios";
 import { BASE_URL, SignUp_Url } from "../NWConfig";
-import AsyncStorage from "node_modules/@react-native-async-storage/async-storage/lib/typescript";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const Url = `${BASE_URL}${SignUp_Url}`;
-
-// const SignUpApi = () => {
-
-// }
-
-// export default SignUpApi;
 
 export const SignUpApi = createAsyncThunk(
     'SignUpApi',

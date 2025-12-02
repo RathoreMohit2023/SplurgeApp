@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { ForgoteApi } from "../Api/Forgote";
+import { ForgoteApi } from '../Api/ForgoteApi'
 
 const forgoteSlice = createSlice({
     name: "Forgote",

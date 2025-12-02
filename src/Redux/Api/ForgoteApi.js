@@ -1,11 +1,11 @@
-import { createAsyncThunk } from "node_modules/@reduxjs/toolkit/dist";
-import axios from "node_modules/axios";
+import axios from "axios";
 import { BASE_URL, Forgote_Url } from "../NWConfig";
-import AsyncStorage from "node_modules/@react-native-async-storage/async-storage/lib/typescript";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const Url = `${BASE_URL}${Forgote_Url}`;
 
-export const forgoteApi = createAsyncThunk(
+export const ForgoteApi = createAsyncThunk(
     'ForgoteApi',
     async (PosttData) => {
 
@@ -20,7 +20,7 @@ export const forgoteApi = createAsyncThunk(
             const response = await axios.post(Url, PosttData, {
                 headers
             })
-            console.log("Response from LoginApi:", response.data);
+            console.log("Response from ForgoteApi:", response.data);
       
             const result = response.data;
             return result;

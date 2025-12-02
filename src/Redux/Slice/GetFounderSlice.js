@@ -10,14 +10,14 @@ const GetFounderSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder.GetCase(GetFounderApi.pending, (state, action) => {
+    builder.addCase(GetFounderApi.pending, (state, action) => {
       state.GetFounderloading = true;
     });
-    builder.GetCase(GetFounderApi.fulfilled, (state, action) => {
+    builder.addCase(GetFounderApi.fulfilled, (state, action) => {
       state.GetFounderloading = false;
       state.GetFiunderData = action.payload;
     });
-    builder.GetCase(GetFounderApi.rejected, (state, action) => {
+    builder.addCase(GetFounderApi.rejected, (state, action) => {
       state.GetFounderloading = false;
       state.isError = true;
     });

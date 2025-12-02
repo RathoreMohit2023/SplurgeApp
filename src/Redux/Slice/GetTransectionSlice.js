@@ -10,14 +10,14 @@ const GetTransactionSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder.GetCase(GetTransectionApi.pending, (state, action) => {
+    builder.addCase(GetTransectionApi.pending, (state, action) => {
       state.GetTransactionLoading = true;
     });
-    builder.GetCase(GetTransectionApi.fulfilled, (state, action) => {
+    builder.addCase(GetTransectionApi.fulfilled, (state, action) => {
       state.GetTransactionLoading = false;
       state.GetTransactionData = action.payload;
     });
-    builder.GetCase(GetTransectionApi.rejected, (state, action) => {
+    builder.addCase(GetTransectionApi.rejected, (state, action) => {
       state.GetTransactionLoading = false;
       state.isError = true;
     });

@@ -10,14 +10,14 @@ const GetVideoSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder.GetCase(GetvideoApi.pending, (state, action) => {
+    builder.addCase(GetvideoApi.pending, (state, action) => {
       state.GetVideoLoading = true;
     });
-    builder.GetCase(GetvideoApi.fulfilled, (state, action) => {
+    builder.addCase(GetvideoApi.fulfilled, (state, action) => {
       state.GetVideoLoading = false;
       state.GetVideoData = action.payload;
     });
-    builder.GetCase(GetvideoApi.rejected, (state, action) => {
+    builder.addCase(GetvideoApi.rejected, (state, action) => {
       state.GetVideoLoading = false;
       state.isError = true;
     });

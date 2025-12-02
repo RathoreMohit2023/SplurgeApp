@@ -10,14 +10,14 @@ const GetGroupsSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-    builder.GetCase(GetGroupsApi.pending, (state, action) => {
+    builder.addCase(GetGroupsApi.pending, (state, action) => {
       state.GetGroupsLoading = true;
     });
-    builder.GetCase(GetGroupsApi.fulfilled, (state, action) => {
+    builder.addCase(GetGroupsApi.fulfilled, (state, action) => {
       state.GetGroupsLoading = false;
       state.GetGroupsData = action.payload;
     });
-    builder.GetCase(GetGroupsApi.rejected, (state, action) => {
+    builder.addCase(GetGroupsApi.rejected, (state, action) => {
       state.GetGroupsLoading = false;
       state.isError = true;
     });
