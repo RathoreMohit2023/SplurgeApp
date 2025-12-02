@@ -29,6 +29,11 @@ import AddGroupReducer from '../Slice/AddGroupSlice';
 import GetVideoReducer from '../Slice/GetVideoSlice';
 import GetFounderReducer from '../Slice/GetFounderSlice';
 import GetArticleReducer from '../Slice/GetArticleSlice';
+import SettleUpReducer from '../Slice/SettleUpSlice';
+import HelpAndSupportReducer from '../Slice/HelpAndSupportSlice';
+import PrivacyPolicyReducer from '../Slice/PrivacyPolicySlice';
+import GetInterestReducer from '../Slice/GetInterestSlice';
+import EditProfileReducer from '../Slice/EditProfileSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
@@ -50,6 +55,11 @@ const rootReducer = combineReducers({
   GetVideo : GetVideoReducer,
   GetFounder : GetFounderReducer, 
   GetArticle : GetArticleReducer,
+  SettleUp : SettleUpReducer,
+  HelpAndSupport : HelpAndSupportReducer,
+  PrivacyPolicy : PrivacyPolicyReducer,
+  GetInterest : GetInterestReducer,
+  EditProfile : EditProfileReducer
 });
 
 const persistConfig = {

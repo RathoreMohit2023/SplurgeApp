@@ -14,6 +14,8 @@ export const DeleteWishlist_Url = '';
 export const AddPaymentLog_Url = '';
 export const AddFriend_Url = '';
 export const AddGroup_Url = '';
+export const SettleUp_Url = '';
+export const EditProfile_Url = '';
 
 //  GET API
 export const GetTransection_Url = '';
@@ -25,3 +27,6 @@ export const GetPaymentLog_Url = '';
 export const GetVideos_Url = '';
 export const GetFounders_Url = '';
 export const GetArticle_Url = '';
+export const HelpAndSupport_Url = '';
+export const PrivacyPolicy_Url = '';
+export const GetInterest_Url = '';
