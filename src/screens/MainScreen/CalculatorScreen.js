@@ -8,6 +8,7 @@ import WishlistTab from './tabs/Wishlisttab';
 import ComparisonTab from './tabs/Comparisontab';
 import { ThemeContext } from '../../components/ThemeContext';
 import getCalculatorStyles from '../../styles/MainScreen/calculatorStyle';
+import { useSelector } from 'react-redux';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -16,6 +17,7 @@ const CalculatorScreen = () => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getCalculatorStyles(colors), [colors]);
   const bottomPadding = insets.bottom + 60;
+ 
 
   return (
     <View style={[styles.container, { paddingBottom: bottomPadding }]}>

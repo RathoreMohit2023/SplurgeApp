@@ -24,5 +24,4 @@ const GetUserDetailsSlice = createSlice({
   },
 });
 
-
 export default GetUserDetailsSlice.reducer;

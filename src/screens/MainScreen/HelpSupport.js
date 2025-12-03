@@ -60,7 +60,7 @@ const HelpSupport = ({ navigation }) => {
       />
 
       <AppHeader
-        showThemeToggle={false}
+        showThemeToggle={true}
         navigation={navigation}
         showBackButton={true}
         title="Help & Support"

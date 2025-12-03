@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Bell, Sun, Moon, ArrowLeft } from "lucide-react-native";
 import getHeaderStyle from "../styles/Components/headerStyle";
 import { ThemeContext } from "../components/ThemeContext";
-import { MainLogo } from "../Assets/Images/index";
+import { darkLogo, MainLogo } from "../Assets/Images/index";
 
 const AppHeader = ({
   navigation,
@@ -22,6 +22,8 @@ const AppHeader = ({
   const textColor = colors.text;
 
   const handleThemeToggle = onThemeTogglePress || toggleTheme;
+  const appLogo = themeType === "dark" ? darkLogo : MainLogo;
+
 
   return (
     <View style={headerStyle.container}>
@@ -37,7 +39,7 @@ const AppHeader = ({
         ) : (
           <>
             <Image
-              source={MainLogo}
+              source={appLogo}
               style={headerStyle.logo}
               resizeMode="contain"
             />

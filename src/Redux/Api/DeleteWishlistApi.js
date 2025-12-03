@@ -7,11 +7,9 @@ const url = `${BASE_URL}${DeleteWishlist_Url}`;
 
 export const DeleteWishlistApi = createAsyncThunk(
   'DeleteWishlist',
-  async (id) => {
-    const token = await AsyncStorage.getItem('Token');
-    const parsedToken = JSON.parse(token);
+  async ({token, id}) => {
     const headers = {
-        "Authorization": `Bearer ${parsedToken}`, 
+        "Authorization": `Bearer ${token}`, 
     }
     try {
       const response = await axios.delete(url + id, {

@@ -5,7 +5,7 @@ import {
   Modal,
   Text,
 } from "react-native";
-import { X } from "lucide-react-native";
+import { X, RotateCcw } from "lucide-react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import CustomInput from "../components/CustomInput";
@@ -19,25 +19,50 @@ const AddWishListModal = ({ visible, onClose, onSave }) => {
   const [itemName, setItemName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  const [errors, setErrors] = useState({});
 
-  const handleSave = () => {
-    if (!itemName || !price) return;
+  const validateForm = () => {
+    const newErrors = {};
 
-    const newItem = {
-      id: Date.now().toString(),
-      name: itemName,
-      price: parseInt(price),
-      description: description || "",
-    };
+    if (!itemName.trim()) {
+      newErrors.itemName = "Item Name is required.";
+    }
 
-    onSave(newItem);
-    resetForm();
+    if (!price.trim()) {
+      newErrors.price = "Price is required.";
+    } else if (isNaN(price) || Number(price) <= 0) {
+      newErrors.price = "Please enter a valid positive number for the price.";
+    }
+
+    if (!description.trim()) {
+      newErrors.description = "Description is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const resetForm = () => {
+  const handleSave = () => {
+    if (validateForm()) {
+      const newItem = {
+        name: itemName,
+        price: parseFloat(price),
+        description: description,
+      };
+      onSave(newItem);
+      resetFormAndClose();
+    }
+  };
+
+  const handleReset = () => {
     setItemName("");
     setPrice("");
     setDescription("");
+    setErrors({});
+  };
+
+  const resetFormAndClose = () => {
+    handleReset();
     onClose();
   };
 
@@ -46,7 +71,7 @@ const AddWishListModal = ({ visible, onClose, onSave }) => {
       animationType="slide"
       transparent={true}
       visible={visible}
-      onRequestClose={resetForm}
+      onRequestClose={resetFormAndClose}
       presentationStyle="overFullScreen"
       statusBarTranslucent={true}
     >
@@ -54,9 +79,14 @@ const AddWishListModal = ({ visible, onClose, onSave }) => {
         <View style={[styles.modalContainer, { maxHeight: '80%' }]}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Add to Wishlist</Text>
-            <TouchableOpacity onPress={resetForm}>
-              <X size={22} color={colors.text} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity onPress={handleReset} style={{ marginRight: 15 }}>
+                <RotateCcw size={20} color={colors.text} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={resetFormAndClose}>
+                <X size={22} color={colors.text} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <KeyboardAwareScrollView
@@ -70,21 +100,39 @@ const AddWishListModal = ({ visible, onClose, onSave }) => {
               <CustomInput
                 label="Item Name"
                 value={itemName}
-                onChangeText={setItemName}
+                onChangeText={(text) => {
+                  setItemName(text);
+                  if (errors.itemName) {
+                    setErrors(prev => ({ ...prev, itemName: null }));
+                  }
+                }}
                 leftIcon="file-document-outline"
+                error={errors.itemName}
               />
               <CustomInput
                 label="Price"
                 value={price}
-                onChangeText={setPrice}
+                onChangeText={(text) => {
+                  setPrice(text);
+                  if (errors.price) {
+                    setErrors(prev => ({ ...prev, price: null }));
+                  }
+                }}
                 keyboardType="numeric"
                 leftIcon="currency-inr"
+                error={errors.price}
               />
               <CustomInput
                 label="Description"
                 value={description}
-                onChangeText={setDescription}
+                onChangeText={(text) => {
+                    setDescription(text)
+                    if (errors.description) {
+                        setErrors(prev => ({ ...prev, description: null }));
+                    }
+                }}
                 leftIcon="text"
+                error={errors.description}
               />
             </View>
 

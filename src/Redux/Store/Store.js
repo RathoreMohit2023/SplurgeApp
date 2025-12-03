@@ -34,6 +34,7 @@ import HelpAndSupportReducer from '../Slice/HelpAndSupportSlice';
 import PrivacyPolicyReducer from '../Slice/PrivacyPolicySlice';
 import GetInterestReducer from '../Slice/GetInterestSlice';
 import EditProfileReducer from '../Slice/EditProfileSlice';
+import GetCategoriesReducer from '../Slice/GetCategoriesSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
@@ -59,7 +60,8 @@ const rootReducer = combineReducers({
   HelpAndSupport : HelpAndSupportReducer,
   PrivacyPolicy : PrivacyPolicyReducer,
   GetInterest : GetInterestReducer,
-  EditProfile : EditProfileReducer
+  EditProfile : EditProfileReducer,
+  GetCategories : GetCategoriesReducer
 });
 
 const persistConfig = {

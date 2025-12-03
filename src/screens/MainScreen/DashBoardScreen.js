@@ -1,281 +1,221 @@
-import React, { useState, useContext, useMemo } from 'react';
+import React, { useState, useContext, useMemo, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StatusBar,
-} from 'react-native';
-import {
-  TrendingDown,
-  Wallet,
-  Coffee,
-  ShoppingBag,
-  Target,
-  ArrowUpRight,
-  Plane,
-  Zap,
+  TrendingDown, Wallet, Target, ArrowUpRight, DollarSign,
+  Car, Coffee, Film, Utensils, ShoppingBag, Home, Lightbulb,
+  Signal, Fuel, Wrench, Stethoscope, School, GraduationCap, Shirt,
+  Plane, Repeat, Shield, Landmark, TrendingUp, ShoppingCart, Scissors,
+  Gift, AlertTriangle, Baby, Dog,
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
+
 import getDashBoardStyles from '../../styles/MainScreen/DashboardStyle';
 import { ThemeContext } from '../../components/ThemeContext';
 import AddWishListModal from '../../Modals/AddWishListModal';
 import AllTransactionsModal from '../../Modals/AllTransactionsModal';
+import ToastMessage from '../../components/ToastMessage';
+import { GetUserDetailsApi } from '../../Redux/Api/GetUserDetailsApi';
+import { GetCategoriesApi } from '../../Redux/Api/GetCategoriesApi';
+import { GetWishlistApi } from '../../Redux/Api/GetWishlistApi';
+import { AddWishlistApi } from '../../Redux/Api/AddWishlistApi';
+import { GetTransectionApi } from '../../Redux/Api/GetTransectionApi';
+
+const categoryIcons = {
+  'Food & Groceries': Utensils, 'Dining Out': Coffee, 'Rent / Housing': Home,
+  'Utilities': Lightbulb, 'Internet & Mobile Recharge': Signal, 'Transportation': Car,
+  'Fuel': Fuel, 'Vehicle Maintenance': Wrench, 'Health & Medical': Stethoscope,
+  'Medicine / Pharmacy': Stethoscope, 'Education': School, 'School Fees': GraduationCap,
+  'Shopping': ShoppingBag, 'Clothing': Shirt, 'Entertainment': Film,
+  'Travel & Trips': Plane, 'Subscriptions': Repeat, 'Insurance': Shield,
+  'Loans & EMIs': Landmark, 'Investments & Savings': TrendingUp, 'Household Supplies': ShoppingCart,
+  'Personal Care': Scissors, 'Gifts & Donations': Gift, 'Emergency Expenses': AlertTriangle,
+  'Kids & Childcare': Baby, 'Pets & Pet Care': Dog,
+};
 
 const DashBoardScreen = () => {
-  const { colors, themeType, toggleTheme } = useContext(ThemeContext);
+  const { colors, themeType } = useContext(ThemeContext);
+  const styles = useMemo(() => getDashBoardStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
+
   const [showTransactions, setShowTransactions] = useState(false);
   const [wishlistModal, setWishlistModal] = useState(false);
-  const insets = useSafeAreaInsets();
-  const DashBoardStyle = useMemo(() => getDashBoardStyles(colors), [colors]);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+
+  const { LoginData } = useSelector(state => state.Login);
+  const { GetWishlistData } = useSelector(state => state.GetWishlist);
+  const { GetTransactionData } = useSelector(state => state.GetTransaction);
 
   const monthlySpending = 32500;
   const weeklyAverage = 7506;
   const dailyAverage = 1083;
-  const savingsGoal = 50000;
-  const savedAmount = 32500;
 
-  const recentTransactions = [
-    {
-      id: '1',
-      description: 'Starbucks Coffee',
-      category: 'Food',
-      amount: 250,
-      icon: Coffee,
-      time: '2h ago',
-      type: 'debit',
-    },
-    {
-      id: '2',
-      description: 'Nike Store',
-      category: 'Shopping',
-      amount: 3500,
-      icon: ShoppingBag,
-      time: '5h ago',
-      type: 'debit',
-    },
-    {
-      id: '3',
-      description: 'Office Trip',
-      category: 'Travel',
-      amount: 12000,
-      icon: Plane,
-      time: '1d ago',
-      type: 'debit',
-    },
-    {
-      id: '4',
-      description: 'Uber Ride',
-      category: 'Transport',
-      amount: 450,
-      icon: Zap,
-      time: '1d ago',
-      type: 'debit',
-    },
-  ];
+  const fetchApi = () => {
+    if (LoginData?.token && LoginData?.user?.id) {
+      dispatch(GetUserDetailsApi(LoginData.token));
+      dispatch(GetCategoriesApi(LoginData.token));
+      dispatch(GetWishlistApi({ token: LoginData.token, id: LoginData.user.id }));
+      dispatch(GetTransectionApi({ token: LoginData.token, id: LoginData.user.id }));
+    }
+  };
 
-  const wishlistItems = [
-    { id: '1', name: 'Sony WH-1000XM5', price: 25000, saved: 75, icon: Zap },
-    { id: '2', name: 'Bali Trip', price: 80000, saved: 30, icon: Plane },
-  ];
+  useEffect(() => {
+    fetchApi();
+  }, [LoginData]);
 
-  const progressWidth = value => `${value}%`;
+  const handleAddItem = async (newItem) => {
+    const token = LoginData?.token;
+    const formData = new FormData();
+    formData.append('user_id', LoginData?.user?.id);
+    formData.append('name', newItem.name);
+    formData.append('price', newItem.price);
+    formData.append('description', newItem.description);
+
+    try {
+      const result = await dispatch(AddWishlistApi({ formData, token })).unwrap();
+      if (result?.status === true || result?.status === "true") {
+        setToastMsg(result?.message || "Item added successfully!");
+        setWishlistModal(false);
+        fetchApi();
+      } else {
+        setToastMsg(result?.message || "Failed to add item.");
+      }
+    } catch (error) {
+      console.error("API Catch Error:", error);
+      setToastMsg("Something went wrong. Please try again.");
+    } finally {
+      setToastVisible(true);
+    }
+  };
+  
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    let parts = dateString.split(/[-/]/);
+    let transactionDate;
+    if (parts[0].length === 4) { // YYYY-MM-DD
+      transactionDate = new Date(parts[0], parts[1] - 1, parts[2]);
+    } else { // DD-MM-YYYY
+      transactionDate = new Date(parts[2], parts[1] - 1, parts[0]);
+    }
+    
+    if (isNaN(transactionDate)) return dateString;
+
+    if (transactionDate.toDateString() === today.toDateString()) return 'Today';
+    if (transactionDate.toDateString() === yesterday.toDateString()) return 'Yesterday';
+    return transactionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  const allTransactions = GetTransactionData?.get_transactions || [];
+  const recentTransactions = allTransactions.slice(0, 4); // Sirf latest 4 transactions dikhayein
+  const wishlistItems = GetWishlistData?.get_wishlists || [];
 
   return (
     <ScrollView
-      style={[DashBoardStyle.container, { paddingBottom: insets.bottom }]}
+      style={styles.container}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 20 }}
+      contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
     >
       <StatusBar
         barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={colors.background}
       />
 
-      <View style={DashBoardStyle.header}>
+      <View style={styles.header}>
         <View>
-          <Text style={DashBoardStyle.greetingText}>Good Morning,</Text>
-          <Text style={DashBoardStyle.userName}>Alex Johnson</Text>
+          <Text style={styles.greetingText}>Good Morning,</Text>
+          <Text style={styles.userName}>{LoginData?.user?.name || 'User'}</Text>
         </View>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <TouchableOpacity style={DashBoardStyle.profileButton}>
-            <View style={DashBoardStyle.profilePlaceholder}>
-              <Text style={DashBoardStyle.profileInitials}>AJ</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.profileButton}>
+          <View style={styles.profilePlaceholder}>
+            <Text style={styles.profileInitials}>
+              {LoginData?.user?.name?.charAt(0).toUpperCase() || 'U'}
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
-      <View style={DashBoardStyle.heroCard}>
-        <View style={DashBoardStyle.rowBetween}>
-          <View style={DashBoardStyle.heroIconBg}>
-            <Wallet size={20} color={colors.theme} />
-          </View>
-          <TouchableOpacity>
-            {/* <MoreHorizontal size={20} color={colors.textSecondary} /> */}
-          </TouchableOpacity>
+      <View style={styles.heroCard}>
+        <View style={styles.rowBetween}>
+          <View style={styles.heroIconBg}><Wallet size={20} color={colors.theme} /></View>
         </View>
-        <View style={DashBoardStyle.heroContent}>
-          <Text style={DashBoardStyle.heroLabel}>Total Spent (Nov)</Text>
-          <Text style={DashBoardStyle.heroValue}>
-            ₹{monthlySpending.toLocaleString()}
-          </Text>
+        <View style={styles.heroContent}>
+          <Text style={styles.heroLabel}>Total Spent (Nov)</Text>
+          <Text style={styles.heroValue}>₹{monthlySpending.toLocaleString()}</Text>
         </View>
-        <View style={DashBoardStyle.heroFooter}>
-          <View style={DashBoardStyle.trendBadge}>
+        <View style={styles.heroFooter}>
+          <View style={styles.trendBadge}>
             <TrendingDown size={14} color={colors.success} />
-            <Text style={DashBoardStyle.trendText}> 12% vs last month</Text>
+            <Text style={styles.trendText}> 12% vs last month</Text>
           </View>
         </View>
       </View>
 
-      <View style={DashBoardStyle.gridContainer}>
-        <View style={DashBoardStyle.statCard}>
-          <Text style={DashBoardStyle.statLabel}>Weekly Avg</Text>
-          <Text style={DashBoardStyle.statValue}>
-            ₹{weeklyAverage.toLocaleString()}
-          </Text>
-          <View style={DashBoardStyle.miniChartLine} />
+      <View style={styles.gridContainer}>
+        <View style={styles.statCard}>
+          <Text style={styles.statLabel}>Weekly Avg</Text>
+          <Text style={styles.statValue}>₹{weeklyAverage.toLocaleString()}</Text>
+          <View style={styles.miniChartLine} />
         </View>
-        <View style={DashBoardStyle.statCard}>
-          <Text style={DashBoardStyle.statLabel}>Daily Avg</Text>
-          <Text style={DashBoardStyle.statValue}>
-            ₹{dailyAverage.toLocaleString()}
-          </Text>
-          <View style={[DashBoardStyle.miniChartLine, { opacity: 0.5 }]} />
+        <View style={styles.statCard}>
+          <Text style={styles.statLabel}>Daily Avg</Text>
+          <Text style={styles.statValue}>₹{dailyAverage.toLocaleString()}</Text>
+          <View style={[styles.miniChartLine, { opacity: 0.5 }]} />
         </View>
       </View>
 
-      {/* <View style={DashBoardStyle.sectionContainer}>
-        <View style={DashBoardStyle.rowBetween}>
-          <Text style={DashBoardStyle.sectionTitle}>Main Goal</Text>
-          <Text style={DashBoardStyle.linkText}>Edit</Text>
-        </View>
-        <View style={DashBoardStyle.goalCard}>
-          <View style={DashBoardStyle.rowBetween}>
-            <View style={DashBoardStyle.row}>
-              <View style={DashBoardStyle.goalIconBg}>
-                <Target size={20} color="#FFFFFF" />
-              </View>
-              <View style={{ marginLeft: 12 }}>
-                <Text style={DashBoardStyle.cardTitle}>Saving Goals</Text>
-                <Text style={DashBoardStyle.textMutedSmall}>
-                  Target: ₹{savingsGoal.toLocaleString()}
-                </Text>
-              </View>
-            </View>
-            <Text style={DashBoardStyle.percentageText}>
-              {Math.round(((savingsGoal - savedAmount) / savingsGoal) * 100)}%
-            </Text>
-          </View>
-          <View style={DashBoardStyle.progressBarContainer}>
-            <View
-              style={[
-                DashBoardStyle.progressBarFill,
-                {
-                  width: progressWidth(
-                    ((savingsGoal - savedAmount) / savingsGoal) * 100,
-                  ),
-                },
-              ]}
-            />
-          </View>
-          <View style={DashBoardStyle.rowBetween}>
-            <Text style={DashBoardStyle.textMutedSmall}>
-              Spent: ₹{savedAmount.toLocaleString()}
-            </Text>
-            <Text style={DashBoardStyle.textMutedSmall}>
-              Remaining: ₹{(savingsGoal - savedAmount).toLocaleString()}
-            </Text>
-          </View>
-        </View>
-      </View> */}
-
-      <View style={DashBoardStyle.sectionContainer}>
-        <View style={DashBoardStyle.rowBetween}>
-          <Text style={DashBoardStyle.sectionTitle}>Transactions</Text>
+      <View style={styles.sectionContainer}>
+        <View style={styles.rowBetween}>
+          <Text style={styles.sectionTitle}>Recent Transactions</Text>
           <TouchableOpacity onPress={() => setShowTransactions(true)}>
-            <Text style={DashBoardStyle.linkText}>See All</Text>
+            <Text style={styles.linkText}>See All</Text>
           </TouchableOpacity>
         </View>
-        {recentTransactions.map(item => {
-          const IconComponent = item.icon;
-          const isCredit = item.type === 'credit';
-          return (
-            <View key={item.id} style={DashBoardStyle.transactionRow}>
-              <View style={DashBoardStyle.row}>
-                <View
-                  style={[
-                    DashBoardStyle.iconCircle,
-                    isCredit && DashBoardStyle.iconCircleSuccess,
-                  ]}
-                >
-                  <IconComponent
-                    size={20}
-                    color={isCredit ? colors.success : colors.text}
-                  />
+        {recentTransactions.length > 0 ? (
+          recentTransactions.map(item => {
+            const IconComponent = categoryIcons[item.category] || DollarSign;
+            return (
+              <View key={item.id} style={styles.transactionRow}>
+                <View style={styles.row}>
+                  <View style={styles.iconCircle}>
+                    <IconComponent size={20} color={colors.darkTheme} />
+                  </View>
+                  <View style={styles.transactionDetails}>
+                    <Text style={styles.transactionTitle}>{item.description}</Text>
+                    <Text style={styles.transactionSub}>{item.category} • {formatDate(item.date)}</Text>
+                  </View>
                 </View>
-                <View style={DashBoardStyle.transactionDetails}>
-                  <Text style={DashBoardStyle.transactionTitle}>
-                    {item.description}
-                  </Text>
-                  <Text style={DashBoardStyle.transactionSub}>
-                    {item.category} • {item.time}
-                  </Text>
-                </View>
-              </View>
-              <Text
-                style={[
-                  DashBoardStyle.transactionAmount,
-                  isCredit && DashBoardStyle.textSuccess,
-                ]}
-              >
-                {isCredit ? '+' : '-'}₹{item.amount.toLocaleString()}
-              </Text>
-            </View>
-          );
-        })}
-      </View>
-
-      <View style={DashBoardStyle.sectionContainer}>
-        <Text style={DashBoardStyle.sectionTitle}>Wishlist</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingRight: 20 }}
-        >
-          {wishlistItems.map(item => (
-            <View key={item.id} style={DashBoardStyle.wishlistCard}>
-              <View style={DashBoardStyle.rowBetween}>
-                <View style={DashBoardStyle.wishlistIcon}>
-                  <item.icon size={16} color={colors.theme} />
-                </View>
-                <Text style={DashBoardStyle.wishlistPercent}>
-                  {item.saved}%
+                <Text style={styles.transactionAmount}>
+                  -₹{Number(item.amount).toLocaleString()}
                 </Text>
               </View>
-              <Text style={DashBoardStyle.wishlistName} numberOfLines={1}>
-                {item.name}
-              </Text>
-              <Text style={DashBoardStyle.wishlistPrice}>
-                ₹{item.price.toLocaleString()}
-              </Text>
-              <View style={DashBoardStyle.miniProgressBg}>
-                <View
-                  style={[
-                    DashBoardStyle.miniProgressFill,
-                    { width: progressWidth(item.saved) },
-                  ]}
-                />
+            );
+          })
+        ) : (
+          <Text style={styles.emptyText}>No recent transactions found.</Text>
+        )}
+      </View>
+
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>Wishlist</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 20 }}>
+          {wishlistItems.map(item => (
+            <View key={item.id} style={styles.wishlistCard}>
+              <View style={styles.rowBetween}>
+                <View style={styles.wishlistIcon}><Target size={16} color={colors.theme} /></View>
               </View>
+              <Text style={styles.wishlistName} numberOfLines={1}>{item.name}</Text>
+              <Text style={styles.wishlistPrice}>₹{parseFloat(item.price).toLocaleString()}</Text>
             </View>
           ))}
-          <TouchableOpacity
-            style={DashBoardStyle.addWishlistCard}
-            onPress={() => setWishlistModal(true)}
-          >
+          <TouchableOpacity style={styles.addWishlistCard} onPress={() => setWishlistModal(true)}>
             <ArrowUpRight size={24} color={colors.textSecondary} />
-            <Text style={DashBoardStyle.addWishlistText}>Add New</Text>
+            <Text style={styles.addWishlistText}>Add New</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -283,18 +223,19 @@ const DashBoardScreen = () => {
       <AddWishListModal
         visible={wishlistModal}
         onClose={() => setWishlistModal(false)}
-        onSave={data => {
-          console.log('Wishlist Saved:', data);
-          setWishlistModal(false);
-        }}
+        onSave={handleAddItem}
       />
       <AllTransactionsModal
         visible={showTransactions}
         onClose={() => setShowTransactions(false)}
-        data={recentTransactions}
+        data={allTransactions}
       />
-
-      <View style={{ height: 100 }} />
+      <ToastMessage
+        visible={toastVisible}
+        message={toastMsg}
+        onHide={() => setToastVisible(false)}
+      />
+       <View style={{ height: 100 }} />
     </ScrollView>
   );
 };

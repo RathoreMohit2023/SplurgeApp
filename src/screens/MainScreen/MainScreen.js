@@ -14,7 +14,7 @@ const MainScreen = ({ navigation }) => {
   return (
     <>
       <AppHeader
-        showThemeToggle={false}
+        showThemeToggle={true}
         navigation={navigation}
         onThemeTogglePress={handleThemeToggle}
       />

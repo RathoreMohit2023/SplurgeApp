@@ -18,13 +18,7 @@ const LoginSlice = createSlice({
       state.LoginLoading = false;
       state.LoginData = action.payload;
 
-      const response = action.payload;
-
-      if (response?.token || response?.message?.toLowerCase().includes("success")) {
-        Alert.alert("Success", "Login Successfully!");
-      } else {
-        Alert.alert("Error", response?.message || "Invalid Credentials");
-      }
+      
     });
     
     builder.addCase(LoginApi.rejected, (state, action) => {

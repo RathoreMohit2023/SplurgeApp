@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from 'react';
+import React, { useState, useContext, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,10 +15,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import AppHeader from '../../components/Header';
 import getPersonalInfoStyle from "../../styles/MainScreen/PersonalInfoStyle";
 import { ThemeContext } from "../../components/ThemeContext";
+import { useSelector } from 'react-redux';
 
 const PersonalInfoScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getPersonalInfoStyle(colors), [colors]);
+  const { GetUserDetailsData } = useSelector((state) => state.GetUserDetails);
+
   
   const insets = useSafeAreaInsets();
   const [form, setForm] = useState({
@@ -31,6 +34,30 @@ const PersonalInfoScreen = ({ navigation }) => {
 
   const [interests, setInterests] = useState(['Finance', 'Technology', 'Travel']);
   const [currentInterest, setCurrentInterest] = useState('');
+
+  useEffect(() => {
+    if (GetUserDetailsData?.user_details?.length > 0) {
+      const user = GetUserDetailsData.user_details[0];
+  
+      setForm({
+        name: user.fullname || '',
+        email: user.email || '',
+        phone: user.mobile || '',
+        location: '',
+        bio: '',
+      });
+  
+      try {
+        if (user.interest) {
+          setInterests(JSON.parse(user.interest));
+        }
+      } catch (err) {
+        console.log("Error parsing interests", err);
+        setInterests([]);
+      }
+    }
+  }, [GetUserDetailsData]);
+  
 
   const handleAddInterest = () => {
     if (currentInterest.trim().length > 0) {
@@ -98,7 +125,7 @@ const PersonalInfoScreen = ({ navigation }) => {
           <View style={styles.profileSection}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatarPlaceholder}>
-                 <Text style={styles.avatarInitials}>AJ</Text>
+                 <Text style={styles.avatarInitials}>{form.name?.split(" ").map((n) => n[0]).join("")}</Text>
               </View>
               <TouchableOpacity style={styles.editBadge} activeOpacity={0.8}>
                 <MaterialCommunityIcons name="camera" size={18} color="#FFF" />
@@ -161,8 +188,6 @@ const PersonalInfoScreen = ({ navigation }) => {
                 ))}
               </View>
             </View>
-            {/* --- Interests Field End --- */}
-
             {renderInput('Bio', 'bio', 'text-short', 'Tell us about yourself', true)}
           </View>
 

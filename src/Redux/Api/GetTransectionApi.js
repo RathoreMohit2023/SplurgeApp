@@ -6,14 +6,14 @@ const url = `${BASE_URL}${GetTransection_Url}`;
 
 export const GetTransectionApi = createAsyncThunk(
   'GetTransection',
-  async (token) => {
+  async ({token, id}) => {
     
     const headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`, 
     }
     try {
-      const response = await axios.get(url, {
+      const response = await axios.get(url + id, {
         headers,
       });
       console.log("GetTransectionApi response:", response.data);
