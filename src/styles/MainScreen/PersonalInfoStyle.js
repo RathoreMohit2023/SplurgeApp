@@ -29,6 +29,12 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.theme,
   },
+  avatarImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    resizeMode: "cover",
+  },  
   avatarInitials: {
     fontSize: 32,
     fontWeight: 'bold',
@@ -142,6 +148,44 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+
+  bottomSheetOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
+  
+  bottomSheet: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  
+  sheetTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  
+  sheetButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginVertical: 6,
+  },
+  
+  sheetButtonText: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#fff',
+  }
+  
 });
 
 export default getPersonalInfoStyle;

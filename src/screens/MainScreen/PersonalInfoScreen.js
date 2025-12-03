@@ -8,6 +8,8 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  Image
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,12 +17,69 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import AppHeader from '../../components/Header';
 import getPersonalInfoStyle from "../../styles/MainScreen/PersonalInfoStyle";
 import { ThemeContext } from "../../components/ThemeContext";
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+
 
 const PersonalInfoScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getPersonalInfoStyle(colors), [colors]);
-  
+  const [profileImage, setProfileImage] = useState(null);
+
   const insets = useSafeAreaInsets();
+
+  const openCamera = () => {
+    const options = {
+      mediaType: 'photo',
+      saveToPhotos: true,
+      quality: 0.8,
+    };
+  
+    launchCamera(options, (response) => {
+      if (response.didCancel) return;
+      if (response.errorMessage) return;
+  
+      const uri = response.assets[0].uri;
+      setProfileImage(uri);
+    });
+  };
+  
+  const openGallery = () => {
+    const options = {
+      mediaType: 'photo',
+      quality: 0.8,
+    };
+  
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) return;
+      if (response.errorMessage) return;
+  
+      const uri = response.assets[0].uri;
+      setProfileImage(uri);
+    });
+  };
+
+  const openImagePickerOptions = () => {
+    Alert.alert(
+      "Select Option",
+      "Choose a method to upload your profile photo",
+      [
+        {
+          text: "Open Camera",
+          onPress: openCamera
+        },
+        {
+          text: "Open Gallery",
+          onPress: openGallery
+        },
+        {
+          text: "Cancel",
+          style: "cancel"
+        }
+      ],
+      { cancelable: true }
+    );
+  };  
+  
   const [form, setForm] = useState({
     name: "Arjun Patel",
     email: "arjun.patel@gmail.com",
@@ -93,14 +152,30 @@ const PersonalInfoScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false} 
           contentContainerStyle={styles.scrollContent}
         >
-          
           {/* Profile Image Section */}
           <View style={styles.profileSection}>
             <View style={styles.avatarContainer}>
-              <View style={styles.avatarPlaceholder}>
+
+              {/* <View style={styles.avatarPlaceholder}>
                  <Text style={styles.avatarInitials}>AJ</Text>
+              </View> */}
+
+              <View style={styles.avatarPlaceholder}>
+                {profileImage ? (
+                  <Image 
+                    source={{ uri: profileImage }} 
+                    style={styles.avatarImage} 
+                  />
+                  ) : (
+                  <Text style={styles.avatarInitials}>AJ</Text>
+                )}
               </View>
-              <TouchableOpacity style={styles.editBadge} activeOpacity={0.8}>
+
+              <TouchableOpacity 
+                style={styles.editBadge} 
+                activeOpacity={0.8}
+                onPress={openImagePickerOptions}  
+              >
                 <MaterialCommunityIcons name="camera" size={18} color="#FFF" />
               </TouchableOpacity>
             </View>

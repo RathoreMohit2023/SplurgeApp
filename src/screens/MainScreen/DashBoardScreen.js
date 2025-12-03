@@ -15,14 +15,18 @@ import {
   ArrowUpRight,
   Plane,
   Zap,
+  Navigation,
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getDashBoardStyles from '../../styles/MainScreen/DashboardStyle';
 import { ThemeContext } from '../../components/ThemeContext';
 import AddWishListModal from '../../Modals/AddWishListModal';
 import AllTransactionsModal from '../../Modals/AllTransactionsModal';
+import { SquarePen } from 'lucide-react-native';
+import  AddGoalModal  from "../../Modals/AddMonthalyGoal";
 
-const DashBoardScreen = () => {
+const DashBoardScreen = ({navigation}) => {
+
   const { colors, themeType, toggleTheme } = useContext(ThemeContext);
   const [showTransactions, setShowTransactions] = useState(false);
   const [wishlistModal, setWishlistModal] = useState(false);
@@ -81,6 +85,22 @@ const DashBoardScreen = () => {
 
   const progressWidth = value => `${value}%`;
 
+  const [goalModal, setGoalModal] = useState(false);
+  const [editGoalModal, setEditGoalModal] = useState(false);
+
+  const [goalData, setGoalData] = useState({
+    amount: 0,
+    date: "",
+  });
+
+  const spent = 4500;
+
+  const percentage = goalData.amount > 0
+    ? (spent / goalData.amount) * 100
+    : 0;
+
+  const remaining = goalData.amount - spent;
+
   return (
     <ScrollView
       style={[DashBoardStyle.container, { paddingBottom: insets.bottom }]}
@@ -100,7 +120,11 @@ const DashBoardScreen = () => {
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <TouchableOpacity style={DashBoardStyle.profileButton}>
             <View style={DashBoardStyle.profilePlaceholder}>
-              <Text style={DashBoardStyle.profileInitials}>AJ</Text>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate("PersonalInfoScreen")}
+              >
+                <Text style={DashBoardStyle.profileInitials}>AJ</Text>
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         </View>
@@ -146,50 +170,94 @@ const DashBoardScreen = () => {
         </View>
       </View>
 
-      {/* <View style={DashBoardStyle.sectionContainer}>
+      <View style={DashBoardStyle.sectionContainer}>
         <View style={DashBoardStyle.rowBetween}>
           <Text style={DashBoardStyle.sectionTitle}>Main Goal</Text>
-          <Text style={DashBoardStyle.linkText}>Edit</Text>
+
+          {/* Add button */}
+          <TouchableOpacity onPress={() => setGoalModal(true)}>
+            <Text style={DashBoardStyle.linkText}>Add</Text>
+          </TouchableOpacity>
+
         </View>
+
         <View style={DashBoardStyle.goalCard}>
-          <View style={DashBoardStyle.rowBetween}>
-            <View style={DashBoardStyle.row}>
-              <View style={DashBoardStyle.goalIconBg}>
-                <Target size={20} color="#FFFFFF" />
-              </View>
-              <View style={{ marginLeft: 12 }}>
-                <Text style={DashBoardStyle.cardTitle}>Saving Goals</Text>
-                <Text style={DashBoardStyle.textMutedSmall}>
-                  Target: ₹{savingsGoal.toLocaleString()}
-                </Text>
-              </View>
+    
+        {/* Pencil edit - TOP RIGHT */}
+        <TouchableOpacity
+          style={DashBoardStyle.editIcon}
+          onPress={() => setEditGoalModal(true)}
+        >
+          <SquarePen size={16} color="#555" />
+        </TouchableOpacity>
+
+
+        <View style={DashBoardStyle.rowBetween}>
+          <View style={DashBoardStyle.row}>
+            <View style={DashBoardStyle.goalIconBg}>
+              <Target size={20} color="#FFFFFF" />
             </View>
-            <Text style={DashBoardStyle.percentageText}>
-              {Math.round(((savingsGoal - savedAmount) / savingsGoal) * 100)}%
-            </Text>
+
+            <View style={{ marginLeft: 12 }}>
+              <Text style={DashBoardStyle.cardTitle}>Saving Goals</Text>
+                {/* <Text style={DashBoardStyle.textMutedSmall}>
+                Target: ₹{savingsGoal.toLocaleString()}
+              </Text> */}
+              <Text style={DashBoardStyle.textMutedSmall}>
+                Target: ₹{goalData.amount}
+              </Text>
+            </View>
           </View>
-          <View style={DashBoardStyle.progressBarContainer}>
-            <View
-              style={[
-                DashBoardStyle.progressBarFill,
-                {
-                  width: progressWidth(
-                    ((savingsGoal - savedAmount) / savingsGoal) * 100,
-                  ),
-                },
-              ]}
-            />
-          </View>
-          <View style={DashBoardStyle.rowBetween}>
-            <Text style={DashBoardStyle.textMutedSmall}>
-              Spent: ₹{savedAmount.toLocaleString()}
-            </Text>
-            <Text style={DashBoardStyle.textMutedSmall}>
-              Remaining: ₹{(savingsGoal - savedAmount).toLocaleString()}
-            </Text>
-          </View>
+
+          {/* <Text style={DashBoardStyle.percentageText}>
+          {Math.round(((savingsGoal - savedAmount) / savingsGoal) * 100)}%
+          </Text> */}
+          <Text style={DashBoardStyle.percentageText}>
+            {percentage.toFixed(0)}%
+          </Text>
         </View>
-      </View> */}
+
+        {/* <View style={DashBoardStyle.progressBarContainer}>
+        <View
+          style={[
+            DashBoardStyle.progressBarFill,
+            {
+              width: progressWidth(
+                ((savingsGoal - savedAmount) / savingsGoal) * 100,
+              ),
+            },
+          ]}
+        />
+        </View> */}
+
+        <View style={DashBoardStyle.progressBarBackground}>
+          <View
+            style={[
+              DashBoardStyle.progressBarFill,
+              { width: `${percentage}%` },
+            ]}
+          />
+        </View>
+
+        <View style={DashBoardStyle.rowBetween}>
+          {/* <Text style={DashBoardStyle.textMutedSmall}>
+          Spent: ₹{savedAmount.toLocaleString()}
+          </Text> */}
+
+          <Text style={DashBoardStyle.textMutedSmall}>
+            Spent: ₹{spent}
+          </Text>
+
+          {/* <Text style={DashBoardStyle.textMutedSmall}>
+          Remaining: ₹{(savingsGoal - savedAmount).toLocaleString()}
+          </Text> */}
+          <Text style={DashBoardStyle.textMutedSmall}>
+            Remaining: ₹{remaining}
+          </Text>
+        </View>
+      </View>
+    </View>
+
 
       <View style={DashBoardStyle.sectionContainer}>
         <View style={DashBoardStyle.rowBetween}>
@@ -293,7 +361,24 @@ const DashBoardScreen = () => {
         onClose={() => setShowTransactions(false)}
         data={recentTransactions}
       />
+      <AddGoalModal
+        visible={goalModal}
+        onClose={() => setGoalModal(false)}
+        onSave={(data) => {
+        console.log("Goal Saved:", data);
+        setGoalData(data);  // update actual target
+        }}
+      />
 
+      <AddGoalModal
+        visible={editGoalModal}
+        onClose={() => setEditGoalModal(false)}
+        initialValues={goalData}     // <-- pre-filled values
+        onSave={(data) => {
+        console.log("Goal Updated:", data);
+        setGoalData(data);
+        }}
+      />
       <View style={{ height: 100 }} />
     </ScrollView>
   );

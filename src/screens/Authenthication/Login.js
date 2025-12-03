@@ -17,7 +17,8 @@ import getLoginStyle from "../../styles/authenthication/LoginStyle";
 import { ThemeContext } from "../../components/ThemeContext";
 import { useDispatch, useSelector } from "react-redux";
 import { LoginApi } from "../../Redux/Api/LoginApi";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CheckBox from "@react-native-community/checkbox";
 
 
 const SignInScreen = ({ navigation }) => {
@@ -32,7 +33,31 @@ const SignInScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
+  useEffect(() => {
+    const loadSavedCredentials = async () => {
+      try {
+        const savedEmail = await AsyncStorage.getItem("savedEmail");
+        const savedPassword = await AsyncStorage.getItem("savedPassword");
+  
+        if (savedEmail) {
+          setEmail(savedEmail);
+          setRememberMe(true);
+        }
+  
+        if (savedPassword) {
+          setPassword(savedPassword);
+          setRememberMe(true);
+        }
+      } catch (error) {
+        console.log("Error loading saved credentials", error);
+      }
+    };
+  
+    loadSavedCredentials();
+  }, []);
+  
   // useEffect(() => {
   //   let mounted = true;
   //   const loadEmail = async () => {
@@ -82,9 +107,19 @@ const SignInScreen = ({ navigation }) => {
       result?.payload?.token ||
       result?.payload?.message?.toLowerCase().includes("success")
     ) {
-      navigation.replace("MainScreen");
-    }    
-  };
+    
+    // Remember Me functionality
+    if (rememberMe) {
+      await AsyncStorage.setItem("savedEmail", email);
+      await AsyncStorage.setItem("savedPassword", password);
+    } else {
+      await AsyncStorage.removeItem("savedEmail");
+      await AsyncStorage.removeItem("savedPassword");
+    }
+
+    navigation.replace("MainScreen"); }
+
+  }; 
 
   return (
     <KeyboardAwareScrollView
@@ -134,12 +169,20 @@ const SignInScreen = ({ navigation }) => {
               error={passwordError}
             />
 
-            <TouchableOpacity 
-              onPress={() => navigation.navigate("forgotePassword")}
-              style={styles.forgotContainer}
-            >
-              <Text style={styles.forgotText}>Forgot Password?</Text>
-            </TouchableOpacity>
+            <View style={styles.rowBetween}>
+              <View style={styles.row}>
+                <CheckBox
+                  value={rememberMe}
+                  onValueChange={(val) => setRememberMe(val)}
+                  tintColors={{ true: colors.theme, false: colors.text }}
+                />
+                <Text style={styles.rememberText}>Remember Me</Text>
+              </View>
+
+              <TouchableOpacity onPress={() => navigation.navigate("forgotePassword")}>
+                <Text style={styles.forgotText}>Forgot Password?</Text>
+              </TouchableOpacity>
+            </View>
 
             <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn}>
               <Text style={styles.primaryBtnText}>{LoginLoading ? "Please wait..." : "Sign In"}</Text>

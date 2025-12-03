@@ -30,15 +30,37 @@ const getLoginStyle = (colors) => StyleSheet.create({
     formContainer: {
         width: "100%",
     },
-    forgotContainer: {
-        alignSelf: "flex-end",
-        marginBottom: 24,
-    },
+    // forgotContainer: {
+    //     // alignSelf: "flex-end",
+    //     marginBottom: 24,
+    //     flexDirection: "row", 
+    //     alignItems: "center", 
+    //     gap: 25,
+    //     // justifyContent: "space-between",
+    //     marginTop: 10
+    // },
     forgotText: {
         color: colors.theme, // Dynamic Theme Color
         fontWeight: "600",
         fontSize: 14,
     },
+    rowBetween: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 24,
+        marginTop: 10,
+      },  
+      row: {
+        flexDirection: "row",
+        alignItems: "center",
+      },
+     
+      rememberText: {
+        color: colors.text,
+        fontSize: 14,
+        marginLeft: 8,
+      },      
     primaryBtn: {
         backgroundColor: colors.theme,
         height: 56,
