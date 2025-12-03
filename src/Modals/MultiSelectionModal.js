@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Modal, View, Text, TouchableOpacity, FlatList } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ThemeContext } from "../components/ThemeContext";
@@ -13,12 +13,25 @@ const MultiSelectionModal = ({
 }) => {
   const { colors } = useContext(ThemeContext);
 
-  const toggleSelect = (item) => {
-    if (selectedItems.includes(item)) {
-      onSelect(selectedItems.filter((i) => i !== item));
-    } else {
-      onSelect([...selectedItems, item]);
+  const [tempSelected, setTempSelected] = useState([]);
+
+  useEffect(() => {
+    if(visible){
+      setTempSelected(selectedItems);
     }
+  }, [visible])
+
+  const toggleSelect = (item) => {
+    if (tempSelected.includes(item)) {
+      setTempSelected(tempSelected.filter((i) => i !== item));
+    } else {
+      setTempSelected([...tempSelected, item]);
+    }
+  };
+
+  const handleSave = () => {
+    onSelect(tempSelected);
+    onClose();
   };
 
   return (
@@ -63,10 +76,12 @@ const MultiSelectionModal = ({
 
       <FlatList
         data={data}
-        keyExtractor={(item) => item}
+        // keyExtractor={(item) => item}
+        keyExtractor={(item, index) => index.toString()}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => {
-          const isSelected = selectedItems.includes(item);
+          // const isSelected = selectedItems.includes(item);
+          const isSelected = tempSelected.includes(item);
 
           return (
             <TouchableOpacity
@@ -100,6 +115,44 @@ const MultiSelectionModal = ({
           );
         }}
       />
+
+            {/* FOOTER BUTTONS */}
+            <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              marginTop: 15,
+            }}
+          >
+            {/* Cancel */}
+            <TouchableOpacity
+              onPress={onClose}
+              style={{
+                paddingVertical: 10,
+                paddingHorizontal: 15,
+                marginRight: 10,
+              }}
+            >
+              <Text style={{ fontSize: 16, color: colors.textSecondary }}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+
+            {/* Save */}
+            <TouchableOpacity
+              onPress={handleSave}
+              style={{
+                backgroundColor: colors.theme,
+                paddingVertical: 10,
+                paddingHorizontal: 22,
+                borderRadius: 10,
+              }}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "600", color: "white" }}>
+                Save
+              </Text>
+            </TouchableOpacity>
+          </View>
     </View>
   </View>
 </Modal>

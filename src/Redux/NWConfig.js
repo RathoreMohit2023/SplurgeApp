@@ -1,7 +1,7 @@
-export const BASE_URL = '';
+export const BASE_URL = 'https://stage.techsimba.in/splurge/public/';
 
-export const Login_Url = '';
-export const SignUp_Url = '';
+export const Login_Url = 'api/login';
+export const SignUp_Url = 'api/register';
 
 export const Forgote_Url = '';
 
@@ -29,4 +29,4 @@ export const GetFounders_Url = '';
 export const GetArticle_Url = '';
 export const HelpAndSupport_Url = '';
 export const PrivacyPolicy_Url = '';
-export const GetInterest_Url = '';
+export const GetInterest_Url = 'api/get-interest';

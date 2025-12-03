@@ -6,39 +6,48 @@ import {
   Animated,
   ScrollView,
   Image,
-  StatusBar
+  StatusBar,
+  Alert
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { MainLogo } from "../../Assets/Images";
-import { getData } from "../../Redux/storage"; 
+// import { getData } from "../../Redux/storage"; 
 import CustomInput from "../../components/CustomInput"; 
 import getLoginStyle from "../../styles/authenthication/LoginStyle";
 import { ThemeContext } from "../../components/ThemeContext";
+import { useDispatch, useSelector } from "react-redux";
+import { LoginApi } from "../../Redux/Api/LoginApi";
+
+
 
 const SignInScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getLoginStyle(colors), [colors]);
   const fade = useRef(new Animated.Value(0)).current;
+
+  const dispatch = useDispatch();
+  const {LoginData, LoginLoading} = useSelector(state => state.Login)
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  useEffect(() => {
-    let mounted = true;
-    const loadEmail = async () => {
-      try {
-        const user = await getData("user");
-        if (mounted && user && user.email) {
-          setEmail(String(user.email));
-        }
-      } catch (err) {
-        console.log("Error loading user:", err);
-      }
-    };
-    loadEmail();
-    return () => { mounted = false; };
-  }, []);
+  // useEffect(() => {
+  //   let mounted = true;
+  //   const loadEmail = async () => {
+  //     try {
+  //       const user = await getData("user");
+  //       if (mounted && user && user.email) {
+  //         setEmail(String(user.email));
+  //       }
+  //     } catch (err) {
+  //       console.log("Error loading user:", err);
+  //     }
+  //   };
+  //   loadEmail();
+  //   return () => { mounted = false; };
+  // }, []);
 
   useEffect(() => {
     Animated.timing(fade, {
@@ -49,9 +58,32 @@ const SignInScreen = ({ navigation }) => {
   }, [fade]);
 
   const handleSignIn = async () => {
-    setEmailError("");
-    setPasswordError("");
-    navigation.replace("MainScreen");
+    let valid = true;
+
+    if(!email || !email.includes("@")){
+      setEmailError("Enter Valid Email")
+      valid = false;
+    }
+
+    if(!password){
+      setPasswordError("Password Required")
+      valid = false;
+    }
+
+    if(!valid) return;
+
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+
+    const result = await dispatch(LoginApi(formData));
+
+    if (
+      result?.payload?.token ||
+      result?.payload?.message?.toLowerCase().includes("success")
+    ) {
+      navigation.replace("MainScreen");
+    }    
   };
 
   return (
@@ -83,7 +115,7 @@ const SignInScreen = ({ navigation }) => {
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
-                if (emailError) setEmailError("");
+                setEmailError("");
               }}
               leftIcon="email-outline"
               keyboardType="email-address"
@@ -95,7 +127,7 @@ const SignInScreen = ({ navigation }) => {
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
-                if (passwordError) setPasswordError("");
+                setPasswordError("");
               }}
               leftIcon="lock-outline"
               password={true}
@@ -110,19 +142,18 @@ const SignInScreen = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn}>
-              <Text style={styles.primaryBtnText}>Sign In</Text>
+              <Text style={styles.primaryBtnText}>{LoginLoading ? "Please wait..." : "Sign In"}</Text>
             </TouchableOpacity>
 
-            <View style={styles.dividerContainer}>
+            {/* <View style={styles.dividerContainer}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>OR</Text>
               <View style={styles.dividerLine} />
-            </View>
+            </View> */}
 
-            <TouchableOpacity style={styles.googleBtn}>
-              {/* Google Icon Image laga sakte hain yahan */}
+            {/* <TouchableOpacity style={styles.googleBtn}>
               <Text style={styles.googleBtnText}>Continue with Google</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <View style={styles.footerContainer}>
               <Text style={styles.footerText}>Don't have an account? </Text>

@@ -11,7 +11,7 @@ export const SignUpApi = createAsyncThunk(
         const token = await AsyncStorage.getItem('Token');
         const parsedToken = JSON.parse(token);
         const headers = {
-            "Content-Type" : "multiPart form-data",
+            "Content-Type" : "multipart/form-data",
             "Authorization" : `Bearer ${parsedToken}`
         }
 

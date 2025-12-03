@@ -20,7 +20,7 @@ export const GetInterestApi = createAsyncThunk(
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetInterestApi error:", error);
+      console.error("GetInterestApi error:", error.response);
     }
   }
 );

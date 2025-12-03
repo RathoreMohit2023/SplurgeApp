@@ -14,16 +14,20 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { storeData } from "../../Redux/storage";
 import CustomInput from "../../components/CustomInput";
-import SelectionModal from "../../components/SelectionModal";
+// import SelectionModal from "../../components/SelectionModal";
 import { ThemeContext } from "../../components/ThemeContext";
 import getSignUpStyle from "../../styles/authenthication/signUpStyle";
 import MultiSelectionModal from "../../Modals/MultiSelectionModal";
-const interestsList = [
-  "Fashion", "Gaming", "Fitness", "Technology",
-  "Travel", "Music", "Movies", "Books", "Sports", 
-  "Art", "Cooking", "Finance", "Education"
-];
+import { useDispatch, useSelector } from "react-redux";
+import { GetInterestApi } from "../../Redux/Api/GetInterestApi";
+import { SignUpApi } from "../../Redux/Api/SignUpApi";
 
+// const interestsList = [
+//   "Fashion", "Gaming", "Fitness", "Technology",
+//   "Travel", "Music", "Movies", "Books", "Sports", 
+//   "Art", "Cooking", "Finance", "Education"
+// ];
+  
 const SignUp = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   
@@ -35,7 +39,7 @@ const SignUp = ({ navigation }) => {
 
   const [isInterestModalVisible, setInterestModalVisible] = useState(false);
   const [userData, setUserData] = useState({
-    username: "",
+    fullname: "",
     mobile: "",
     email: "",
     interest: "",
@@ -43,6 +47,24 @@ const SignUp = ({ navigation }) => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
+  const dispatch = useDispatch();
+  const { GetInterestData, GetInterestLoading } = useSelector(state => state.GetInterest);
+  const { SignUpData, SignUploading } = useSelector(state => state.SignUp);
+
+  const interestsList = GetInterestData?.interests?.map(item => item.interest_name) || [];
+  const [clickedInterest, setClickedInterest] = useState(false);
+
+  console.log("INTEREST API RESPONSE = ", JSON.stringify(GetInterestData, null, 2));
+
+  // useEffect(() => {
+  //   dispatch(GetInterestApi());
+  // }, []);
+
+  useEffect(() => {
+    if (clickedInterest && GetInterestData?.interests?.length > 0) {
+      setInterestModalVisible(true);
+    }
+  }, [GetInterestData]);
 
   useEffect(() => {
     Animated.parallel([
@@ -60,7 +82,7 @@ const SignUp = ({ navigation }) => {
     let valid = true;
     let tempErrors = {};
 
-    if (!userData.username) { tempErrors.username = "Username is required"; valid = false; }
+    if (!userData.fullname) { tempErrors.fullname = "fullname is required"; valid = false; }
     if (!userData.mobile) { tempErrors.mobile = "Mobile number is required"; valid = false; }
     if (!userData.email || !userData.email.includes("@")) { tempErrors.email = "Valid email is required"; valid = false; }
     if (!userData.interest.length) {
@@ -72,13 +94,44 @@ const SignUp = ({ navigation }) => {
 
     setErrors(tempErrors);
 
-    if (valid) {
-      try {
-        await storeData("user", userData);
-        Alert.alert("Success", "Account created!", [{ text: "OK", onPress: () => navigation.replace("signIn") }]);
-      } catch (error) {
-        Alert.alert("Error", "Failed to save data");
+    // if (valid) {
+    //   try {
+    //     await storeData("user", userData);
+    //     Alert.alert("Success", "Account created!", [{ text: "OK", onPress: () => navigation.replace("signIn") }]);
+    //   } catch (error) {
+    //     Alert.alert("Error", "Failed to save data");
+    //   }
+    // }
+
+    if(!valid) return;
+
+    const formData = new FormData();
+    formData.append("fullname", userData.fullname);
+    formData.append("mobile", userData.mobile);
+    formData.append("email", userData.email);
+    formData.append("interest", userData.interest);
+    formData.append("password", userData.password);
+    formData.append("confirmPassword", userData.confirmPassword);
+
+      // Interest is array → convert to comma string
+    formData.append("interest", userData.interest.join(","));
+
+    try{
+      const result = await dispatch(SignUpApi(formData)).unwrap();
+
+      console.log("Signup API Result ===>", result);
+
+      if(result?.status === true){
+        Alert.alert("Success", result.message || "Account-created!",[
+          { text: "Ok", onPress: () => navigation.replace("signIn")}
+        ]);
+      } else {
+        Alert.alert("Error", result?.message || "SignUp failed")
       }
+    }
+    catch(error){
+      console.log("SignUp Error ==>", error);
+      Alert.alert("Error", "SignUp failed. Try again later.");
     }
   };
 
@@ -120,11 +173,11 @@ const SignUp = ({ navigation }) => {
         {/* Form */}
         <Animated.View style={[styles.formContainer, { opacity: fade, transform: [{ translateY: slide }] }]}>
           <CustomInput
-            label="Username"
+            label="Fullname"
             leftIcon="account-outline"
-            value={userData.username}
-            onChangeText={(val) => handleOnChange("username", val)}
-            error={errors.username}
+            value={userData.fullname}
+            onChangeText={(val) => handleOnChange("fullname", val)}
+            error={errors.fullname}
             // Pass colors props agar CustomInput support karta hai
           />
           <CustomInput
@@ -154,7 +207,12 @@ const SignUp = ({ navigation }) => {
                     borderColor: errors.interest ? colors.error : colors.border 
                 }
               ]}
-              onPress={() => setInterestModalVisible(true)}
+              // onPress={() => setInterestModalVisible(true)}
+              onPress={() => {
+                setClickedInterest(true);
+                dispatch(GetInterestApi());       // fetch data again on open
+                setInterestModalVisible(true);    // open immediately if data exists
+              }}              
               activeOpacity={0.8}
             >
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -166,19 +224,20 @@ const SignUp = ({ navigation }) => {
                   style={{ marginRight: 12 }}
                 />
                 <Text
-  style={[
-    styles.dropdownText,
-    {
-      color: userData.interest.length
-        ? colors.text
-        : colors.textDisabled,
-    },
-  ]}
->
-  {userData.interest.length
-    ? userData.interest.join(", ")
-    : "Select Interests"}
-</Text>
+                  style={[
+                  styles.dropdownText,
+                  {
+                    color: userData.interest.length
+                    ? colors.text
+                    : colors.textDisabled,
+                  },
+                ]}
+                >
+                  {userData.interest.length
+                    ? userData.interest.join(", ")
+                    : "Select Interests"
+                  }  
+                </Text>
               </View>
               <Icon name="chevron-down" size={24} color={colors.textDisabled} />
             </TouchableOpacity>
@@ -212,7 +271,7 @@ const SignUp = ({ navigation }) => {
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate("signIn")}>
-              <Text style={styles.linkText}>Sign In</Text>
+              <Text style={styles.linkText}>{SignUpData ? "Please wait..." : "Sign In"}</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -220,13 +279,14 @@ const SignUp = ({ navigation }) => {
 
       {/* === REUSABLE MODAL COMPONENT === */}
       <MultiSelectionModal
-  visible={isInterestModalVisible}
-  title="Choose Interests"
-  data={interestsList}
-  selectedItems={userData.interest}
-  onClose={() => setInterestModalVisible(false)}
-  onSelect={(items) => handleOnChange("interest", items)}
-/>
+        key={interestsList.length} 
+        visible={isInterestModalVisible}
+        title="Choose Interests"
+        data={interestsList}
+        selectedItems={userData.interest}
+        onClose={() => setInterestModalVisible(false)}
+        onSelect={(items) => handleOnChange("interest", items)}
+      />
 
 
     </KeyboardAwareScrollView>
