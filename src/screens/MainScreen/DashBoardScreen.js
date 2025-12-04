@@ -81,12 +81,10 @@ const DashBoardScreen = ({ navigation }) => {
     const daysInMonthSoFar = now.getDate();
     const currentMonthName = now.toLocaleString('default', { month: 'short' });
 
-    // Calculate previous month's year and month index
     const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const prevMonthYear = prevMonthDate.getFullYear();
     const prevMonth = prevMonthDate.getMonth();
 
-    // Filter transactions for current and previous months
     const currentMonthTxns = allTransactions.filter(t => {
       const txnDate = new Date(t.date);
       return txnDate.getFullYear() === currentYear && txnDate.getMonth() === currentMonth;
@@ -96,20 +94,17 @@ const DashBoardScreen = ({ navigation }) => {
       return txnDate.getFullYear() === prevMonthYear && txnDate.getMonth() === prevMonth;
     });
 
-    // Calculate totals
     const totalSpentThisMonth = currentMonthTxns.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
     const totalSpentLastMonth = prevMonthTxns.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
     
-    // Calculate averages
     const dailyAverage = daysInMonthSoFar > 0 ? totalSpentThisMonth / daysInMonthSoFar : 0;
     const weeklyAverage = dailyAverage * 7;
 
-    // Calculate percentage change vs last month
     let percentageChange = 0;
     if (totalSpentLastMonth > 0) {
       percentageChange = ((totalSpentThisMonth - totalSpentLastMonth) / totalSpentLastMonth) * 100;
     } else if (totalSpentThisMonth > 0) {
-      percentageChange = 100; // Infinite increase if last month was 0
+      percentageChange = 100;
     }
 
     return {
@@ -118,6 +113,7 @@ const DashBoardScreen = ({ navigation }) => {
       weeklyAverage,
       percentageChange,
       currentMonthName,
+      currentMonthTxns, // Return current month transactions to be used later
     };
   }, [allTransactions]);
 
@@ -132,15 +128,15 @@ const DashBoardScreen = ({ navigation }) => {
   const goalDataFromApi = GetMonthlyBudgetData?.data;
   const isGoalForCurrentMonth = isDateInCurrentMonth(goalDataFromApi?.created_at);
   const goalData = isGoalForCurrentMonth ? goalDataFromApi : null;
-  
   const hasGoal = !!goalData;
-  const goalAmount = goalData?.amount || 0;
+  const goalAmount = parseFloat(goalData?.amount || 0);
   const percentage = goalAmount > 0 ? (dynamicStats.totalSpentThisMonth / goalAmount) * 100 : 0;
   const remaining = goalAmount - dynamicStats.totalSpentThisMonth;
 
+  // --- CORRECTED: Recent transactions now uses the filtered list ---
+  const recentTransactions = dynamicStats.currentMonthTxns.slice(0, 4);
 
   const handleAddItem = async (newItem) => {
-    // This function remains unchanged
     const token = LoginData?.token;
     const formData = new FormData();
     formData.append('user_id', LoginData?.user?.id);
@@ -164,7 +160,6 @@ const DashBoardScreen = ({ navigation }) => {
   };
   
   const handleSaveGoal = async (data) => {
-    // This function remains unchanged
     const token = LoginData?.token;
     const formData = new FormData();
     formData.append('user_id', LoginData?.user?.id);
@@ -186,16 +181,11 @@ const DashBoardScreen = ({ navigation }) => {
   };
 
   const handleEditGoal = async (data) => {
-    console.log(data,  'handleEditGoal');
-    
-    // This function remains unchanged
     const token = LoginData?.token;
     const formData = new FormData();
     formData.append('amount', data.amount);
     try {
       const result = await dispatch(EditMonthlyBudgetApi({ formData, token, id: data?.id })).unwrap();
-      console.log(result,  'handleEditGoal');
-      
       if (result?.status) {
         setToastMsg(result.message || 'Goal updated successfully!');
         setGoalModalVisible(false);
@@ -216,7 +206,6 @@ const DashBoardScreen = ({ navigation }) => {
   };
 
   const formatDate = (dateString) => {
-    // This function remains unchanged
     if (!dateString) return '';
     const today = new Date();
     const yesterday = new Date(today);
@@ -231,7 +220,6 @@ const DashBoardScreen = ({ navigation }) => {
     return transactionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const recentTransactions = allTransactions.slice(0, 4);
   const wishlistItems = GetWishlistData?.get_wishlists || [];
   
   return (
@@ -256,15 +244,15 @@ const DashBoardScreen = ({ navigation }) => {
         <View style={styles.rowBetween}><View style={styles.heroIconBg}><Wallet size={20} color={colors.theme} /></View></View>
         <View style={styles.heroContent}>
           <Text style={styles.heroLabel}>Total Spent ({dynamicStats.currentMonthName})</Text>
-          <Text style={styles.heroValue}>₹{dynamicStats?.totalSpentThisMonth?.toLocaleString()}</Text>
+          <Text style={styles.heroValue}>₹{dynamicStats.totalSpentThisMonth?.toLocaleString()}</Text>
         </View>
         <View style={styles.heroFooter}>
           <View style={styles.trendBadge}>
             {dynamicStats.percentageChange >= 0 ? 
-              <TrendingUp size={14} color={colors.red} /> : 
+              <TrendingUp size={14} color={colors.error} /> : 
               <TrendingDown size={14} color={colors.success} />
             }
-            <Text style={[styles.trendText, {color: dynamicStats.percentageChange >= 0 ? colors.red : colors.success}]}>
+            <Text style={[styles.trendText, {color: dynamicStats.percentageChange >= 0 ? colors.error : colors.success}]}>
               {` ${Math.abs(dynamicStats.percentageChange).toFixed(0)}% vs last month`}
             </Text>
           </View>
@@ -288,7 +276,7 @@ const DashBoardScreen = ({ navigation }) => {
         <View style={styles.rowBetween}>
           <Text style={styles.sectionTitle}>Main Goal</Text>
           <TouchableOpacity style={styles.linkButton} onPress={() => openGoalModal(hasGoal)}>
-            <Text style={styles.linkText}>{goalAmount > 0 ? "Edit Goal" : "Add Goal"}</Text>
+            <Text style={styles.linkText}>{hasGoal ? "Edit Goal" : "Add Goal"}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.goalCard}>
@@ -330,7 +318,7 @@ const DashBoardScreen = ({ navigation }) => {
           })
         ) : (
           <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No recent transactions found.</Text>
+            <Text style={styles.emptyText}>No transactions for this month yet.</Text>
           </View>
         )}
       </View>
@@ -349,7 +337,7 @@ const DashBoardScreen = ({ navigation }) => {
       </View>
 
       <AddWishListModal visible={wishlistModal} onClose={() => setWishlistModal(false)} onSave={handleAddItem} />
-      <AllTransactionsModal visible={showTransactions} onClose={() => setShowTransactions(false)} data={allTransactions} />
+      <AllTransactionsModal visible={showTransactions} onClose={() => setShowTransactions(false)} data={recentTransactions} />
       
       <AddGoalModal
         visible={goalModalVisible}
