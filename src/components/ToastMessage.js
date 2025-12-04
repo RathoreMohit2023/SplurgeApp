@@ -36,7 +36,7 @@ const ToastMessage = ({ visible, message, onHide }) => {
 const styles = StyleSheet.create({
   toast: {
     position: "absolute",
-    bottom: 80,
+    bottom: 100,
     alignSelf: "center",
     backgroundColor: "#333",
     paddingVertical: 12,

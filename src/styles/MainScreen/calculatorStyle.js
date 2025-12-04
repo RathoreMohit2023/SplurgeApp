@@ -16,11 +16,13 @@ const getCalculatorStyles = (colors) => StyleSheet.create({
     fontSize: 28,
     fontWeight: "700",
     color: colors.text, // Dynamic Text
+    fontFamily: 'serif',
   },
   subtitle: {
     fontSize: 14,
     color: colors.textSecondary, // Dynamic Secondary Text
     marginTop: 4,
+    fontFamily: 'serif',
   },
 });
 

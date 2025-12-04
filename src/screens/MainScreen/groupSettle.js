@@ -25,6 +25,7 @@ import CreateGroupModal from '../../Modals/CreateGroupModal';
 import SettleUpModal from '../../Modals/SettleUpModal';
 import getGroupSettleStyle from '../../styles/MainScreen/groupSettleStyle';
 import { ThemeContext } from '../../components/ThemeContext';
+import { useSelector } from 'react-redux';
 
 const GroupSettle = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -39,6 +40,8 @@ const GroupSettle = ({ navigation }) => {
 
   const [friendCode, setFriendCode] = useState('');
   const [snack, setSnack] = useState({ visible: false, message: '' });
+  const { LoginData } = useSelector(state => state.Login);
+
 
   const [friends, setFriends] = useState([
     { id: '1', name: 'Alex Kumar', points: 850, owes: 0, owed: 250 },
@@ -69,7 +72,7 @@ const GroupSettle = ({ navigation }) => {
       type: 'owed',
     },
   ];
-  const userCode = 'SPL-2K4X9';
+  const userCode = LoginData?.user?.code;
   const shareableLink = 'https://splurge.app/invite/2K4X9';
 
   const showSnack = message => setSnack({ visible: true, message });

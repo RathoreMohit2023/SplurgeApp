@@ -35,6 +35,11 @@ import PrivacyPolicyReducer from '../Slice/PrivacyPolicySlice';
 import GetInterestReducer from '../Slice/GetInterestSlice';
 import EditProfileReducer from '../Slice/EditProfileSlice';
 import GetCategoriesReducer from '../Slice/GetCategoriesSlice';
+import EditTransactionReducer from '../Slice/EditTransectionSlice';
+import DeleteTransectionReducer from '../Slice/DeleteTransectionSlice';
+import AddMonthlyBudgetReducer from '../Slice/AddMonthlyBudgetSlice';
+import EditMonthlyBudgetReducer from '../Slice/EditMonthlyBudgetSlice';
+import GetMonthlyBudgetReducer from '../Slice/GetMonthlyBudgetSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
@@ -61,7 +66,12 @@ const rootReducer = combineReducers({
   PrivacyPolicy : PrivacyPolicyReducer,
   GetInterest : GetInterestReducer,
   EditProfile : EditProfileReducer,
-  GetCategories : GetCategoriesReducer
+  GetCategories : GetCategoriesReducer,
+  EditTransaction : EditTransactionReducer,
+  DeleteTransection : DeleteTransectionReducer,
+  AddMonthlyBudget : AddMonthlyBudgetReducer,
+  EditMonthlyBudget : EditMonthlyBudgetReducer,
+  GetMonthlyBudget : GetMonthlyBudgetReducer
 });
 
 const persistConfig = {

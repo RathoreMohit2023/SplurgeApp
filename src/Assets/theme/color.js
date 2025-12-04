@@ -13,6 +13,7 @@ const commonColors = {
 
   // 🔵 Basic Shades
   red: "#FF0000",
+  lowRed: "#FF00008F",
   green: "#00FF00",
   yellow: "#FFFF00",
   orange: "#FFA500",
@@ -68,7 +69,7 @@ const Colors = {
     text: "#121212",
     textSecondary: "#666666",
     textDisabled: "#9e9e9e",
-    border: "#E0E0E0",
+    border: "#B3B3B3FF",
     separator: "#F0F0F0",
     tintedThemeColor: "rgba(112, 21, 238, 0.10)",
     iconDefault: "#333333",

@@ -10,7 +10,7 @@ import {
   ScrollView
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { MainLogo } from "../../Assets/Images";
+import { darkLogo, MainLogo } from "../../Assets/Images";
 // import { getData } from "../../Redux/storage"; 
 import CustomInput from "../../components/CustomInput"; 
 import getLoginStyle from "../../styles/authenthication/LoginStyle";
@@ -33,26 +33,11 @@ const SignInScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
+  const [showToast, setShowToast] = useState(false);
 
   const [rememberMe, setRememberMe] = useState(false);
-
-  // useEffect(() => {
-  //   let mounted = true;
-  //   const loadEmail = async () => {
-  //     try {
-  //       const user = await getData("user");
-  //       if (mounted && user && user.email) {
-  //         setEmail(String(user.email));
-  //       }
-  //     } catch (err) {
-  //       console.log("Error loading user:", err);
-  //     }
-  //   };
-  //   loadEmail();
-  //   return () => { mounted = false; };
-  // }, []);
+  const appLogo = themeType === "dark" ? darkLogo : MainLogo;
 
   useEffect(() => {
     Animated.timing(fade, {
@@ -118,23 +103,37 @@ const SignInScreen = ({ navigation }) => {
     formData.append('email', email.trim());
     formData.append('password', password);
 
-    const result = await dispatch(LoginApi(formData));
+    try {
+      const result = await dispatch(LoginApi(formData));
+      const response = result?.payload;
 
-    if (
-      result?.payload?.token ||
-      result?.payload?.message?.toLowerCase().includes("success")
-    ) {
-      // navigation.replace("MainScreen");
-      if (rememberMe) {
-        await AsyncStorage.setItem("savedEmail", email);
-        await AsyncStorage.setItem("savedPassword", password);
+      if (
+        response?.token ||
+        response?.status === 200 ||
+        response?.message?.toLowerCase().includes('success')
+      ) {
+        setToastMsg(response?.message || 'Login Successful');
+        setShowToast(true);
+
+        if (rememberMe) {
+          await AsyncStorage.setItem("savedEmail", email);
+          await AsyncStorage.setItem("savedPassword", password);
+        } else {
+          await AsyncStorage.removeItem("savedEmail");
+          await AsyncStorage.removeItem("savedPassword");
+        }
+        
+        setTimeout(() => {
+          navigation.replace('MainScreen');
+        }, 1500);
       } else {
-        await AsyncStorage.removeItem("savedEmail");
-        await AsyncStorage.removeItem("savedPassword");
+        setToastMsg(response?.message || 'Invalid credentials');
+        setShowToast(true);
       }
-    
-      navigation.replace("MainScreen");
-    }    
+    } catch (error) {
+      setToastMsg('Something went wrong. Please try again.');
+      setShowToast(true);
+    } 
   };
 
   return (
@@ -157,7 +156,7 @@ const SignInScreen = ({ navigation }) => {
         <Animated.View
           style={{ width: '100%', opacity: fade, alignItems: 'center' }}
         >
-          <Image source={MainLogo} style={styles.logo} resizeMode="contain" />
+          <Image source={appLogo} style={styles.logo} resizeMode="contain" />
           <Text style={styles.welcomeText}>Welcome Back!</Text>
           <Text style={styles.tagline}>Spend smarter. Live better.</Text>
 
@@ -235,6 +234,7 @@ const SignInScreen = ({ navigation }) => {
         </Animated.View>
       </ScrollView>
       {LoginLoading && <DashedLoader color={colors.primary} size={100} />}
+      
       <ToastMessage
         visible={showToast}
         message={toastMsg}
