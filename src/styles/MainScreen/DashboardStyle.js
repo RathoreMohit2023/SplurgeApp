@@ -195,12 +195,13 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#9E9E9E",
         borderRadius: 10,
     },
     textMutedSmall: {
         color: "rgba(255,255,255,0.8)",
         fontSize: 12,
+        paddingTop: 6
     },
 
     // --- Transactions ---
@@ -301,7 +302,27 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         height: '100%',
         backgroundColor: colors.theme,
         borderRadius: 2,
-    }
+    },
+
+    editIcon: {
+        position: "absolute",
+        top: 4,
+        right: 8,
+        padding: 2.5,
+        backgroundColor: "#F2F2F2",
+        borderRadius: 8,
+        elevation: 3,
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+      },
+      progressBarBackground: {
+        height: 10,
+        borderRadius: 10,
+        backgroundColor: "#ddd",
+        overflow: "hidden",
+        marginTop: 6,
+      },     
 });
 
 export default getDashBoardStyles;

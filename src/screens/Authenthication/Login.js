@@ -6,17 +6,22 @@ import {
   Animated,
   Image,
   StatusBar,
-  ScrollView,
-} from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useDispatch, useSelector } from 'react-redux';
-import { MainLogo } from '../../Assets/Images';
-import CustomInput from '../../components/CustomInput';
-import DashedLoader from '../../components/DashedLoader';
+  Alert,
+  ScrollView
+} from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { MainLogo } from "../../Assets/Images";
+// import { getData } from "../../Redux/storage"; 
+import CustomInput from "../../components/CustomInput"; 
+import getLoginStyle from "../../styles/authenthication/LoginStyle";
+import { ThemeContext } from "../../components/ThemeContext";
+import { useDispatch, useSelector } from "react-redux";
+import { LoginApi } from "../../Redux/Api/LoginApi";
 import ToastMessage from '../../components/ToastMessage';
-import getLoginStyle from '../../styles/authenthication/LoginStyle';
-import { ThemeContext } from '../../components/ThemeContext';
-import { LoginApi } from '../../Redux/Api/LoginApi';
+import DashedLoader from "../../components/DashedLoader";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CheckBox from "@react-native-community/checkbox";
+
 
 const SignInScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -24,13 +29,30 @@ const SignInScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { LoginLoading } = useSelector(state => state.Login);
   const fade = useRef(new Animated.Value(0)).current;
-
-  const [email, setEmail] = useState('nilesh.techsimba@gmail.com');
-  const [password, setPassword] = useState('123456789');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [toastMsg, setToastMsg] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // useEffect(() => {
+  //   let mounted = true;
+  //   const loadEmail = async () => {
+  //     try {
+  //       const user = await getData("user");
+  //       if (mounted && user && user.email) {
+  //         setEmail(String(user.email));
+  //       }
+  //     } catch (err) {
+  //       console.log("Error loading user:", err);
+  //     }
+  //   };
+  //   loadEmail();
+  //   return () => { mounted = false; };
+  // }, []);
 
   useEffect(() => {
     Animated.timing(fade, {
@@ -63,6 +85,29 @@ const SignInScreen = ({ navigation }) => {
     return isValid;
   };
 
+  useEffect(() => {
+    const loadSavedCredentials = async () => {
+      try {
+        const savedEmail = await AsyncStorage.getItem("savedEmail");
+        const savedPassword = await AsyncStorage.getItem("savedPassword");
+  
+        if (savedEmail) {
+          setEmail(savedEmail);
+          setRememberMe(true);
+        }
+  
+        if (savedPassword) {
+          setPassword(savedPassword);
+          setRememberMe(true);
+        }
+      } catch (error) {
+        console.log("Error loading saved credentials", error);
+      }
+    };
+  
+    loadSavedCredentials();
+  }, []);  
+
   const handleSignIn = async () => {
     setEmailError('');
     setPasswordError('');
@@ -73,28 +118,23 @@ const SignInScreen = ({ navigation }) => {
     formData.append('email', email.trim());
     formData.append('password', password);
 
-    try {
-      const result = await dispatch(LoginApi(formData));
-      const response = result?.payload;
+    const result = await dispatch(LoginApi(formData));
 
-      if (
-        response?.token ||
-        response?.status === 200 ||
-        response?.message?.toLowerCase().includes('success')
-      ) {
-        setToastMsg(response?.message || 'Login Successful');
-        setShowToast(true);
-        setTimeout(() => {
-          navigation.replace('MainScreen');
-        }, 1500);
+    if (
+      result?.payload?.token ||
+      result?.payload?.message?.toLowerCase().includes("success")
+    ) {
+      // navigation.replace("MainScreen");
+      if (rememberMe) {
+        await AsyncStorage.setItem("savedEmail", email);
+        await AsyncStorage.setItem("savedPassword", password);
       } else {
-        setToastMsg(response?.message || 'Invalid credentials');
-        setShowToast(true);
+        await AsyncStorage.removeItem("savedEmail");
+        await AsyncStorage.removeItem("savedPassword");
       }
-    } catch (error) {
-      setToastMsg('Something went wrong. Please try again.');
-      setShowToast(true);
-    }
+    
+      navigation.replace("MainScreen");
+    }    
   };
 
   return (
@@ -146,12 +186,28 @@ const SignInScreen = ({ navigation }) => {
               error={passwordError}
             />
 
-            <TouchableOpacity
-              onPress={() => navigation.navigate('forgotePassword')}
+            {/* <TouchableOpacity 
+              onPress={() => navigation.navigate("forgotePassword")}
               style={styles.forgotContainer}
             >
               <Text style={styles.forgotText}>Forgot Password?</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+
+            <View style={styles.rowBetween}>
+              <View style={styles.row}>
+                <CheckBox
+                  value={rememberMe}
+                  onValueChange={(val) => setRememberMe(val)}
+                  tintColors={{ true: colors.theme, false: colors.text }}
+                />
+                <Text style={styles.rememberText}>Remember Me</Text>
+              </View>
+
+              <TouchableOpacity onPress={() => navigation.navigate("forgotePassword")}>
+                <Text style={styles.forgotText}>Forgot Password?</Text>
+              </TouchableOpacity>
+            </View>
+
 
             <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn}>
               <Text style={styles.primaryBtnText}>
