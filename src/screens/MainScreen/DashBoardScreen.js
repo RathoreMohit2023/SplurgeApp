@@ -114,6 +114,10 @@ const DashBoardScreen = () => {
   const allTransactions = GetTransactionData?.get_transactions || [];
   const recentTransactions = allTransactions.slice(0, 4); // Sirf latest 4 transactions dikhayein
   const wishlistItems = GetWishlistData?.get_wishlists || [];
+  const total = allTransactions.reduce(
+    (sum, t) => sum + parseFloat(t.amount || 0),
+    0,
+  );
 
   return (
     <ScrollView
@@ -138,7 +142,7 @@ const DashBoardScreen = () => {
             </Text>
           </View>
         </TouchableOpacity>
-      </View>
+      </View> 
 
       <View style={styles.heroCard}>
         <View style={styles.rowBetween}>
@@ -146,7 +150,7 @@ const DashBoardScreen = () => {
         </View>
         <View style={styles.heroContent}>
           <Text style={styles.heroLabel}>Total Spent (Nov)</Text>
-          <Text style={styles.heroValue}>₹{monthlySpending.toLocaleString()}</Text>
+          <Text style={styles.heroValue}>₹{total?.toLocaleString()}</Text>
         </View>
         <View style={styles.heroFooter}>
           <View style={styles.trendBadge}>

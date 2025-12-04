@@ -17,7 +17,6 @@ import ToastMessage from '../../../components/ToastMessage';
 import DashedLoader from '../../../components/DashedLoader';
 import { GetTransectionApi } from '../../../Redux/Api/GetTransectionApi';
 
-// API se aane wali sabhi categories ke liye ek comprehensive icon map
 const categoryIcons = {
   'Food & Groceries': Utensils,
   'Dining Out': Coffee,
