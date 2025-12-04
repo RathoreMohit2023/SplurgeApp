@@ -18,15 +18,18 @@ const AddMonthalyGoal = ({ visible, onClose, onSave, initialValues }) => {
 
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
+  const [id, setId] = useState(null);
 
   // Prefill values for EDIT mode
   useEffect(() => {
     if (visible && initialValues) {
-      setAmount(initialValues.amount?.toString() || "");
-      setDate(initialValues.date || "");
+      setAmount(initialValues?.amount?.toString() || "");
+      setDate(initialValues?.date || "");
+      setId(initialValues?.id);
     } else if (visible) {
       setAmount("");
       setDate("");
+      setId(null);
     }
   }, [visible]);
 
@@ -36,6 +39,7 @@ const AddMonthalyGoal = ({ visible, onClose, onSave, initialValues }) => {
     onSave({
       amount: Number(amount),
       date: date || "Not Selected",
+      id,
     });
 
     onClose();

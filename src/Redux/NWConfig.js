@@ -2,7 +2,6 @@ export const BASE_URL = 'https://stage.techsimba.in/splurge/public/api/';
 
 export const Login_Url = 'login';
 export const SignUp_Url = 'register';
-
 export const Forgote_Url = '';
 
 
@@ -11,11 +10,15 @@ export const AddTransaction_Url = 'add-transaction';
 export const AddWishlist_Url = 'add-wishlist';
 export const EditWishlist_Url = 'edit-wishlist/';
 export const DeleteWishlist_Url = 'delete-wishlist/';
+export const DeleteTransaction_Url = 'delete-transaction/';
 export const AddPaymentLog_Url = '';
 export const AddFriend_Url = '';
 export const AddGroup_Url = '';
 export const SettleUp_Url = '';
 export const EditProfile_Url = '';
+export const EditTransection_Url = 'edit-transaction/';
+export const AddMonthlyBudget_Url = 'add-monthly-budget';
+export const EditMonthlyBudget_Url = 'edit-monthly-budget/';
 
 //  GET API
 export const GetTransection_Url = 'get-transactions/';
@@ -31,3 +34,4 @@ export const HelpAndSupport_Url = '';
 export const PrivacyPolicy_Url = '';
 export const GetInterest_Url = 'get-interest';
 export const GetCategories_Url = 'get-categories';
+export const GetMonthlyBudget_Url = 'get-monthly-budget/';

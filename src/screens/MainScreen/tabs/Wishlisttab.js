@@ -2,7 +2,7 @@ import React, { useState, useContext, useMemo, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Pencil, Trash2, Gift } from 'lucide-react-native';
+import { Pencil, Trash2, Gift, Plus } from 'lucide-react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 import AddWishListModal from '../../../Modals/AddWishListModal';
@@ -129,19 +129,27 @@ const WishlistTab = () => {
 
   const isLoading = GetWishlistLoading || AddWishlistLoading || EditWishlistLoading || DeleteWishlistLoading;
   const wishlistData = GetWishlistData?.get_wishlists || [];
+  const total = wishlistData.reduce(
+    (sum, t) => sum + parseFloat(t.price || 0),
+    0,
+  );
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>Your Goals</Text>
-        <TouchableOpacity
-          style={styles.addBtn}
-          onPress={() => setAddModalVisible(true)}
-          disabled={isLoading}
-        >
-          <Text style={styles.addBtnText}>+ Add New</Text>
-        </TouchableOpacity>
-      </View>
+       <View style={styles.summaryCard}>
+              <View>
+                <Text style={styles.summaryLabel}>Total Wishlist Amount</Text>
+                <Text style={styles.summaryValue}>₹{total.toLocaleString()}</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => setAddModalVisible(true)}
+                activeOpacity={0.8}
+                disabled={isLoading}
+              >
+                <Plus size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
 
       <FlatList
         data={wishlistData}
@@ -168,7 +176,7 @@ const WishlistTab = () => {
                       onPress={() => openEditModal(item)}
                       disabled={isLoading}
                     >
-                      <Pencil size={18} color={colors.blue} />
+                      <Pencil size={18} color={colors.text} />
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.iconBtn}
@@ -185,7 +193,7 @@ const WishlistTab = () => {
         ListEmptyComponent={!isLoading && (
             <View style={styles.emptyContainer}>
                 <Text style={styles.emptyText}>No items in your wishlist yet.</Text>
-                <Text style={styles.emptySubText}>Tap '+ Add New' to create a goal.</Text>
+                <Text style={styles.emptySubText}>Tap the + to create a goal.</Text>
             </View>
         )}
       />
@@ -201,9 +209,6 @@ const WishlistTab = () => {
         onSave={handleEditItem}
         itemToEdit={itemToEdit}
       />
-
-      {isLoading && <DashedLoader />}
-
       <ToastMessage
         visible={toastVisible}
         message={toastMsg}

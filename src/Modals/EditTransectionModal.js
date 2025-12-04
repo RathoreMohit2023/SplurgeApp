@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from "react";
+import React, { useState, useContext, useMemo, useEffect } from "react";
 import { View, TouchableOpacity, Modal, Text } from "react-native";
 import {
   X,
@@ -17,7 +17,7 @@ import SelectionModal from "../components/SelectionModal";
 import getAddTransactionModalStyle from "../styles/Modals/AddTransactionModalStyle";
 import { ThemeContext } from "../components/ThemeContext";
 
-const AddTransactionModal = ({ visible, onClose, onSave }) => {
+const EditTransactionModal = ({ visible, onClose, onSave, item }) => {
   const { colors } = useContext(ThemeContext);
   const styles = useMemo(() => getAddTransactionModalStyle(colors), [colors]);
   const { GetCategoriesData } = useSelector((state) => state.GetCategories);
@@ -38,51 +38,65 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [calendarModalVisible, setCalendarModalVisible] = useState(false);
 
+  // Effect to pre-fill the form when an item is passed
+  useEffect(() => {
+    if (item) {
+      setDesc(item.description || "");
+      setAmount(item.amount ? String(item.amount) : "");
+      setCategory(item.category || "");
+      setDate(item.date || "");
+      setErrors({}); // Clear previous errors
+    }
+  }, [item, visible]); // Rerun when item changes or modal becomes visible
+
   const validateForm = () => {
     const newErrors = {};
-    if (!desc.trim()) {
-      newErrors.desc = "Description is required.";
-    }
+    if (!desc.trim()) newErrors.desc = "Description is required.";
     if (!amount.trim()) {
       newErrors.amount = "Amount is required.";
     } else if (isNaN(amount) || Number(amount) <= 0) {
       newErrors.amount = "Please enter a valid positive number.";
     }
-    if (!category) {
-      newErrors.category = "Please select a category.";
-    }
-    if (!date) {
-      newErrors.date = "Please select a date.";
-    }
+    if (!category) newErrors.category = "Please select a category.";
+    if (!date) newErrors.date = "Please select a date.";
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = () => {
     if (validateForm()) {
-      const newTxn = {
-        id: Date.now().toString(),
+      const updatedTxn = {
+        id: item.id, // Pass the original item's ID
         description: desc,
         amount: parseFloat(amount),
         category: category,
         date: date,
-        icon: Utensils,
       };
-      onSave(newTxn);
-      resetFormAndClose();
+      onSave(updatedTxn);
+      // Parent component is responsible for closing the modal on success
     }
   };
 
   const handleReset = () => {
-    setDesc("");
-    setAmount("");
-    setCategory("");
-    setDate("");
+    // Reset to the original item's values
+    if (item) {
+      setDesc(item.description || "");
+      setAmount(item.amount ? String(item.amount) : "");
+      setCategory(item.category || "");
+      setDate(item.date || "");
+    } else { // Or clear if no item (should not happen in edit mode)
+      setDesc("");
+      setAmount("");
+      setCategory("");
+      setDate("");
+    }
     setErrors({});
   };
 
   const resetFormAndClose = () => {
-    handleReset();
+    // We don't need to reset state here because the useEffect will do it
+    // when the modal is closed and 'item' becomes null.
     onClose();
   };
 
@@ -97,7 +111,7 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
       <View style={styles.modalOverlay}>
         <View style={[styles.modalContainer, { maxHeight: '85%' }]}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>New Transaction</Text>
+            <Text style={styles.modalTitle}>Edit Transaction</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity onPress={handleReset} style={{ marginRight: 15 }}>
                 <RotateCcw size={20} color={colors.text} />
@@ -108,42 +122,14 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
             </View>
           </View>
 
-          <KeyboardAwareScrollView
-                      enableOnAndroid={true}
-                      extraScrollHeight={20}
-                      keyboardShouldPersistTaps="handled"
-                      showsVerticalScrollIndicator={false}
-                      contentContainerStyle={{ paddingBottom: 20 }}
-                    >
+         <KeyboardAwareScrollView
+                     enableOnAndroid={true}
+                     extraScrollHeight={20}
+                     keyboardShouldPersistTaps="handled"
+                     showsVerticalScrollIndicator={false}
+                     contentContainerStyle={{ paddingBottom: 20 }}
+                   >
             <View style={styles.form}>
-            <TouchableOpacity
-                onPress={() => setCategoryModalVisible(true)}
-                style={styles.selectorBtn}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <ShoppingBag size={20} color={colors.theme} style={{ marginRight: 10 }} />
-                  <Text style={[styles.selectorText, !category && { color: colors.textDisabled }]}>
-                    {category || "Select Category"}
-                  </Text>
-                </View>
-                <ChevronDown size={20} color={colors.textSecondary} />
-              </TouchableOpacity>
-              {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
-
-              <TouchableOpacity
-                onPress={() => setCalendarModalVisible(true)}
-                style={styles.selectorBtn}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <CalendarIcon size={20} color={colors.theme} style={{ marginRight: 10 }} />
-                  <Text style={[styles.selectorText, !date && { color: colors.textDisabled }]}>
-                    {date || "Select Date"}
-                  </Text>
-                </View>
-                <ChevronDown size={20} color={colors.textSecondary} />
-              </TouchableOpacity>
-              {errors.date && <Text style={styles.errorText}>{errors.date}</Text>}
-
               <CustomInput
                 label="Description"
                 value={desc}
@@ -166,10 +152,39 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
                 leftIcon="currency-inr"
                 error={errors.amount}
               />
+
+              <TouchableOpacity
+                onPress={() => setCategoryModalVisible(true)}
+                style={styles.selectorBtn}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <ShoppingBag size={20} color={colors.theme} style={{ marginRight: 10 }} />
+                  <Text style={[styles.selectorText, !category && { color: colors.textDisabled }]}>
+                    {category || "Select Category"}
+                  </Text>
+                </View>
+                <ChevronDown size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+              {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
+
+
+              <TouchableOpacity
+                onPress={() => setCalendarModalVisible(true)}
+                style={styles.selectorBtn}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <CalendarIcon size={20} color={colors.theme} style={{ marginRight: 10 }} />
+                  <Text style={[styles.selectorText, !date && { color: colors.textDisabled }]}>
+                    {date || "Select Date"}
+                  </Text>
+                </View>
+                <ChevronDown size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+              {errors.date && <Text style={styles.errorText}>{errors.date}</Text>}
             </View>
 
             <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-              <Text style={styles.saveBtnText}>Save Transaction</Text>
+              <Text style={styles.saveBtnText}>Save Changes</Text>
             </TouchableOpacity>
           </KeyboardAwareScrollView>
         </View>
@@ -178,8 +193,8 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
       <SelectionModal
         visible={categoryModalVisible}
         onClose={() => setCategoryModalVisible(false)}
-        onSelect={(item) => {
-          setCategory(item);
+        onSelect={(selectedItem) => {
+          setCategory(selectedItem);
           if (errors.category) setErrors((p) => ({ ...p, category: null }));
         }}
         data={categoryList}
@@ -200,6 +215,9 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
                 setDate(day.dateString);
                 if (errors.date) setErrors((p) => ({ ...p, date: null }));
                 setCalendarModalVisible(false);
+              }}
+              markedDates={{
+                [date]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' }
               }}
               theme={{
                 backgroundColor: colors.surface,
@@ -229,4 +247,4 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
   );
 };
 
-export default AddTransactionModal;
+export default EditTransactionModal;

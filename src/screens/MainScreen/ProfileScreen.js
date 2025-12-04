@@ -36,9 +36,13 @@ const ProfileScreen = ({ navigation }) => {
   const styles = useMemo(() => getProfileStyle(colors), [colors]);
   const { GetUserDetailsData } = useSelector((state) => state.GetUserDetails);
   const [user, setUser] = useState('');
+    const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
+  
 
   const [snack, setSnack] = useState({ visible: false, message: "" });
   const insets = useSafeAreaInsets();
+  const allTransactions = GetTransactionData?.get_transactions || [];
+
 
   const dummyuser = {
     name: "Arjun Patel",
@@ -47,14 +51,11 @@ const ProfileScreen = ({ navigation }) => {
     code: "SPL-2K4X9",
     points: 1200,
     rank: 3,
-    totalFriends: 8,
+    totalFriends: 0,
     spent: "₹45,230",
   };
 
-  const stats = [
-    { label: "Total Spent", value: dummyuser?.spent, icon: CreditCard, color: "#FFD700" },
-    { label: "Friends", value: dummyuser?.totalFriends, icon: User, color: "#4FB6FF" },
-  ];
+  
 
   const menuSections = [
     {
@@ -88,6 +89,33 @@ const ProfileScreen = ({ navigation }) => {
       ]
     }
   ];
+
+  const { currentMonthTransactions, currentMonthTotal } = useMemo(() => {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+  
+      const filteredTransactions = allTransactions.filter(t => {
+          if (!t.date) return false;
+          const txnDate = new Date(t.date);
+          return txnDate.getFullYear() === currentYear && txnDate.getMonth() === currentMonth;
+      });
+  
+      const total = filteredTransactions.reduce(
+          (sum, t) => sum + parseFloat(t.amount || 0),
+          0,
+      );
+  
+      // Sort transactions by date, newest first
+      filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+      return { currentMonthTransactions: filteredTransactions, currentMonthTotal: total };
+    }, [allTransactions]);
+
+    const stats = [
+      { label: "Total Spent", value: currentMonthTotal, icon: CreditCard, color: "#FFD700" },
+      { label: "Friends", value: dummyuser?.totalFriends, icon: User, color: "#4FB6FF" },
+    ];
 
   useEffect(() => {
     if (GetUserDetailsData) {

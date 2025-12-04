@@ -10,17 +10,19 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: 20,
     },
     greetingText: {
         color: colors.textSecondary,
         fontSize: 14,
         fontWeight: '500',
+        fontFamily : 'serif',
     },
     userName: {
         color: colors.text,
         fontSize: 22,
         fontWeight: '700',
+        fontFamily : 'serif',
     },
     profileButton: {
         width: 45,
@@ -43,6 +45,7 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
     profileInitials: {
         color: colors.theme,
         fontWeight: '700',
+        fontFamily : 'serif',
     },
     transactionDetails: {
         // justifyContent: 'space-between',
@@ -53,7 +56,7 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         backgroundColor: colors.tintedThemeColor,
         borderRadius: 24,
         padding: 20,
-        marginBottom: 20,
+        marginBottom: 15,
         borderWidth: 1,
         borderColor: colors.border,
        
@@ -74,12 +77,14 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         color: colors.textSecondary,
         fontSize: 14,
         marginBottom: 6,
+        fontFamily : 'serif',
     },
     heroValue: {
         color: colors.text,
         fontSize: 36,
         fontWeight: '800',
         letterSpacing: 0.5,
+        fontFamily : 'serif',
     },
     heroFooter: {
         flexDirection: 'row',
@@ -97,13 +102,14 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         color: colors.success,
         fontSize: 14,
         fontWeight: '600',
+        fontFamily : 'serif',
     },
 
     // --- Stats Grid ---
     gridContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 24,
+        marginBottom: 20,
     },
     statCard: {
         width: '48%',
@@ -117,12 +123,14 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         color: colors.textSecondary,
         fontSize: 12,
         marginBottom: 8,
+        fontFamily : 'serif',
     },
     statValue: {
         color: colors.text,
         fontSize: 20,
         fontWeight: '700',
         marginBottom: 8,
+        fontFamily : 'serif',
     },
     miniChartLine: {
         height: 3,
@@ -133,7 +141,7 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
 
     // --- Common Sections ---
     sectionContainer: {
-        marginBottom: 28,
+        marginBottom: 20,
     },
     rowBetween: {
         flexDirection: "row",
@@ -149,12 +157,21 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         fontSize: 18,
         fontWeight: '700',
         marginBottom: 16,
+        fontFamily : 'serif',
+    },
+    linkButton: {
+        borderWidth: 1,
+        borderColor: colors.theme,
+        borderRadius: 12,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        marginBottom: 10,
     },
     linkText: {
         color: colors.theme,
         fontSize: 14,
         fontWeight: '600',
-        marginBottom: 16,
+        fontFamily : 'serif',
     },
 
     // --- Goal Card ---
@@ -180,11 +197,13 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         color: "#FFFFFF",
         fontSize: 16,
         fontWeight: '700',
+        fontFamily : 'serif',
     },
     percentageText: {
         color: "#FFFFFF",
         fontWeight: '700',
         fontSize: 16,
+        fontFamily : 'serif',
     },
     progressBarContainer: {
         height: 6,
@@ -195,13 +214,14 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: "#9E9E9E",
+        backgroundColor: colors.orange,
         borderRadius: 10,
     },
     textMutedSmall: {
         color: "rgba(255,255,255,0.8)",
         fontSize: 12,
-        paddingTop: 6
+        paddingTop: 6,
+        fontFamily : 'serif',
     },
 
     // --- Transactions ---
@@ -215,7 +235,7 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 14,
-        backgroundColor: colors.background,
+        backgroundColor: colors.tintedThemeColor,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 14,
@@ -231,19 +251,35 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         marginBottom: 4,
+        fontFamily : 'serif',
     },
     transactionSub: {
         color: colors.textSecondary,
         fontSize: 12,
+        fontFamily : 'serif',
     },
     transactionAmount: {
         color: colors.text,
         fontSize: 16,
         fontWeight: '600',
-        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+        fontFamily : 'serif',
+        // fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     },
     textSuccess: {
         color: colors.success,
+        fontFamily : 'serif',
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 15,
+
+    },
+    emptyText: {
+        color: colors.textSecondary,
+        fontSize: 15,
+        fontFamily : 'serif',
     },
 
     // --- Wishlist ---
@@ -254,7 +290,7 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         padding: 14,
         marginRight: 12,
         borderWidth: 1,
-        borderColor: colors.border,
+        borderColor: colors.theme,
     },
     addWishlistCard: {
         width: 80,
@@ -264,33 +300,41 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         marginRight: 12,
         borderWidth: 2,
         borderStyle: 'dashed',
-        borderColor: colors.border,
+        borderColor: colors.theme,
         justifyContent: 'center',
         alignItems: 'center',
         gap: 8
     },
     addWishlistText: {
-        color: colors.textSecondary,
+        color: colors.theme,
         fontSize: 12,
+        fontFamily : 'serif',
     },
     wishlistIcon: {
-        marginBottom: 12,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        // marginBottom: 12,
     },
     wishlistPercent: {
         color: colors.textSecondary,
         fontSize: 12,
         fontWeight: '600',
+        fontFamily : 'serif',
     },
     wishlistName: {
         color: colors.text,
         fontSize: 14,
         fontWeight: '600',
         marginBottom: 4,
+        fontFamily : 'serif',
     },
     wishlistPrice: {
-        color: colors.textSecondary,
+        color: colors.theme,
         fontSize: 12,
+        fontWeight: 'bold',
         marginBottom: 12,
+        fontFamily : 'serif',
     },
     miniProgressBg: {
         height: 4,

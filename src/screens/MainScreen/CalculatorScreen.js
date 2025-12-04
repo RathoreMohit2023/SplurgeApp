@@ -9,6 +9,7 @@ import ComparisonTab from './tabs/Comparisontab';
 import { ThemeContext } from '../../components/ThemeContext';
 import getCalculatorStyles from '../../styles/MainScreen/calculatorStyle';
 import { useSelector } from 'react-redux';
+import DashedLoader from '../../components/DashedLoader';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -17,6 +18,13 @@ const CalculatorScreen = () => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getCalculatorStyles(colors), [colors]);
   const bottomPadding = insets.bottom + 60;
+  const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
+  const { AddTransactionLoading } = useSelector(state => state.AddTransaction);
+  const { GetWishlistData, GetWishlistLoading } = useSelector(state => state.GetWishlist || {});
+    const { AddWishlistLoading } = useSelector(state => state.AddWishlist || {});
+    const { EditWishlistLoading } = useSelector(state => state.EditWishlist || {});
+    const { DeleteWishlistLoading } = useSelector(state => state.DeleteWishlist || {});
+  const isLoading = GetTransactionLoading || AddTransactionLoading ||GetWishlistLoading || AddWishlistLoading || EditWishlistLoading || DeleteWishlistLoading;
  
 
   return (
@@ -52,6 +60,7 @@ const CalculatorScreen = () => {
             fontWeight: '700',
             textTransform: 'capitalize',
             fontSize: 14,
+            fontFamily: 'serif',
           },
           tabBarPressColor: colors.tintedThemeColor,
         }}
@@ -61,6 +70,7 @@ const CalculatorScreen = () => {
         <Tab.Screen name="Wishlist" component={WishlistTab} />
         <Tab.Screen name="Comparison" component={ComparisonTab} />
       </Tab.Navigator>
+      {isLoading && <DashedLoader color={colors.primary} size={100} />}
     </View>
   );
 };

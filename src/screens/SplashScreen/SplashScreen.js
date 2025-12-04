@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useContext, useMemo } from 'react';
 import { View, Animated, StatusBar } from 'react-native';
-import { MainLogo } from '../../Assets/Images';
+import { darkLogo, MainLogo } from '../../Assets/Images';
 import getSplashStyles from '../../styles/Splashstyle/splashStyle';
 import { ThemeContext } from '../../components/ThemeContext';
 
@@ -9,6 +9,7 @@ const SplashScreen = ({ navigation }) => {
   const styles = useMemo(() => getSplashStyles(colors), [colors]);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
+   const appLogo = themeType === "dark" ? darkLogo : MainLogo;
 
   useEffect(() => {
     Animated.parallel([
@@ -39,7 +40,7 @@ const SplashScreen = ({ navigation }) => {
       />
 
       <Animated.Image
-        source={MainLogo}
+        source={appLogo}
         style={[styles.logo, { opacity: fadeAnim }]}
         resizeMode="contain"
       />

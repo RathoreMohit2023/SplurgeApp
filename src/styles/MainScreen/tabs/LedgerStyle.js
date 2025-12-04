@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const getLedgerStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background, // Dynamic Background
+    backgroundColor: colors.background,
     paddingHorizontal: 20,
     paddingTop: 15,
   },
@@ -11,24 +11,24 @@ const getLedgerStyles = (colors) => StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: colors.tintedThemeColor, // Card color (White in Light, Dark Grey in Dark)
+    backgroundColor: colors.tintedThemeColor,
     padding: 20,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: colors.border,
     marginBottom: 20,
-    // Shadow for Light Mode depth
-   
   },
   summaryLabel: { 
     color: colors.textSecondary, 
     fontSize: 14, 
-    marginBottom: 4 
+    marginBottom: 4 ,
+    fontFamily: 'serif',
   },
   summaryValue: { 
     color: colors.text, 
     fontSize: 32, 
-    fontWeight: "700" 
+    fontWeight: "700" ,
+    fontFamily: 'serif',
   },
   addButton: {
     backgroundColor: colors.theme,
@@ -44,26 +44,29 @@ const getLedgerStyles = (colors) => StyleSheet.create({
     shadowRadius: 6,
   },
   itemCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: colors.tintedThemeColor, // Consistent card background
+    backgroundColor: colors.tintedThemeColor,
     padding: 16,
     borderRadius: 16,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: colors.border,
   },
+  cardTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   leftSection: { 
     flexDirection: "row", 
     alignItems: "center", 
-    flex: 1 
+    flex: 1,
+    marginRight: 8,
   },
   iconBox: {
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: colors.background, // Inset look (Darker than card in Light mode)
+    backgroundColor: colors.background,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 14,
@@ -76,17 +79,57 @@ const getLedgerStyles = (colors) => StyleSheet.create({
   itemTitle: { 
     color: colors.text, 
     fontSize: 16, 
-    fontWeight: "600" 
+    fontWeight: "600" ,
+    fontFamily: 'serif',
   },
   itemSub: { 
     color: colors.textSecondary, 
     fontSize: 12, 
-    marginTop: 2 
+    marginTop: 2 ,
+    fontFamily: 'serif',
   },
   amountText: { 
     color: colors.text, 
     fontSize: 16, 
-    fontWeight: "700" 
+    fontWeight: "700" ,
+    fontFamily: 'serif',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 8,
+    textAlign: 'center',
+    fontFamily: 'serif',
+  },
+  emptySubText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    maxWidth: 240,
+    fontFamily: 'serif',
+  },
+  divider: { 
+    height: 1, 
+    backgroundColor: colors.border, 
+    marginVertical: 12 
+  },
+  footer: { 
+    flexDirection: 'row', 
+    justifyContent: 'flex-end', 
+    alignItems: 'center',
+    gap: 20,
+  },
+  iconBtn: { 
+    padding: 4,
   },
 });
 

@@ -22,27 +22,30 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     gap: 8 
   },
   heroTitle: { 
-    // color: "#FFD700", // Gold color stays for the "Sparkle" effect
     color: "#B89600",
     fontWeight: "700", 
     fontSize: 14, 
-    textTransform: "uppercase" 
+    textTransform: "uppercase",
+    fontFamily: 'serif',
   },
   heroText: { 
     color: colors.textSecondary, 
     fontSize: 16, 
-    lineHeight: 24 
+    lineHeight: 24 ,
+    fontFamily: 'serif',
   },
   heroHighlight: {
-    color: colors.text, // Important: Changed from #fff to dynamic text
+    color: colors.text,
     fontWeight: 'bold',
+    fontFamily: 'serif',
   },
   
   sectionTitle: { 
     color: colors.text, 
     fontSize: 18, 
     fontWeight: "700", 
-    marginBottom: 16 
+    marginBottom: 16 ,
+    fontFamily: 'serif',
   },
   
   itemCard: {
@@ -72,12 +75,14 @@ const getComparisonStyles = (colors) => StyleSheet.create({
   itemName: { 
     color: colors.text, 
     fontSize: 16, 
-    fontWeight: "600" 
+    fontWeight: "600" ,
+    fontFamily: 'serif',
   },
   itemPrice: { 
     color: colors.textSecondary, 
     fontSize: 12, 
-    marginTop: 4 
+    marginTop: 4 ,
+    fontFamily: 'serif',
   },
   
   badge: {
@@ -88,6 +93,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
   badgeText: {
     fontWeight: "700",
     fontSize: 12,
+    fontFamily: 'serif',
   }
 });
 

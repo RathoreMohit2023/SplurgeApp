@@ -30,6 +30,7 @@ const getAddWishListModalStyle = (colors) => StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     color: colors.text,
+    fontFamily: 'serif',
   },
   form: {
     marginBottom: 20,
@@ -51,6 +52,7 @@ const getAddWishListModalStyle = (colors) => StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
     fontSize: 16,
+    fontFamily: 'serif',
   },
 });
 
