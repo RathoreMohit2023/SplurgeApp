@@ -3,28 +3,24 @@ import axios from 'axios';
 import { BASE_URL, GetVideos_Url } from '../NWConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const url = `${BASE_URL}${GetVideos_Url}`;
-
 export const GetvideoApi = createAsyncThunk(
   'GetvideoApi',
-  async (PostData) => {
-    
-    const token = await AsyncStorage.getItem('Token');
-    const parsedToken = JSON.parse(token);
-    const headers = {
-        "Content-Type" : "multipart/form-data",
-        "Authorization": `Bearer ${parsedToken}`, 
-    }
+  async (token) => {
     try {
-      const response = await axios.post(url, PostData, {
-        headers
-      });
+      const response = await axios.get(
+        `${BASE_URL}${GetVideos_Url}`,
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      )
       console.log("Response from GetvideoApi:", response.data);
-      
-      const result = response.data;
-      return result;
+      return response.data;
     } catch (error) {
-      console.log('Error in GetvideoApi:', error.response.data);
+      console.log('❌ Error in GetvideoApi:', error.response ? error.response.data : error.message);
+      throw error;
     }
   }
 );

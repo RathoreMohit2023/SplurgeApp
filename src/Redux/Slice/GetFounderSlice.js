@@ -6,7 +6,7 @@ const GetFounderSlice = createSlice({
   initialState: {
     GetFounderloading: false,
     isError: false,
-    GetFiunderData: [],
+    GetFounderData: [],
   },
 
   extraReducers: (builder) => {
@@ -15,7 +15,7 @@ const GetFounderSlice = createSlice({
     });
     builder.addCase(GetFounderApi.fulfilled, (state, action) => {
       state.GetFounderloading = false;
-      state.GetFiunderData = action.payload;
+      state.GetFounderData = action.payload;
     });
     builder.addCase(GetFounderApi.rejected, (state, action) => {
       state.GetFounderloading = false;

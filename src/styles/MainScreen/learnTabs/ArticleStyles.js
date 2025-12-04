@@ -67,6 +67,7 @@ const getArticlesStyle = (colors, isDark = false) => {
       fontWeight: '600',
       marginBottom: 6,
       lineHeight: 22,
+      fontFamily: 'serif',
     },
 
     row: {
@@ -88,6 +89,7 @@ const getArticlesStyle = (colors, isDark = false) => {
       color: colors.textSecondary,
       fontSize: 12,
       marginLeft: 6,
+      fontFamily: 'serif',
     },
 
     badge: {
@@ -101,6 +103,7 @@ const getArticlesStyle = (colors, isDark = false) => {
       fontSize: 11,
       fontWeight: '600',
       marginLeft: 4,
+      fontFamily: 'serif',
     }
   });
 };

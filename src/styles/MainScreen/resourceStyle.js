@@ -16,11 +16,13 @@ const getResourceStyles = (colors) => StyleSheet.create({
     color: colors.text, // Dynamic Text
     fontSize: 32,
     fontWeight: "700",
+    fontFamily: 'serif',
   },
   subHeading: {
     color: colors.textSecondary, // Dynamic Secondary Text
     fontSize: 15,
     marginTop: 4,
+    fontFamily: 'serif',
   },
 });
 

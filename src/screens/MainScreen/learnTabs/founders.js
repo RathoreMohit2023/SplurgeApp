@@ -1,40 +1,48 @@
-import React, { useContext, useMemo } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PlayCircle, Clock, CheckCircle2 } from 'lucide-react-native';
-
-// Imports
 import getFoundersStyle from "../../../styles/MainScreen/learnTabs/founderStyle"; // Import Style Function
-import { ThemeContext } from "../../../components/ThemeContext"; // Import Context
-
-const founderSeries = [
-  { id: "1", title: "Why We Built Splurge", duration: "18:30", watched: true },
-  { id: "2", title: "The Psychology of Student Spending", duration: "22:15", watched: false },
-  { id: "3", title: "Financial Freedom in Your 20s", duration: "25:45", watched: false },
-  { id: "4", title: "Interview with FinTech CEO", duration: "45:00", watched: false },
-];
+import { ThemeContext } from "../../../components/ThemeContext"; 
+import { GetFounderApi } from '../../../Redux/Api/GetFounderApi';
+import { useDispatch, useSelector } from 'react-redux';
+import ModalVideoPlayer from '../../../Modals/ModalVideoPlayer';
 
 const Founders = () => {
   const insets = useSafeAreaInsets();
-  
-  // 1. Context
   const { colors } = useContext(ThemeContext);
-  
-  // 2. Memoize Styles
   const styles = useMemo(() => getFoundersStyle(colors), [colors]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const { LoginData } = useSelector(state => state.Login);
+  const { GetFounderloading, GetFounderData } = useSelector(state => state.GetFounder);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(GetFounderApi(LoginData.token));
+  }, []);
+
+  const videos = GetFounderData?.founderVedio || [];
 
   return (
     <View style={styles.tabContainer}>
+
+      {GetFounderloading && (
+        <ActivityIndicator size="large" color={colors.theme} style={{ marginTop: 20 }} />
+      )}
+
       <FlatList
-        data={founderSeries}
-        keyExtractor={(item) => item.id}
+        data={videos}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 80 }]}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.itemCard} activeOpacity={0.7}>
-            {/* Large Thumbnail for Founders */}
+          <TouchableOpacity 
+            style={styles.itemCard} 
+            activeOpacity={0.7}
+            onPress={() => setSelectedVideo(item.url)}  
+          >
             <View style={styles.largeThumbnail}>
-              {/* Changed to Theme color to contrast against tinted background */}
               <PlayCircle size={32} color={colors.theme} />
             </View>
 
@@ -58,6 +66,13 @@ const Founders = () => {
           </TouchableOpacity>
         )}
       />
+
+      <ModalVideoPlayer
+        visible={!!selectedVideo}
+        videoUrl={selectedVideo}
+        onClose={() => setSelectedVideo(null)}
+      />
+
     </View>
   )
 }

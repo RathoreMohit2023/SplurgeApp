@@ -23,6 +23,8 @@ import ArticleScreen from "../screens/MainScreen/learnTabs/Arricles";
 import TermsAndPolicies from "../screens/MainScreen/TermsAndPolicies";
 import HelpSupport from "../screens/MainScreen/HelpSupport";
 import PersonalInfoScreen from "../screens/MainScreen/PersonalInfoScreen";
+import VideoPlayerScreen from "../components/VideoPlayer";
+import ModalVideoPlayer from "../Modals/ModalVideoPlayer";
 
 const RootNavigator = () => {
     const Stack = createStackNavigator();
@@ -51,6 +53,8 @@ const RootNavigator = () => {
             <Stack.Screen name="TermsPolicies" component={TermsAndPolicies} />
             <Stack.Screen name="HelpSupport" component={HelpSupport} />
             <Stack.Screen name="PersonalInfoScreen" component={PersonalInfoScreen} />
+            <Stack.Screen name="VideoPlayerScreen" component={VideoPlayerScreen} />
+            <Stack.Screen name="ModalVideoPlayer" component={ModalVideoPlayer} />
         </Stack.Navigator>
     )
 };
