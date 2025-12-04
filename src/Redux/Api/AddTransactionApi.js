@@ -7,16 +7,14 @@ const url = `${BASE_URL}${AddTransaction_Url}`;
 
 export const AddTransactionApi = createAsyncThunk(
   'AddTransactionApi',
-  async (PostData) => {
+  async ({ formData, token }) => {
     
-    const token = await AsyncStorage.getItem('Token');
-    const parsedToken = JSON.parse(token);
     const headers = {
         "Content-Type" : "multipart/form-data",
-        "Authorization": `Bearer ${parsedToken}`, 
+        "Authorization": `Bearer ${token}`, 
     }
     try {
-      const response = await axios.post(url, PostData, {
+      const response = await axios.post(url, formData, {
         headers
       });
       console.log("Response from AddTransactionApi:", response.data);

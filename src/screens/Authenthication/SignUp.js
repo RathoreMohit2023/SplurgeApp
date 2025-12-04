@@ -5,66 +5,55 @@ import {
   TouchableOpacity,
   Animated,
   ScrollView,
-  Alert,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 
-import { storeData } from "../../Redux/storage";
 import CustomInput from "../../components/CustomInput";
-// import SelectionModal from "../../components/SelectionModal";
+import MultiSelectionModal from "../../Modals/MultiSelectionModal";
+import DashedLoader from "../../components/DashedLoader";
+import CustomAlert from "../../components/CustomAlert";
+
 import { ThemeContext } from "../../components/ThemeContext";
 import getSignUpStyle from "../../styles/authenthication/signUpStyle";
-import MultiSelectionModal from "../../Modals/MultiSelectionModal";
-import { useDispatch, useSelector } from "react-redux";
 import { GetInterestApi } from "../../Redux/Api/GetInterestApi";
 import { SignUpApi } from "../../Redux/Api/SignUpApi";
 
-// const interestsList = [
-//   "Fashion", "Gaming", "Fitness", "Technology",
-//   "Travel", "Music", "Movies", "Books", "Sports", 
-//   "Art", "Cooking", "Finance", "Education"
-// ];
-  
 const SignUp = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
-  
   const styles = useMemo(() => getSignUpStyle(colors), [colors]);
-
+  const insets = useSafeAreaInsets();
+  
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(50)).current;
-  const insets = useSafeAreaInsets();
+
+  const dispatch = useDispatch();
+  const { GetInterestData } = useSelector(state => state.GetInterest);
+  const { SignUploading } = useSelector(state => state.SignUp);
 
   const [isInterestModalVisible, setInterestModalVisible] = useState(false);
+  const [clickedInterest, setClickedInterest] = useState(false);
+  const interestsList = GetInterestData?.interests?.map(item => item.interest_name) || [];
+
   const [userData, setUserData] = useState({
     fullname: "",
     mobile: "",
     email: "",
-    interest: "",
+    interest: [],
     password: "",
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
-  const dispatch = useDispatch();
-  const { GetInterestData, GetInterestLoading } = useSelector(state => state.GetInterest);
-  const { SignUpData, SignUploading } = useSelector(state => state.SignUp);
 
-  const interestsList = GetInterestData?.interests?.map(item => item.interest_name) || [];
-  const [clickedInterest, setClickedInterest] = useState(false);
-
-  console.log("INTEREST API RESPONSE = ", JSON.stringify(GetInterestData, null, 2));
-
-  // useEffect(() => {
-  //   dispatch(GetInterestApi());
-  // }, []);
-
-  useEffect(() => {
-    if (clickedInterest && GetInterestData?.interests?.length > 0) {
-      setInterestModalVisible(true);
-    }
-  }, [GetInterestData]);
+  const [alertConfig, setAlertConfig] = useState({
+    visible: false,
+    title: "",
+    message: "",
+    isSuccess: false,
+  });
 
   useEffect(() => {
     Animated.parallel([
@@ -73,65 +62,101 @@ const SignUp = ({ navigation }) => {
     ]).start();
   }, []);
 
+  useEffect(() => {
+    if (clickedInterest && GetInterestData?.interests?.length > 0) {
+      setInterestModalVisible(true);
+    }
+  }, [GetInterestData]);
+
   const handleOnChange = (key, value) => {
     setUserData((prev) => ({ ...prev, [key]: value }));
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
+  };
+
+  const handleAlertConfirm = () => {
+    setAlertConfig((prev) => ({ ...prev, visible: false }));
+    if (alertConfig.isSuccess) {
+      navigation.replace("signIn");
+    }
   };
 
   const registerUser = async () => {
     let valid = true;
     let tempErrors = {};
 
-    if (!userData.fullname) { tempErrors.fullname = "fullname is required"; valid = false; }
-    if (!userData.mobile) { tempErrors.mobile = "Mobile number is required"; valid = false; }
-    if (!userData.email || !userData.email.includes("@")) { tempErrors.email = "Valid email is required"; valid = false; }
-    if (!userData.interest.length) {
+    if (!userData.fullname) { 
+      tempErrors.fullname = "Fullname is required"; 
+      valid = false; 
+    }
+
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!userData.mobile) {
+      tempErrors.mobile = "Mobile number is required";
+      valid = false;
+    } else if (!mobileRegex.test(userData.mobile)) {
+      tempErrors.mobile = "Please enter a valid 10-digit mobile number";
+      valid = false;
+    }
+
+    if (!userData.email || !userData.email.includes("@")) { 
+      tempErrors.email = "Valid email is required"; 
+      valid = false; 
+    }
+    
+    if (!userData.interest || userData.interest.length === 0) {
       tempErrors.interest = "Select at least 1 interest";
       valid = false;
     }
-    if (!userData.password || userData.password.length < 6) { tempErrors.password = "Password min 6 chars"; valid = false; }
-    if (userData.password !== userData.confirmPassword) { tempErrors.confirmPassword = "Passwords do not match"; valid = false; }
+    
+    if (!userData.password || userData.password.length < 6) { 
+      tempErrors.password = "Password min 6 chars"; 
+      valid = false; 
+    }
+    
+    if (userData.password !== userData.confirmPassword) { 
+      tempErrors.confirmPassword = "Passwords do not match"; 
+      valid = false; 
+    }
 
     setErrors(tempErrors);
 
-    // if (valid) {
-    //   try {
-    //     await storeData("user", userData);
-    //     Alert.alert("Success", "Account created!", [{ text: "OK", onPress: () => navigation.replace("signIn") }]);
-    //   } catch (error) {
-    //     Alert.alert("Error", "Failed to save data");
-    //   }
-    // }
+    if (!valid) return;
 
-    if(!valid) return;
+    const postData = {
+      fullname: userData.fullname,
+      mobile: userData.mobile,
+      email: userData.email,
+      interest: userData.interest,
+      password: userData.password,
+      confirmPassword: userData.confirmPassword,
+    };
 
-    const formData = new FormData();
-    formData.append("fullname", userData.fullname);
-    formData.append("mobile", userData.mobile);
-    formData.append("email", userData.email);
-    formData.append("interest", userData.interest);
-    formData.append("password", userData.password);
-    formData.append("confirmPassword", userData.confirmPassword);
-
-      // Interest is array → convert to comma string
-    formData.append("interest", userData.interest.join(","));
-
-    try{
-      const result = await dispatch(SignUpApi(formData)).unwrap();
-
-      console.log("Signup API Result ===>", result);
-
-      if(result?.status === true){
-        Alert.alert("Success", result.message || "Account-created!",[
-          { text: "Ok", onPress: () => navigation.replace("signIn")}
-        ]);
+    try {
+      const result = await dispatch(SignUpApi(postData)).unwrap();
+      console.log("Response from SignUpApi:", result);
+      
+      if (result?.status === true) {
+        setAlertConfig({
+          visible: true,
+          title: "Success",
+          message: result?.message || "Account created successfully!",
+          isSuccess: true
+        });
       } else {
-        Alert.alert("Error", result?.message || "SignUp failed")
+        setAlertConfig({
+          visible: true,
+          title: "Failed",
+          message: result?.message || "SignUp failed. Please try again.",
+          isSuccess: false
+        });
       }
-    }
-    catch(error){
-      console.log("SignUp Error ==>", error);
-      Alert.alert("Error", "SignUp failed. Try again later.");
+    } catch (error) {
+      setAlertConfig({
+        visible: true,
+        title: "Error",
+        message: "Something went wrong. Please check your connection.",
+        isSuccess: false
+      });
     }
   };
 
@@ -145,6 +170,7 @@ const SignUp = ({ navigation }) => {
       }}
       enableOnAndroid={true}
       keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
       style={{ backgroundColor: colors.background }}
     >
       <StatusBar 
@@ -156,7 +182,6 @@ const SignUp = ({ navigation }) => {
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
@@ -170,7 +195,6 @@ const SignUp = ({ navigation }) => {
           </Animated.View>
         </View>
 
-        {/* Form */}
         <Animated.View style={[styles.formContainer, { opacity: fade, transform: [{ translateY: slide }] }]}>
           <CustomInput
             label="Fullname"
@@ -178,12 +202,12 @@ const SignUp = ({ navigation }) => {
             value={userData.fullname}
             onChangeText={(val) => handleOnChange("fullname", val)}
             error={errors.fullname}
-            // Pass colors props agar CustomInput support karta hai
           />
           <CustomInput
             label="Mobile Number"
             leftIcon="phone-outline"
             keyboardType="phone-pad"
+            maxLength={10}
             value={userData.mobile}
             onChangeText={(val) => handleOnChange("mobile", val)}
             error={errors.mobile}
@@ -197,29 +221,23 @@ const SignUp = ({ navigation }) => {
             error={errors.email}
           />
 
-          {/* === REUSABLE MODAL TRIGGER === */}
           <View style={styles.dropdownContainer}>
             <TouchableOpacity
               style={[
                 styles.dropdownTrigger,
-                { 
-                    // Dynamic Border Color Logic
-                    borderColor: errors.interest ? colors.error : colors.border 
-                }
+                { borderColor: errors.interest ? colors.error : colors.border }
               ]}
-              // onPress={() => setInterestModalVisible(true)}
               onPress={() => {
                 setClickedInterest(true);
-                dispatch(GetInterestApi());       // fetch data again on open
-                setInterestModalVisible(true);    // open immediately if data exists
+                dispatch(GetInterestApi());
+                setInterestModalVisible(true);
               }}              
               activeOpacity={0.8}
             >
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
                 <Icon 
                   name="heart-outline" 
                   size={24} 
-                  // Dynamic Icon Color
                   color={errors.interest ? colors.error : colors.textDisabled} 
                   style={{ marginRight: 12 }}
                 />
@@ -232,8 +250,9 @@ const SignUp = ({ navigation }) => {
                     : colors.textDisabled,
                   },
                 ]}
+                numberOfLines={1}
                 >
-                  {userData.interest.length
+                  {userData.interest.length > 0
                     ? userData.interest.join(", ")
                     : "Select Interests"
                   }  
@@ -265,19 +284,20 @@ const SignUp = ({ navigation }) => {
             style={[styles.primaryBtn, { marginBottom: insets.bottom }]}
             onPress={registerUser}
           >
-            <Text style={styles.primaryBtnText}>Sign Up</Text>
+            <Text style={styles.primaryBtnText}>
+             Sign Up
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate("signIn")}>
-              <Text style={styles.linkText}>{SignUpData ? "Please wait..." : "Sign In"}</Text>
+              <Text style={styles.linkText}>Sign In</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
       </ScrollView>
 
-      {/* === REUSABLE MODAL COMPONENT === */}
       <MultiSelectionModal
         key={interestsList.length} 
         visible={isInterestModalVisible}
@@ -288,6 +308,21 @@ const SignUp = ({ navigation }) => {
         onSelect={(items) => handleOnChange("interest", items)}
       />
 
+      {SignUploading && (
+        <DashedLoader 
+          size={100} 
+          color={colors.primary} 
+        />
+      )}
+
+      <CustomAlert 
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        confirmText="OK"
+        onConfirm={handleAlertConfirm}
+        showCancel={false}
+      />
 
     </KeyboardAwareScrollView>
   );

@@ -1,16 +1,16 @@
-export const BASE_URL = 'https://stage.techsimba.in/splurge/public/';
+export const BASE_URL = 'https://stage.techsimba.in/splurge/public/api/';
 
-export const Login_Url = 'api/login';
-export const SignUp_Url = 'api/register';
+export const Login_Url = 'login';
+export const SignUp_Url = 'register';
 
 export const Forgote_Url = '';
 
 
 // POST API
-export const AddTransaction_Url = '';
-export const AddWishlist_Url = '';
-export const EditWishlist_Url = '';
-export const DeleteWishlist_Url = '';
+export const AddTransaction_Url = 'add-transaction';
+export const AddWishlist_Url = 'add-wishlist';
+export const EditWishlist_Url = 'edit-wishlist/';
+export const DeleteWishlist_Url = 'delete-wishlist/';
 export const AddPaymentLog_Url = '';
 export const AddFriend_Url = '';
 export const AddGroup_Url = '';
@@ -18,9 +18,9 @@ export const SettleUp_Url = '';
 export const EditProfile_Url = '';
 
 //  GET API
-export const GetTransection_Url = '';
-export const GetWishlist_Url = '';
-export const GetUserDetails_Url = '';
+export const GetTransection_Url = 'get-transactions/';
+export const GetWishlist_Url = 'get-wishlists/';
+export const GetUserDetails_Url = 'get-user-details';
 export const GetFriends_Url = '';
 export const GetGroups_Url = '';
 export const GetPaymentLog_Url = '';
@@ -29,4 +29,5 @@ export const GetFounders_Url = '';
 export const GetArticle_Url = '';
 export const HelpAndSupport_Url = '';
 export const PrivacyPolicy_Url = '';
-export const GetInterest_Url = 'api/get-interest';
+export const GetInterest_Url = 'get-interest';
+export const GetCategories_Url = 'get-categories';

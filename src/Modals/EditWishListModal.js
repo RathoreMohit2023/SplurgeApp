@@ -5,7 +5,7 @@ import {
   Modal,
   Text,
 } from "react-native";
-import { X } from "lucide-react-native";
+import { X, RotateCcw } from "lucide-react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import CustomInput from "../components/CustomInput";
@@ -19,31 +19,59 @@ const EditWishListModal = ({ visible, onClose, onSave, itemToEdit }) => {
   const [itemName, setItemName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (visible && itemToEdit) {
       setItemName(itemToEdit.name);
       setPrice(itemToEdit.price.toString());
       setDescription(itemToEdit.description);
-    } else if (!visible) {
-      setItemName("");
-      setPrice("");
-      setDescription("");
+      setErrors({}); // Clear errors when a new item is loaded
     }
   }, [visible, itemToEdit]);
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!itemName.trim()) {
+      newErrors.itemName = "Item Name is required.";
+    }
+
+    if (!price.trim()) {
+      newErrors.price = "Price is required.";
+    } else if (isNaN(price) || Number(price) <= 0) {
+      newErrors.price = "Please enter a valid positive number for the price.";
+    }
+
+    if (!description.trim()) {
+      newErrors.description = "Description is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = () => {
-    if (!itemName || !price || !itemToEdit) return;
+    if (validateForm() && itemToEdit) {
+      const updatedItem = {
+        ...itemToEdit,
+        name: itemName,
+        price: parseFloat(price),
+        description: description,
+      };
 
-    const updatedItem = {
-      ...itemToEdit,
-      name: itemName,
-      price: parseInt(price),
-      description: description || "",
-    };
+      onSave(updatedItem);
+      onClose();
+    }
+  };
 
-    onSave(updatedItem);
-    onClose();
+  const handleReset = () => {
+    if (itemToEdit) {
+      setItemName('');
+      setPrice('');
+      setDescription('');
+      setErrors({});
+    }
   };
 
   return (
@@ -59,9 +87,14 @@ const EditWishListModal = ({ visible, onClose, onSave, itemToEdit }) => {
         <View style={[styles.modalContainer, { maxHeight: '80%' }]}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Edit Wishlist Item</Text>
-            <TouchableOpacity onPress={onClose}>
-              <X size={22} color={colors.text} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity onPress={handleReset} style={{ marginRight: 15 }}>
+                <RotateCcw size={20} color={colors.text} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onClose}>
+                <X size={22} color={colors.text} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <KeyboardAwareScrollView
@@ -75,21 +108,39 @@ const EditWishListModal = ({ visible, onClose, onSave, itemToEdit }) => {
               <CustomInput
                 label="Item Name"
                 value={itemName}
-                onChangeText={setItemName}
+                onChangeText={(text) => {
+                  setItemName(text);
+                  if (errors.itemName) {
+                    setErrors(prev => ({ ...prev, itemName: null }));
+                  }
+                }}
                 leftIcon="file-document-outline"
+                error={errors.itemName}
               />
               <CustomInput
                 label="Price"
                 value={price}
-                onChangeText={text => setPrice(text.replace(/[^0-9]/g, ''))}
+                onChangeText={(text) => {
+                  setPrice(text);
+                  if (errors.price) {
+                    setErrors(prev => ({ ...prev, price: null }));
+                  }
+                }}
                 keyboardType="numeric"
                 leftIcon="currency-inr"
+                error={errors.price}
               />
               <CustomInput
                 label="Description"
                 value={description}
-                onChangeText={setDescription}
+                onChangeText={(text) => {
+                  setDescription(text);
+                  if (errors.description) {
+                    setErrors(prev => ({ ...prev, description: null }));
+                  }
+                }}
                 leftIcon="text"
+                error={errors.description}
               />
             </View>
 

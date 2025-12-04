@@ -54,7 +54,7 @@ const TermsAndPolicies = ({ navigation }) => {
       />
       
       <AppHeader
-        showThemeToggle={false}
+        showThemeToggle={true}
         navigation={navigation}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}

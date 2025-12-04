@@ -1,75 +1,120 @@
-import React, { useState, useContext, useMemo } from 'react';
-import { View, FlatList, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useContext, useMemo, useEffect } from 'react';
+import { View, FlatList, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  Pencil,
-  Trash2,
-  Gift,
-  ShoppingBag,
-  Gamepad2,
-} from 'lucide-react-native';
+import { Pencil, Trash2, Gift } from 'lucide-react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
 import AddWishListModal from '../../../Modals/AddWishListModal';
 import EditWishListModal from '../../../Modals/EditWishListModal';
+import ToastMessage from '../../../components/ToastMessage';
+import DashedLoader from '../../../components/DashedLoader';
+import CustomAlert from '../../../components/CustomAlert'; // CustomAlert import karein
+
 import { ThemeContext } from '../../../components/ThemeContext';
 import getWishlistStyles from '../../../styles/MainScreen/tabs/WishlistStyle';
-
-const initialWishlist = [
-  {
-    id: '1',
-    name: 'Concert Ticket',
-    price: 2500,
-    description: 'Travis Scott',
-    icon: Gift,
-  },
-  {
-    id: '2',
-    name: 'Headphones',
-    price: 4500,
-    description: 'Sony WH-1000XM5',
-    icon: ShoppingBag,
-  },
-  {
-    id: '3',
-    name: 'PS5 Console',
-    price: 35000,
-    description: 'Gaming bundle',
-    icon: Gamepad2,
-  },
-  {
-    id: '4',
-    name: 'New Sneakers',
-    price: 8000,
-    description: 'Jordan 1 Low',
-    icon: ShoppingBag,
-  },
-];
+import { GetWishlistApi } from '../../../Redux/Api/GetWishlistApi';
+import { AddWishlistApi } from '../../../Redux/Api/AddWishlistApi';
+import { EditWishlistApi } from '../../../Redux/Api/EditWishlistApi';
+import { DeleteWishlistApi } from '../../../Redux/Api/DeleteWishlistApi';
 
 const WishlistTab = () => {
   const { colors } = useContext(ThemeContext);
   const styles = useMemo(() => getWishlistStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
 
-  const [wishlist, setWishlist] = useState(initialWishlist);
+  const { LoginData } = useSelector(state => state.Login);
+  const { GetWishlistData, GetWishlistLoading } = useSelector(state => state.GetWishlist || {});
+  const { AddWishlistLoading } = useSelector(state => state.AddWishlist || {});
+  const { EditWishlistLoading } = useSelector(state => state.EditWishlist || {});
+  const { DeleteWishlistLoading } = useSelector(state => state.DeleteWishlist || {});
+
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
 
-  const insets = useSafeAreaInsets();
+  // Custom Alert State
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
-  const handleAddItem = newItem => {
-    setWishlist([newItem, ...wishlist]);
-    setAddModalVisible(false);
+  const fetchWishlist = () => {
+    if (LoginData?.token && LoginData?.user?.id) {
+      dispatch(GetWishlistApi({ token: LoginData.token, id: LoginData.user.id }));
+    }
   };
 
-  const handleEditItem = updatedItem => {
-    setWishlist(currentList =>
-      currentList.map(item =>
-        item.id === updatedItem.id ? updatedItem : item,
-      ),
-    );
-    setEditModalVisible(false);
-    setItemToEdit(null);
+  useEffect(() => {
+    fetchWishlist();
+  }, [LoginData]);
+
+  const handleAddItem = async (newItem) => {
+    const token = LoginData?.token;
+    const formData = new FormData();
+    formData.append('user_id', LoginData?.user?.id);
+    formData.append('name', newItem.name);
+    formData.append('price', newItem.price);
+    formData.append('description', newItem.description || '');
+
+    try {
+      const result = await dispatch(AddWishlistApi({ formData, token })).unwrap();
+      if (result?.status === true || result?.status === "true") {
+        setToastMsg(result?.message || "Item added successfully!");
+        setAddModalVisible(false);
+        fetchWishlist();
+      } else {
+        setToastMsg(result?.message || "Failed to add item.");
+      }
+    } catch (error) {
+      setToastMsg("Something went wrong. Please try again.");
+    } finally {
+      setToastVisible(true);
+    }
+  };
+
+  const handleEditItem = async (updatedItem) => {
+    const token = LoginData?.token;
+    const formData = new FormData();
+    formData.append('wishlist_id', updatedItem.id);
+    formData.append('name', updatedItem.name);
+    formData.append('price', updatedItem.price);
+    formData.append('description', updatedItem.description || '');
+    
+    try {
+      const result = await dispatch(EditWishlistApi({ formData, token, id: updatedItem.id })).unwrap();
+      if (result?.status === true || result?.status === "true") {
+        setToastMsg(result?.message || "Item updated successfully!");
+        setEditModalVisible(false);
+        setItemToEdit(null);
+        fetchWishlist();
+      } else {
+        setToastMsg(result?.message || "Failed to update item.");
+      }
+    } catch (error) {
+      setToastMsg("Something went wrong. Please try again.");
+    } finally {
+      setToastVisible(true);
+    }
+  };
+
+  const handleDeleteItem = async (itemId) => {
+    const token = LoginData?.token;
+    try {
+        const result = await dispatch(DeleteWishlistApi({ token, id: itemId })).unwrap();
+        if (result?.status === true || result?.status === "true") {
+            setToastMsg(result?.message || "Item deleted.");
+            fetchWishlist();
+        } else {
+            setToastMsg(result?.message || "Failed to delete item.");
+            fetchWishlist();
+        }
+    } catch (error) {
+        setToastMsg("Something went wrong. Please try again.");
+    } finally {
+        setToastVisible(true);
+    }
   };
 
   const openEditModal = item => {
@@ -78,27 +123,12 @@ const WishlistTab = () => {
   };
 
   const confirmDeleteItem = (itemId, itemName) => {
-    Alert.alert(
-      'Delete Item',
-      `Are you sure you want to delete "${itemName}" from your wishlist?`,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: () => handleDeleteItem(itemId),
-          style: 'destructive',
-        },
-      ],
-      { cancelable: true },
-    );
+    setItemToDelete({ id: itemId, name: itemName });
+    setIsAlertVisible(true);
   };
 
-  const handleDeleteItem = itemId => {
-    setWishlist(currentList => currentList.filter(item => item.id !== itemId));
-  };
+  const isLoading = GetWishlistLoading || AddWishlistLoading || EditWishlistLoading || DeleteWishlistLoading;
+  const wishlistData = GetWishlistData?.get_wishlists || [];
 
   return (
     <View style={styles.container}>
@@ -107,47 +137,43 @@ const WishlistTab = () => {
         <TouchableOpacity
           style={styles.addBtn}
           onPress={() => setAddModalVisible(true)}
+          disabled={isLoading}
         >
           <Text style={styles.addBtnText}>+ Add New</Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
-        data={wishlist}
-        keyExtractor={item => item.id}
+        data={wishlistData}
+        keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
-        renderItem={({ item }) => {
-          const Icon = item.icon || Gift;
-          return (
+        contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
+        renderItem={({ item }) => (
             <View style={styles.card}>
               <View style={styles.iconContainer}>
-                <Icon size={24} color={colors.text} />
+                <Gift size={24} color={colors.text} />
               </View>
-
               <View style={styles.contentContainer}>
                 <View style={styles.rowBetween}>
                   <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.price}>
-                    ₹{item.price.toLocaleString()}
-                  </Text>
+                  <Text style={styles.price}>₹{Number(item.price).toLocaleString()}</Text>
                 </View>
                 <Text style={styles.desc}>{item.description}</Text>
-
                 <View style={styles.divider} />
-
                 <View style={styles.footer}>
                   <Text style={styles.status}>Target</Text>
                   <View style={styles.actions}>
                     <TouchableOpacity
                       style={styles.iconBtn}
                       onPress={() => openEditModal(item)}
+                      disabled={isLoading}
                     >
                       <Pencil size={18} color={colors.blue} />
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.iconBtn}
                       onPress={() => confirmDeleteItem(item.id, item.name)}
+                      disabled={isLoading}
                     >
                       <Trash2 size={18} color={colors.error} />
                     </TouchableOpacity>
@@ -155,8 +181,13 @@ const WishlistTab = () => {
                 </View>
               </View>
             </View>
-          );
-        }}
+        )}
+        ListEmptyComponent={!isLoading && (
+            <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No items in your wishlist yet.</Text>
+                <Text style={styles.emptySubText}>Tap '+ Add New' to create a goal.</Text>
+            </View>
+        )}
       />
 
       <AddWishListModal
@@ -164,12 +195,39 @@ const WishlistTab = () => {
         onClose={() => setAddModalVisible(false)}
         onSave={handleAddItem}
       />
-
       <EditWishListModal
         visible={editModalVisible}
         onClose={() => setEditModalVisible(false)}
         onSave={handleEditItem}
         itemToEdit={itemToEdit}
+      />
+
+      {isLoading && <DashedLoader />}
+
+      <ToastMessage
+        visible={toastVisible}
+        message={toastMsg}
+        onHide={() => setToastVisible(false)}
+      />
+
+      <CustomAlert
+        visible={isAlertVisible}
+        title="Delete Item"
+        message={itemToDelete ? `Are you sure you want to delete "${itemToDelete.name}"?` : ""}
+        showCancel={true}
+        cancelText="Cancel"
+        confirmText="Delete"
+        onCancel={() => {
+          setIsAlertVisible(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={() => {
+          if (itemToDelete) {
+            handleDeleteItem(itemToDelete.id);
+          }
+          setIsAlertVisible(false);
+          setItemToDelete(null);
+        }}
       />
     </View>
   );

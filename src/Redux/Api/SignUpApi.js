@@ -23,7 +23,7 @@ export const SignUpApi = createAsyncThunk(
             return result;
         }
         catch(error){
-            console.log('Error in SignUpApi:', error.response.data);
+           return error?.response?.data;
         }
     }
 );

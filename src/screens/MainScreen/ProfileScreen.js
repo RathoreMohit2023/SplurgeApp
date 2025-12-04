@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from "react";
+import React, { useState, useContext, useMemo, useEffect } from "react";
 import {
   View,
   ScrollView,
@@ -21,22 +21,26 @@ import {
   Shield,
   HelpCircle,
   Settings,
-  LogOut
+  LogOut,
+  Phone
 } from "lucide-react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import getProfileStyle from "../../styles/MainScreen/ProfileStyle"; 
 import { ThemeContext } from "../../components/ThemeContext";
+import { useSelector } from "react-redux";
 
 const ProfileScreen = ({ navigation }) => {
   
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getProfileStyle(colors), [colors]);
+  const { GetUserDetailsData } = useSelector((state) => state.GetUserDetails);
+  const [user, setUser] = useState('');
 
   const [snack, setSnack] = useState({ visible: false, message: "" });
   const insets = useSafeAreaInsets();
 
-  const user = {
+  const dummyuser = {
     name: "Arjun Patel",
     email: "arjun.patel@gmail.com",
     phone: "+91 98765 43210",
@@ -48,8 +52,8 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   const stats = [
-    { label: "Total Spent", value: user.spent, icon: CreditCard, color: "#FFD700" },
-    { label: "Friends", value: user.totalFriends, icon: User, color: "#4FB6FF" },
+    { label: "Total Spent", value: dummyuser?.spent, icon: CreditCard, color: "#FFD700" },
+    { label: "Friends", value: dummyuser?.totalFriends, icon: User, color: "#4FB6FF" },
   ];
 
   const menuSections = [
@@ -84,6 +88,13 @@ const ProfileScreen = ({ navigation }) => {
       ]
     }
   ];
+
+  useEffect(() => {
+    if (GetUserDetailsData) {
+      setUser(GetUserDetailsData?.user_details[0]);
+    }
+    
+  },[GetUserDetailsData]);
   
 
   const handleLogout = () => {
@@ -115,28 +126,26 @@ const ProfileScreen = ({ navigation }) => {
                 <View style={styles.avatarContainer}>
                     <Avatar.Text
                         size={80}
-                        label={user.name.split(" ").map((n) => n[0]).join("")}
+                        label={user?.fullname?.split(" ").map((n) => n[0]).join("")}
                         style={styles.avatar}
                         labelStyle={styles.avatarLabel}
                     />
-                    {/* <View style={styles.rankBadge}>
-                        <Text style={styles.rankText}>#{user.rank}</Text>
-                    </View> */}
                 </View>
 
                 <View style={styles.userInfo}>
-                    <Text style={styles.userName}>{user.name}</Text>
-                    <Text style={styles.userHandle}>{user.code}</Text>
+                    <Text style={styles.userName}>{user?.fullname}</Text>
+                    <Text style={styles.userHandle}>{user?.code}</Text>
+                    <View style={styles.contactRow}>
+                        <Phone size={14} color={colors.textSecondary} />
+                        <Text style={styles.contactText}>{user?.mobile}</Text>
+                    </View>
                     
                     <View style={styles.contactRow}>
                         <Mail size={14} color={colors.textSecondary} />
-                        <Text style={styles.contactText}>{user.email}</Text>
+                        <Text style={styles.contactText}>{user?.email}</Text>
                     </View>
                 </View>
 
-                {/* <TouchableOpacity style={styles.editButton}>
-                    <Settings size={20} color={colors.text} />
-                </TouchableOpacity> */}
             </View>
         </View>
 

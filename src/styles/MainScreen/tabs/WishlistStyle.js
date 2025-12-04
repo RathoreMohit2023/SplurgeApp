@@ -97,6 +97,30 @@ const getWishlistStyles = (colors) => StyleSheet.create({
   iconBtn: { 
     opacity: 0.8 
   },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.textPrimary,   // theme based
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  
+  emptySubText: {
+    fontSize: 14,
+    color: colors.darkPrimary, // softer text
+    textAlign: 'center',
+    lineHeight: 20,
+    maxWidth: 240,               // better readable width
+  },
+  
 });
 
 export default getWishlistStyles;

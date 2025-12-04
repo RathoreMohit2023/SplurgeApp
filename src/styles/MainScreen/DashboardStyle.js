@@ -44,6 +44,9 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         color: colors.theme,
         fontWeight: '700',
     },
+    transactionDetails: {
+        // justifyContent: 'space-between',
+    },
 
     // --- Hero Card ---
     heroCard: {

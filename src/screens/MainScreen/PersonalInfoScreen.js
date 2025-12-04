@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from 'react';
+import React, { useState, useContext, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,13 +18,14 @@ import AppHeader from '../../components/Header';
 import getPersonalInfoStyle from "../../styles/MainScreen/PersonalInfoStyle";
 import { ThemeContext } from "../../components/ThemeContext";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-
+import { useSelector } from 'react-redux';
 
 const PersonalInfoScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getPersonalInfoStyle(colors), [colors]);
-  const [profileImage, setProfileImage] = useState(null);
-
+  const [profileImage, setProfileImage] = useState("");
+  const { GetUserDetailsData } = useSelector((state) => state.GetUserDetails);
+  
   const insets = useSafeAreaInsets();
 
   const openCamera = () => {
@@ -88,8 +89,66 @@ const PersonalInfoScreen = ({ navigation }) => {
     bio: 'Digital nomad & tech enthusiast.',
   });
 
-  const [interests, setInterests] = useState(['Finance', 'Technology', 'Travel']);
+  // const [interests, setInterests] = useState(['Finance', 'Technology', 'Travel']);
+  const [interests, setInterests] = useState([]);
   const [currentInterest, setCurrentInterest] = useState('');
+
+  // useEffect(() => {
+  //   if (GetUserDetailsData?.user_details?.length > 0) {
+  //     const user = GetUserDetailsData.user_details[0];
+  
+  //     setForm({
+  //       name: user.fullname || '',
+  //       email: user.email || '',
+  //       phone: user.mobile || '',
+  //       location: '',
+  //       bio: '',
+  //     });
+  
+  //     try {
+  //       if (user.interest) {
+  //         setInterests(JSON.parse(user.interest));
+  //       }
+  //     } catch (err) {
+  //       console.log("Error parsing interests", err);
+  //       setInterests([]);
+  //     }
+  //   }
+  // }, [GetUserDetailsData]);
+
+  useEffect(() => {
+    if (GetUserDetailsData?.user_details?.length > 0) {
+      const user = GetUserDetailsData.user_details[0];
+  
+      setForm({
+        name: user.fullname || '',
+        email: user.email || '',
+        phone: user.mobile || '',
+        location: '',
+        bio: '',
+      });
+  
+      try {
+        if (user.interest) {
+          const parsed = JSON.parse(user.interest);
+  
+          // Ensure parsed value is an array
+          if (Array.isArray(parsed)) {
+            setInterests(parsed);
+          } else {
+            setInterests([]); // fallback
+          }
+        } else {
+          setInterests([]); // no interests found
+        }
+      } catch (err) {
+        console.log("Error parsing interests", err);
+        setInterests([]); // fallback on error
+      }
+    }
+  }, [GetUserDetailsData]);
+  
+  
 
   const handleAddInterest = () => {
     if (currentInterest.trim().length > 0) {
@@ -155,19 +214,16 @@ const PersonalInfoScreen = ({ navigation }) => {
           {/* Profile Image Section */}
           <View style={styles.profileSection}>
             <View style={styles.avatarContainer}>
-
-              {/* <View style={styles.avatarPlaceholder}>
-                 <Text style={styles.avatarInitials}>AJ</Text>
-              </View> */}
-
               <View style={styles.avatarPlaceholder}>
                 {profileImage ? (
                   <Image 
                     source={{ uri: profileImage }} 
-                    style={styles.avatarImage} 
+                    style={styles.avatarImage}
                   />
-                  ) : (
-                  <Text style={styles.avatarInitials}>AJ</Text>
+                ) : (
+                  <Text style={styles.avatarInitials}>
+                    {form.name?.split(" ").map((n) => n[0]).join("")}
+                  </Text>
                 )}
               </View>
 
@@ -179,6 +235,7 @@ const PersonalInfoScreen = ({ navigation }) => {
                 <MaterialCommunityIcons name="camera" size={18} color="#FFF" />
               </TouchableOpacity>
             </View>
+
             <Text style={styles.profileName}>{form.name}</Text>
             <Text style={styles.profileEmail}>{form.email}</Text>
           </View>
@@ -236,8 +293,6 @@ const PersonalInfoScreen = ({ navigation }) => {
                 ))}
               </View>
             </View>
-            {/* --- Interests Field End --- */}
-
             {renderInput('Bio', 'bio', 'text-short', 'Tell us about yourself', true)}
           </View>
 
