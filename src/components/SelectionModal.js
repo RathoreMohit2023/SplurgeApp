@@ -38,7 +38,7 @@ const SelectionModal = ({
   const handleSearch = text => {
     setSearchQuery(text);
     if (text) {
-      const newData = data.filter(item =>
+      const newData = data?.filter(item =>
         item.toLowerCase().includes(text.toLowerCase()),
       );
       setFilteredData(newData);
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 20, // Add padding so modal doesn't touch screen edges when keyboard is up
+    paddingVertical: 20,
   },
   backdropClickArea: {
     flex: 1,
@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    width: width * 0.9, // 90% of screen width
-    maxHeight: height * 0.7, // Limit height
+    width: width * 0.9, 
+    maxHeight: height * 0.7,
     backgroundColor: Colors.surface || '#fff',
     borderRadius: 20,
     padding: 20,
@@ -200,6 +200,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
+    fontFamily: 'serif',
     fontWeight: 'bold',
     color: Colors.text || '#000',
   },
@@ -226,6 +227,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.text || '#000',
     fontSize: 16,
+    fontFamily: 'serif',
     height: '100%',
   },
   listContent: {
@@ -243,6 +245,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
+    fontFamily: 'serif',
     color: Colors.text || '#333',
   },
   selectedItemWrapper: {
@@ -264,6 +267,7 @@ const styles = StyleSheet.create({
     color: Colors.placeholder || '#999',
     marginTop: 10,
     fontSize: 14,
+    fontFamily: 'serif',
   },
 });
 

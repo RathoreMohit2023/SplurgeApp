@@ -98,6 +98,7 @@ const getStyles = (colors) => StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
+    fontFamily: 'serif',
     color: colors.text, 
     padding: 0,
   },
@@ -115,6 +116,7 @@ const getStyles = (colors) => StyleSheet.create({
     color: colors.error,
     marginTop: 4,
     fontSize: 12,
+    fontFamily: 'serif',
     marginLeft: 4,
   },
 });

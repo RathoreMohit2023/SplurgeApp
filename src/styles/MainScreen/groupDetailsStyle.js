@@ -28,6 +28,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     headerTitle: {
         color: colors.text, // Dynamic Text
         fontSize: 18,
+        fontFamily : 'serif',
         fontWeight: '700',
         flex: 1,
         textAlign: 'center',
@@ -55,6 +56,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     heroLabel: {
         color: "rgba(255,255,255,0.8)", // Always Light because bg is Purple
         fontSize: 14,
+        fontFamily : 'serif',
         fontWeight: '600',
         marginBottom: 4,
     },
@@ -62,7 +64,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         color: "#FFFFFF", // Fixed White
         fontSize: 32,
         fontWeight: '800',
-        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+        fontFamily : 'serif',
     },
     circularIcon: {
         backgroundColor: colors.background, // Dynamic: White in Light, Black in Dark
@@ -86,6 +88,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     progressText: {
         color: colors.text, 
         fontSize: 12,
+        fontFamily : 'serif',
         fontWeight: '600',
     },
     progressBar: {
@@ -96,6 +99,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     totalBudgetLabel: {
         color:  colors.text, 
         fontSize: 11,
+        fontFamily : 'serif',
         marginTop: 8,
         textAlign: 'right'
     },
@@ -120,6 +124,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     sectionTitle: {
         color: colors.text,
         fontSize: 18,
+        fontFamily : 'serif',
         fontWeight: '700',
     },
     smallBtn: {
@@ -136,6 +141,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         color: colors.theme,
         fontWeight: '600',
         fontSize: 12,
+        fontFamily : 'serif',
         marginLeft: 4,
     },
     addButton: {
@@ -153,6 +159,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         color: colors.theme,
         fontWeight: '600',
         fontSize: 12,
+        fontFamily : 'serif',
     },
 
     // --- Members List ---
@@ -185,6 +192,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     memberName: {
         color: colors.text,
         fontSize: 15,
+        fontFamily : 'serif',
         fontWeight: '600',
         marginBottom: 2,
     },
@@ -198,6 +206,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     adminText: {
         color: colors.theme,
         fontSize: 10,
+        fontFamily : 'serif',
         fontWeight: '700',
     },
     divider: {
@@ -228,22 +237,26 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     expenseTitle: {
         color: colors.text,
         fontSize: 16,
+        fontFamily : 'serif',
         fontWeight: '600',
         marginBottom: 4,
     },
     expenseSub: {
         color: colors.textSecondary,
         fontSize: 12,
+        fontFamily : 'serif',
     },
     expenseAmount: {
         color: colors.text,
         fontSize: 16,
+        fontFamily : 'serif',
         fontWeight: '700',
         fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     },
     splitText: {
         color: colors.textSecondary,
         fontSize: 11,
+        fontFamily : 'serif',
         marginTop: 2,
     },
 });

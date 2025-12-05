@@ -31,12 +31,14 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
   },
   title: {
     fontSize: 20,
+    fontFamily : 'serif',
     fontWeight: "700",
     color: colors.text, // Dynamic Text
     marginBottom: 2,
   },
   subtitle: {
     fontSize: 13,
+    fontFamily : 'serif',
     color: colors.textSecondary,
   },
   closeBtn: {
@@ -57,6 +59,7 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
   },
   label: {
     fontSize: 12,
+    fontFamily : 'serif',
     fontWeight: "600",
     color: colors.textSecondary,
     marginBottom: 8,
@@ -94,11 +97,13 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
   },
   selectorLabel: {
     fontSize: 11,
+    fontFamily : 'serif',
     color: colors.textSecondary,
     fontWeight: "500",
   },
   selectorValue: {
     fontSize: 15,
+    fontFamily : 'serif',
     color: colors.text,
     fontWeight: "600",
     marginTop: 2,
@@ -150,6 +155,7 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
   },
   avatarText: {
     fontSize: 12,
+    fontFamily : 'serif',
     color: colors.textSecondary,
     fontWeight: "700",
   },
@@ -158,6 +164,7 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
   },
   splitName: {
     fontSize: 14,
+    fontFamily : 'serif',
     color: colors.textSecondary,
   },
   splitNameSelected: {
@@ -167,6 +174,7 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
   errorText: {
     color: colors.error,
     fontSize: 12,
+    fontFamily : 'serif',
     marginTop: 6,
     marginLeft: 4,
   },
@@ -188,6 +196,7 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
   submitBtnText: {
     color: "#fff",
     fontSize: 16,
+    fontFamily : 'serif',
     fontWeight: "700",
   },
 
