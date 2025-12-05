@@ -43,7 +43,7 @@ const AddGroupMemberModal = ({
   };
 
   const handleSelectName = (name) => {
-    const friendObj = friends.find((f) => f.name === name);
+    const friendObj = friends.find((f) => f.fullname === name);
     if (friendObj) {
       setSelectedFriend(friendObj);
       setError("");
@@ -58,8 +58,7 @@ const AddGroupMemberModal = ({
       onRequestClose={resetForm}
       statusBarTranslucent={true}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <View
         style={styles.overlay}
       >
         <View style={styles.modalContainer}>
@@ -95,7 +94,7 @@ const AddGroupMemberModal = ({
                     !selectedFriend && styles.placeholderText
                   ]}
                 >
-                  {selectedFriend ? selectedFriend.name : "Search friends..."}
+                  {selectedFriend ? selectedFriend.fullname : "Search friends..."}
                 </Text>
               </View>
               <ChevronDown size={20} color={colors.textSecondary} />
@@ -122,16 +121,16 @@ const AddGroupMemberModal = ({
             </TouchableOpacity>
           </View>
         </View>
-      </KeyboardAvoidingView>
+      </View>
 
       <SelectionModal
         visible={selectionVisible}
         onClose={() => setSelectionVisible(false)}
         title="Select Friend"
         placeholder="Search by name..."
-        data={friends.map(f => f.name)}
+        data={friends?.map(f => f.fullname)}
         onSelect={handleSelectName}
-        selectedItem={selectedFriend?.name}
+        selectedItem={selectedFriend?.fullname}
       />
     </Modal>
   );

@@ -1,22 +1,22 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { BASE_URL, AddFriend_Url } from '../NWConfig';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const url = `${BASE_URL}${AddFriend_Url}`;
 
 export const AddFriendApi = createAsyncThunk(
   'AddFriendApi',
-  async (PostData) => {
+  async ({formData, token}) => {
     
-    const token = await AsyncStorage.getItem('Token');
-    const parsedToken = JSON.parse(token);
     const headers = {
         "Content-Type" : "multipart/form-data",
-        "Authorization": `Bearer ${parsedToken}`, 
+        "Authorization": `Bearer ${token}`, 
     }
+    console.log("formData:", formData);
+    console.log("token:", token);
+    
     try {
-      const response = await axios.post(url, PostData, {
+      const response = await axios.post(url, formData, {
         headers
       });
       console.log("Response from AddFriendApi:", response.data);
@@ -24,7 +24,7 @@ export const AddFriendApi = createAsyncThunk(
       const result = response.data;
       return result;
     } catch (error) {
-      console.log('Error in AddFriendApi:', error.response.data);
+      return error?.response?.data;
     }
   }
 );

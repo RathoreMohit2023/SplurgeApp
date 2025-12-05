@@ -28,11 +28,13 @@ const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
   },
   modalTitle: {
     fontSize: 22,
+    fontFamily: 'serif',
     fontWeight: "700",
     color: colors.text, // Dynamic Text
   },
   modalSubtitle: {
     fontSize: 13,
+    fontFamily: 'serif',
     color: colors.textSecondary,
     marginTop: 2,
   },
@@ -49,6 +51,7 @@ const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
   },
   label: {
     fontSize: 13,
+    fontFamily: 'serif',
     fontWeight: "600",
     color: colors.text,
     marginBottom: 8,
@@ -81,6 +84,7 @@ const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
   },
   selectorValue: {
     fontSize: 15,
+    fontFamily: 'serif',
     color: colors.text,
     fontWeight: "500",
   },
@@ -94,6 +98,7 @@ const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
   errorText: {
     color: colors.error,
     fontSize: 12,
+    fontFamily: 'serif',
     marginTop: 4,
     marginLeft: 4,
   },
@@ -130,11 +135,13 @@ const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
   },
   cancelButtonText: {
     fontSize: 16,
+    fontFamily: 'serif',
     fontWeight: "600",
     color: colors.textSecondary,
   },
   saveButtonText: {
     fontSize: 16,
+    fontFamily: 'serif',
     fontWeight: "700",
     color: "#fff", // Button text usually white
   },

@@ -80,7 +80,7 @@ const AddPaymentLogModal = ({ visible, onClose, friends = [], onSave }) => {
   };
 
   const handleOpenFriendSelect = () => {
-    const friendNames = friends.map((f) => f.name);
+    const friendNames = friends?.map((f) => f.fullname);
     setSelectionData(friendNames);
     setSelectionTitle("Select Friend");
     setSelectionMode("FRIEND");
@@ -97,9 +97,9 @@ const AddPaymentLogModal = ({ visible, onClose, friends = [], onSave }) => {
 
   const handleSelection = (selectedItemString) => {
     if (selectionMode === "FRIEND") {
-      const selectedFriend = friends.find(f => f.name === selectedItemString);
+      const selectedFriend = friends?.find(f => f.fullname === selectedItemString);
       if (selectedFriend) {
-        setFriend({ label: selectedFriend.name, value: selectedFriend.id });
+        setFriend({ label: selectedFriend.fullname, value: selectedFriend.id });
         setErrors((prev) => ({ ...prev, friend: "" }));
       }
     } else if (selectionMode === "TYPE") {

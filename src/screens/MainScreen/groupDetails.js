@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from 'react';
+import React, { useState, useContext, useMemo, use, useEffect } from 'react';
 import { View, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import {
   Text,
@@ -22,6 +22,7 @@ import AddGroupMemberModal from '../../Modals/AddGroupMemberModal';
 import AddGroupExpenseModal from '../../Modals/AddGroupExpenseModal';
 import getGroupDetailsStyle from '../../styles/MainScreen/groupDetailsStyle';
 import { ThemeContext } from '../../components/ThemeContext';
+import { useSelector } from 'react-redux';
 
 const MY_FRIENDS = [
   { id: '1', name: 'Alice Johnson', role: 'Designer' },
@@ -38,6 +39,8 @@ const MEMBERS = [
 
 const GroupDetails = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
+  const { GetFriendsData } = useSelector(state => state.GetFriends || {});
+
 
   const styles = useMemo(() => getGroupDetailsStyle(colors), [colors]);
 
@@ -47,10 +50,17 @@ const GroupDetails = ({ navigation }) => {
 
   const [expenseFormOpen, setExpenseFormOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const [friendList, setFriendList] = useState([]);
   const [snack, setSnack] = useState({ visible: false, message: '' });
   const [modalVisible, setModalVisible] = useState(false);
 
   const [groupMembers, setGroupMembers] = useState([]);
+
+  useEffect(() => {
+    if (GetFriendsData?.friends) {
+      setFriendList(GetFriendsData?.friends);
+    }
+  }, [GetFriendsData]);
 
   const handleAddMember = selectedFriend => {
     if (groupMembers.find(m => m.id === selectedFriend.id)) {
@@ -300,7 +310,7 @@ const GroupDetails = ({ navigation }) => {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSubmit={handleAddMember}
-        friends={MY_FRIENDS}
+        friends={friendList}
       />
 
       <AddGroupExpenseModal

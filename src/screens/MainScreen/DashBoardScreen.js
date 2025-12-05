@@ -23,6 +23,11 @@ import { GetTransectionApi } from '../../Redux/Api/GetTransectionApi';
 import { GetMonthlyBudgetApi } from '../../Redux/Api/GetMonthlyBudgetApi';
 import { AddMonthlyBudgetApi } from '../../Redux/Api/AddMonthlyBudgetApi';
 import { EditMonthlyBudgetApi } from '../../Redux/Api/EditMonthlyBudgetApi';
+import { GetFriendsApi } from '../../Redux/Api/GetFriendsApi';
+import { GetvideoApi } from '../../Redux/Api/GetVideoApi';
+import { GetFounderApi } from '../../Redux/Api/GetFounderApi';
+import { GetArticleApi } from '../../Redux/Api/GetArticleApi';
+import { GetGroupsApi } from '../../Redux/Api/GetGroupsAPi';
 
 const categoryIcons = {
   'Food & Groceries': Utensils, 'Dining Out': Coffee, 'Rent / Housing': Home,
@@ -64,6 +69,10 @@ const DashBoardScreen = ({ navigation }) => {
       dispatch(GetWishlistApi({ token, id: userId }));
       dispatch(GetTransectionApi({ token, id: userId }));
       dispatch(GetMonthlyBudgetApi({ token, id: userId }));
+      dispatch(GetFriendsApi({ token, id: userId }));
+      dispatch(GetGroupsApi({ token, id: userId }));
+      dispatch(GetvideoApi(token));
+      dispatch(GetFounderApi(token));
     }
   };
 

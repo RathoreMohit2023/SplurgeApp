@@ -23,11 +23,13 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         color: colors.text,
         fontSize: 26,
         fontWeight: "700",
+        fontFamily: 'serif',
     },
     subtitle: {
         color: colors.textSecondary,
         fontSize: 14,
         marginTop: 2,
+        fontFamily: 'serif',
     },
     headerIconBtn: {
         padding: 10,
@@ -58,6 +60,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 1,
+        fontFamily: 'serif',
     },
     shareBadge: {
         flexDirection: 'row',
@@ -74,6 +77,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         color: colors.text,
         fontSize: 12,
         fontWeight: '600',
+        fontFamily: 'serif',
     },
     codeContainer: {
         flexDirection: 'row',
@@ -89,8 +93,8 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     codeText: {
         color: colors.text,
         fontSize: 22,
+        fontFamily: 'serif',
         fontWeight: '700',
-        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
         letterSpacing: 1,
     },
     copyBtn: {
@@ -113,13 +117,14 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         alignItems: 'center',
     },
     inputIcon: {
-        paddingLeft: 12,
+        paddingLeft: 10,
     },
     textInput: {
         flex: 1,
         color: colors.text,
         paddingHorizontal: 12,
         fontSize: 16,
+        fontFamily: 'serif',
         height: 50,
     },
     addBtn: {
@@ -133,6 +138,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         color: colors.background,
         fontWeight: '700',
         fontSize: 14,
+        fontFamily: 'serif',
     },
 
     // --- Sections ---
@@ -148,11 +154,13 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     sectionTitle: {
         color: colors.text,
         fontSize: 18,
+        fontFamily: 'serif',
         fontWeight: "700",
     },
     linkText: {
         color: colors.theme,
         fontSize: 14,
+        fontFamily: 'serif',
         fontWeight: "600",
     },
     linkBtn: {
@@ -198,12 +206,14 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     friendName: {
         color: colors.text,
         fontSize: 16,
+        fontFamily: 'serif',
         fontWeight: '600',
         marginBottom: 2,
     },
     settledText: {
         color: colors.textSecondary,
         fontSize: 12,
+        fontFamily: 'serif',
     },
     statusRow: {
         flexDirection: 'row',
@@ -211,6 +221,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     },
     statusText: {
         fontSize: 13,
+        fontFamily: 'serif',
         fontWeight: '600',
     },
     actionIcon: {
@@ -221,7 +232,8 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: colors.border,
+        borderColor: colors.theme,
+        marginLeft: 12
     },
     
     // --- Friend Footer (New Styles) ---
@@ -251,6 +263,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     },
     actionBtnText: {
         fontSize: 12,
+        fontFamily: 'serif',
         fontWeight: '600',
         marginLeft: 6,
         color: colors.text,
@@ -289,16 +302,18 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         color: colors.text,
         fontWeight: '700',
         fontSize: 16,
+        fontFamily: 'serif',
     },
     groupMembers: {
         color: colors.textSecondary,
         fontSize: 12,
+        fontFamily: 'serif',
     },
     amountText: {
         color: colors.text,
         fontWeight: '700',
         fontSize: 16,
-        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+        fontFamily: 'serif',
     },
     progressContainer: {
         marginTop: 16,
@@ -306,6 +321,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     progressLabel: {
         color: colors.textSecondary,
         fontSize: 11,
+        fontFamily: 'serif',
         marginBottom: 6,
     },
     progressBar: {
@@ -334,15 +350,18 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     logTitle: {
         color: colors.text,
         fontSize: 14,
+        fontFamily: 'serif',
         fontWeight: '600',
     },
     logDesc: {
         color: colors.textSecondary,
         fontSize: 12,
+        fontFamily: 'serif',
     },
     logAmount: {
         fontWeight: '700',
         fontSize: 14,
+        fontFamily: 'serif',
         fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     }
 });

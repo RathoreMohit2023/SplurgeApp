@@ -33,9 +33,11 @@ const getAddGroupMemberModalStyle = (colors) => StyleSheet.create({
     fontWeight: "700",
     color: colors.text, // Dynamic Text
     marginBottom: 4,
+    fontFamily : 'serif',
   },
   subtitle: {
     fontSize: 13,
+    fontFamily : 'serif',
     color: colors.textSecondary,
   },
   closeBtn: {
@@ -48,6 +50,7 @@ const getAddGroupMemberModalStyle = (colors) => StyleSheet.create({
   },
   label: {
     fontSize: 14,
+    fontFamily : 'serif',
     fontWeight: "600",
     color: colors.text,
     marginBottom: 10,
@@ -82,6 +85,7 @@ const getAddGroupMemberModalStyle = (colors) => StyleSheet.create({
   },
   selectorText: {
     fontSize: 16,
+    fontFamily : 'serif',
     color: colors.text,
     fontWeight: "500",
   },
@@ -91,6 +95,7 @@ const getAddGroupMemberModalStyle = (colors) => StyleSheet.create({
   errorText: {
     color: colors.error,
     fontSize: 12,
+    fontFamily : 'serif',
     marginTop: 6,
     marginLeft: 4,
   },
@@ -112,6 +117,7 @@ const getAddGroupMemberModalStyle = (colors) => StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: "600",
     fontSize: 15,
+    fontFamily : 'serif',
   },
   addBtn: {
     flex: 1.5,
@@ -131,6 +137,7 @@ const getAddGroupMemberModalStyle = (colors) => StyleSheet.create({
     color: "#FFF", // Button text usually white
     fontWeight: "700",
     fontSize: 15,
+    fontFamily : 'serif',
   },
 });
 
