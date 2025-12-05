@@ -19,17 +19,20 @@ const getTermsAndPoliciesStyle = (colors) => StyleSheet.create({
     color: colors.text, // Dynamic Text
     marginBottom: 8,
     letterSpacing: 0.5,
+    fontFamily: 'serif',
   },
   subTitle: {
     fontSize: 13,
     color: colors.textDisabled, // Dynamic Disabled Text
     marginBottom: 16,
     fontWeight: '500',
+    fontFamily: 'serif',
   },
   description: {
     fontSize: 15,
     color: colors.textSecondary,
     lineHeight: 22,
+    fontFamily: 'serif',
   },
   cardsContainer: {
     gap: 16,
@@ -67,11 +70,13 @@ const getTermsAndPoliciesStyle = (colors) => StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     color: colors.text,
+    fontFamily: 'serif',
   },
   cardContent: {
     fontSize: 14,
     color: colors.textSecondary,
     lineHeight: 22,
+    fontFamily: 'serif',
   },
   contactSection: {
     marginTop: 35,
@@ -81,6 +86,7 @@ const getTermsAndPoliciesStyle = (colors) => StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     marginBottom: 15,
+    fontFamily: 'serif',
   },
   contactCard: {
     flexDirection: 'row',
@@ -98,11 +104,13 @@ const getTermsAndPoliciesStyle = (colors) => StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#FFF', // Always White on Theme Color
+    fontFamily: 'serif',
   },
   contactSubtitle: {
     fontSize: 13,
     color: 'rgba(255,255,255,0.8)',
     marginTop: 2,
+    fontFamily: 'serif',
   },
 });
 

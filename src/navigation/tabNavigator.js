@@ -47,8 +47,9 @@ const TabNavigator = () => {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: "500",
+          fontWeight: "700",
           paddingBottom: 4,
+          fontFamily: 'serif',
         },
       }}
     >

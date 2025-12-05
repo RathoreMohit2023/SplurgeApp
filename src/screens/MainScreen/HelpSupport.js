@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useEffect, useContext, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Linking,
   StatusBar,
+  ActivityIndicator
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -13,44 +14,63 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import AppHeader from '../../components/Header';
 import getHelpSupportStyle from "../../styles/MainScreen/HelpSupportStyle"; 
 import { ThemeContext } from "../../components/ThemeContext"; 
+import { HelpAndSupportApi } from '../../Redux/Api/HelpAndSupportApi';
+import { useDispatch, useSelector } from 'react-redux';
 
 const HelpSupport = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
-
   const styles = useMemo(() => getHelpSupportStyle(colors), [colors]);
-
   const insets = useSafeAreaInsets();
+  const { LoginData } = useSelector(state => state.Login);
+  const { HelpAndSupportLoading, HelpAndSupportData } = useSelector(state => state.HelpAndSupport);
 
-  const contactDetails = [
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(HelpAndSupportApi(LoginData.token))
+  }, []);
+
+  const support = HelpAndSupportData?.support?.[0] || {};
+
+  const contactDetails = [          
     {
-      id: 'email',
+      id: 'email', 
       icon: 'email-outline',
       label: 'Email Support',
-      value: 'support@splurgeapp.com',
-      action: () => Linking.openURL('mailto:support@splurgeapp.com'),
+      value: support.email,
+      action: () => Linking.openURL(`mailto:${support.email}`),
     },
     {
       id: 'phone',
       icon: 'phone-outline',
       label: 'Customer Care',
-      value: '+1 (800) 123-4567',
-      action: () => Linking.openURL('tel:+18001234567'),
+      value: support.contact,
+      action: () => Linking.openURL(`tel:${support.contact}`),
     },
     {
       id: 'website',
       icon: 'web',
       label: 'Website',
-      value: 'www.splurgeapp.com',
-      action: () => Linking.openURL('https://www.splurgeapp.com'),
+      value: support.website,
+      action: () => Linking.openURL(
+          support.website.startsWith("http")
+          ? support.website
+          : `https://${support.website}`
+      ),
     },
     {
       id: 'address',
       icon: 'map-marker-outline',
       label: 'Headquarters',
-      value: '123 Innovation Dr, Tech City, CA 90210',
-      action: () => {}, 
+      value: support.location,
+      action: () =>
+        Linking.openURL(
+          `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+            support.location
+          )}`
+        )
     },
-  ];
+  ].filter(item => item.value);
 
   return (
     <View style={styles.container}>
@@ -75,7 +95,6 @@ const HelpSupport = ({ navigation }) => {
             { paddingBottom: insets.bottom + 40 } // Adds safe area + 40px extra space
         ]}
       >
-        
         {/* Company Branding Section */}
         <View style={styles.brandSection}>
             <View style={styles.logoContainer}>
@@ -88,6 +107,10 @@ const HelpSupport = ({ navigation }) => {
               We are dedicated to providing the best financial tools for your lifestyle.
             </Text>
         </View>
+
+        {HelpAndSupportLoading && (
+          <ActivityIndicator size="large" color={colors.theme} style={{ marginTop: 20 }} />
+        )}
 
         {/* Contact Details Card */}
         <View style={styles.card}>

@@ -35,12 +35,14 @@ const getHelpSupportStyle = (colors) => StyleSheet.create({
     fontWeight: '800',
     color: colors.text, // Dynamic Text
     letterSpacing: 1,
+    fontFamily: 'serif',
   },
   appVersion: {
     fontSize: 14,
     color: colors.textDisabled,
     marginTop: 4,
     marginBottom: 16,
+    fontFamily: 'serif',
   },
   aboutText: {
     textAlign: 'center',
@@ -48,6 +50,7 @@ const getHelpSupportStyle = (colors) => StyleSheet.create({
     lineHeight: 22,
     fontSize: 14,
     maxWidth: '90%',
+    fontFamily: 'serif',
   },
   // Card Styles
   card: {
@@ -67,6 +70,7 @@ const getHelpSupportStyle = (colors) => StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     marginBottom: 15,
+    fontFamily: 'serif',
   },
   row: {
     flexDirection: 'row',
@@ -93,11 +97,13 @@ const getHelpSupportStyle = (colors) => StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
     marginBottom: 2,
+    fontFamily: 'serif',
   },
   value: {
     fontSize: 15,
     color: colors.text,
-    fontWeight: '500',
+    fontWeight: '600',
+    fontFamily: 'serif',
   },
   // Footer
   footer: {
@@ -108,6 +114,7 @@ const getHelpSupportStyle = (colors) => StyleSheet.create({
     color: colors.textDisabled,
     fontSize: 14,
     marginBottom: 15,
+    fontFamily: 'serif',
   },
   socialRow: {
     flexDirection: 'row',
@@ -124,6 +131,7 @@ const getHelpSupportStyle = (colors) => StyleSheet.create({
   copyright: {
     color: colors.textDisabled,
     fontSize: 12,
+    fontFamily: 'serif',
   },
 });
 

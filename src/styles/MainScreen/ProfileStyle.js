@@ -29,6 +29,7 @@ const getProfileStyle = (colors) => StyleSheet.create({
         color: colors.theme,
         fontWeight: '700',
         fontSize: 28,
+        fontFamily: 'serif',
     },
     rankBadge: {
         position: 'absolute',
@@ -45,6 +46,7 @@ const getProfileStyle = (colors) => StyleSheet.create({
         color: "#FFFFFF", // Fixed White
         fontSize: 10,
         fontWeight: '700',
+        fontFamily: 'serif',
     },
     userInfo: {
         flex: 1,
@@ -55,12 +57,14 @@ const getProfileStyle = (colors) => StyleSheet.create({
         fontSize: 22,
         fontWeight: '700',
         marginBottom: 4,
+        fontFamily: 'serif',
     },
     userHandle: {
         color: colors.theme,
         fontSize: 14,
         fontWeight: '600',
         marginBottom: 8,
+        fontFamily: 'serif',
     },
     contactRow: {
         flexDirection: 'row',
@@ -70,6 +74,7 @@ const getProfileStyle = (colors) => StyleSheet.create({
     contactText: {
         color: colors.textSecondary,
         fontSize: 13,
+        fontFamily: 'serif',
     },
     editButton: {
         padding: 10,
@@ -109,11 +114,13 @@ const getProfileStyle = (colors) => StyleSheet.create({
         color: "#FFFFFF", // Fixed White
         fontSize: 16,
         fontWeight: '700',
+        fontFamily: 'serif',
     },
     statLabel: {
         color: "rgba(255,255,255,0.7)", // Fixed Light Gray
         fontSize: 11,
         fontWeight: 'bold',
+        fontFamily: 'serif',
     },
 
     // --- Menu Sections ---
@@ -128,6 +135,7 @@ const getProfileStyle = (colors) => StyleSheet.create({
         marginLeft: 4,
         textTransform: 'uppercase',
         letterSpacing: 1,
+        fontFamily: 'serif',
     },
     menuCard: {
         backgroundColor: colors.tintedThemeColor, // Changed to Surface for better contrast
@@ -160,6 +168,7 @@ const getProfileStyle = (colors) => StyleSheet.create({
         color: colors.text,
         fontSize: 15,
         fontWeight: '500',
+        fontFamily: 'serif',
     },
     divider: {
         backgroundColor: colors.border,
@@ -177,6 +186,7 @@ const getProfileStyle = (colors) => StyleSheet.create({
         color: colors.textSecondary,
         fontSize: 12,
         marginBottom: 16,
+        fontFamily: 'serif',
     },
     logoutButton: {
         flexDirection: 'row',
@@ -191,6 +201,7 @@ const getProfileStyle = (colors) => StyleSheet.create({
         color: colors.error,
         fontSize: 15,
         fontWeight: '600',
+        fontFamily: 'serif',
     },
 });
 

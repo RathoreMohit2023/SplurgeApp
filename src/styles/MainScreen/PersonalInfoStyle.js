@@ -39,6 +39,7 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     color: colors.theme,
+    fontFamily: 'serif',
   },
   editBadge: {
     position: 'absolute',
@@ -58,10 +59,12 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     fontWeight: 'bold',
     color: colors.text,
     marginBottom: 4,
+    fontFamily: 'serif',
   },
   profileEmail: {
     fontSize: 14,
     color: colors.textSecondary,
+    fontFamily: 'serif',
   },
 
   // Form Styles
@@ -76,6 +79,7 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: 8,
     fontWeight: '500',
+    fontFamily: 'serif',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -101,6 +105,7 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     color: colors.text,
     fontSize: 16,
     height: '100%',
+    fontFamily: 'serif',
   },
   multilineInput: {
     textAlignVertical: 'top', 
@@ -127,6 +132,7 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     color: colors.text,
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: 'serif',
   },
 
   // Button Styles
@@ -147,6 +153,7 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     color: '#FFF', // Always white on theme button
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'serif',
   },
 
   bottomSheetOverlay: {
@@ -171,6 +178,7 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     fontWeight: '600',
     marginBottom: 10,
     textAlign: 'center',
+    fontFamily: 'serif',
   },
   
   sheetButton: {
@@ -184,6 +192,7 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     color: '#fff',
+    fontFamily: 'serif',
   }
   
 });

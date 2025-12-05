@@ -27,6 +27,7 @@ const getNotificationStyle = (colors) => StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     color: colors.text, // Dynamic Text
+    fontFamily: 'serif',
   },
   
   // Actions
@@ -45,6 +46,7 @@ const getNotificationStyle = (colors) => StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 13,
     fontWeight: "600",
+    fontFamily: 'serif',
   },
 
   // List
@@ -59,6 +61,7 @@ const getNotificationStyle = (colors) => StyleSheet.create({
     marginBottom: 12,
     textTransform: "uppercase",
     letterSpacing: 1,
+    fontFamily: 'serif',
   },
   
   // Card
@@ -110,19 +113,23 @@ const getNotificationStyle = (colors) => StyleSheet.create({
     fontWeight: "600",
     flex: 1,
     marginRight: 8,
+    fontFamily: 'serif',
   },
   unreadTitle: {
     color: colors.text,
     fontWeight: "700",
+    fontFamily: 'serif',
   },
   time: {
     color: colors.textSecondary,
     fontSize: 12,
+    fontFamily: 'serif',
   },
   message: {
     color: colors.textSecondary,
     fontSize: 13,
     lineHeight: 18,
+    fontFamily: 'serif',
   },
   dot: {
     width: 8,
@@ -145,11 +152,13 @@ const getNotificationStyle = (colors) => StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginTop: 16,
+    fontFamily: 'serif',
   },
   emptySub: {
     color: colors.textSecondary,
     fontSize: 14,
     marginTop: 6,
+    fontFamily: 'serif',
   }
 });
 

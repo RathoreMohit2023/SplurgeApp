@@ -1,38 +1,54 @@
-import React, { useContext, useMemo } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { useContext, useEffect, useMemo } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FileText, CheckCircle2, Clock } from "lucide-react-native";
 
-// Imports
 import getArticlesStyle from "../../../styles/MainScreen/learnTabs/ArticleStyles"; // Import Style Function
-import { ThemeContext } from "../../../components/ThemeContext"; // Import Context
+import { ThemeContext } from "../../../components/ThemeContext";
+import { useNavigation } from '@react-navigation/native';
+import { GetArticleApi } from '../../../Redux/Api/GetArticleApi';
+import { useDispatch, useSelector } from 'react-redux';     
 
-const articles = [
-  { id: "1", title: "The Complete Guide to Financial Literacy", readTime: "15 min", completed: true },
-  { id: "2", title: "Understanding Credit Cards and Debt", readTime: "10 min", completed: false },
-  { id: "3", title: "Investment Basics for Beginners", readTime: "20 min", completed: false },
-  { id: "4", title: "How to Negotiate Your First Salary", readTime: "12 min", completed: false },
-  { id: "5", title: "Needs vs Wants: Budgeting 101", readTime: "5 min", completed: false },
-];
-
-const Arricles = () => {
+const Articles = () => {
   const insets = useSafeAreaInsets();
-  
-  // 1. Context
   const { colors } = useContext(ThemeContext);
-  
-  // 2. Memoize Styles
   const styles = useMemo(() => getArticlesStyle(colors), [colors]);
+  const navigation = useNavigation();
+  const { LoginData } = useSelector(state => state.Login);
+  const { GetArticleloading, GetArticleData } = useSelector(state => state.GetArticle);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(GetArticleApi(LoginData.token));
+  }, [])
+
+  const articles = GetArticleData?.Articles || [];
 
   return (
     <View style={styles.tabContainer}>
+
+      {GetArticleloading && (
+        <ActivityIndicator size="large" color={colors.theme} style={{ marginTop: 20 }} />
+      )}
+
       <FlatList
         data={articles}
         keyExtractor={(item) => item.id}
         contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 80 }]}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.itemCard} activeOpacity={0.7}>
+          <TouchableOpacity 
+            style={styles.itemCard} 
+            activeOpacity={0.7}   
+            onPress={() => {  
+              if (item.url) {
+                navigation.navigate("PDFViewer", { url: item.url });
+              } else {
+                Alert.alert("This article has no PDF yet.");
+              }
+            }}
+          >
             <View style={styles.thumbnailBox}>
               <FileText size={24} color={colors.theme} />
             </View>
@@ -41,10 +57,10 @@ const Arricles = () => {
               <Text style={styles.titleText} numberOfLines={2}>{item.title}</Text>
 
               <View style={styles.row}>
-                <View style={styles.metaRow}>
+                {/* <View style={styles.metaRow}>
                     <Clock size={12} color={colors.textSecondary} />
                     <Text style={styles.subText}>{item.readTime}</Text>
-                </View>
+                </View> */}
                 
                 {/* {item.completed && (
                     <View style={styles.badge}>
@@ -61,4 +77,4 @@ const Arricles = () => {
   )
 }
 
-export default Arricles;
+export default Articles;

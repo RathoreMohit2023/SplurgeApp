@@ -36,7 +36,7 @@ const ProfileScreen = ({ navigation }) => {
   const styles = useMemo(() => getProfileStyle(colors), [colors]);
   const { GetUserDetailsData } = useSelector((state) => state.GetUserDetails);
   const [user, setUser] = useState('');
-    const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
+  const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
   
 
   const [snack, setSnack] = useState({ visible: false, message: "" });
@@ -54,7 +54,6 @@ const ProfileScreen = ({ navigation }) => {
     totalFriends: 0,
     spent: "₹45,230",
   };
-
   
 
   const menuSections = [

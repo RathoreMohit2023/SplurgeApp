@@ -21,7 +21,7 @@ const VideoPlayer = ({ videoUrl }) => {
 
   const videoId = extractVideoId(videoUrl);
 
-  return (
+  return ( 
     <View style={styles.container}>
       <YoutubePlayer
         height={250}

@@ -31,7 +31,7 @@ const PersonalInfoScreen = ({ navigation }) => {
   const openCamera = () => {
     const options = {
       mediaType: 'photo',
-      saveToPhotos: true,
+      saveToPhotos: true,  
       quality: 0.8,
     };
   
@@ -159,6 +159,10 @@ const PersonalInfoScreen = ({ navigation }) => {
 
   const handleRemoveInterest = (indexToRemove) => {
     setInterests(interests.filter((_, index) => index !== indexToRemove));
+  };
+
+  const handleSave = () => {
+
   };
 
   const renderInput = (label, valueKey, icon, placeholder, multiline = false) => (
@@ -297,10 +301,14 @@ const PersonalInfoScreen = ({ navigation }) => {
           </View>
 
           {/* Save Button */}
-          <TouchableOpacity style={styles.saveButton} activeOpacity={0.8}>
+          <TouchableOpacity 
+            style={styles.saveButton} 
+            activeOpacity={0.8}
+            onPress={handleSave}
+          >
             <Text style={styles.saveButtonText}>Save Changes</Text>
           </TouchableOpacity>
-
+                
           <View style={{ height: 40 }} />
         </ScrollView>
       </KeyboardAvoidingView>

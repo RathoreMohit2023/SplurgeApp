@@ -1,46 +1,52 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useEffect, useContext, useMemo } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   Linking,
-  StatusBar
+  StatusBar,
+  useWindowDimensions,
+  ActivityIndicator
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import AppHeader from '../../components/Header';
 import getTermsAndPoliciesStyle from "../../styles/MainScreen/TermsAndPoliciesStyle";
 import { ThemeContext } from "../../components/ThemeContext";
+import { PrivacyPolicyApi } from '../../Redux/Api/PrivacyPolicyApi';
+import { useDispatch, useSelector } from 'react-redux';
+import RenderHTML from 'react-native-render-html';
 
 const TermsAndPolicies = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
-
   const styles = useMemo(() => getTermsAndPoliciesStyle(colors), [colors]);
-
   const insets = useSafeAreaInsets();
+  const { LoginData } = useSelector(state => state.Login);
+  const { PrivacyPolicyLoading, PrivacyPolicyData } = useSelector(
+    state => state.PrivacyPolicy
+  );
+  const textColor = colors.text;   
 
-  const policies = [
-    {
-      id: 1,
-      title: 'User Agreement',
-      icon: 'file-document-outline',
-      content: 'By using our app, you agree to follow all rules and guidelines. We may update these terms anytime to ensure the safety of our community.',
-    },
-    {
-      id: 2,
-      title: 'Privacy Policy',
-      icon: 'shield-lock-outline',
-      content: 'Your data is handled securely. We never share your personal information without consent. We prioritize your digital privacy.',
-    },
-    {
-      id: 3,
-      title: 'Usage Restrictions',
-      icon: 'alert-octagon-outline',
-      content: 'Misuse of the app, including fraudulent activities, spamming, or harassment, may result in immediate account suspension.',
-    },
-  ];
+  
+  const dispatch = useDispatch();
+
+  const { width } = useWindowDimensions();
+
+  useEffect(() => {
+    dispatch(PrivacyPolicyApi(LoginData.token))
+  }, []);
+
+  const htmlContent = PrivacyPolicyData?.content?.[0]?.content || "";
+
+  const htmlStyles = {
+    body: { color: textColor },
+    h2: { fontSize: 22, fontWeight: 'bold', marginTop: 12, color: textColor },
+    h3: { fontSize: 18, fontWeight: '600', marginTop: 10, color: textColor },
+    p:  { fontSize: 15, lineHeight: 24, color: textColor },
+    li: { color: textColor },
+  };
+  
 
   const handleEmailSupport = () => {
     Linking.openURL('mailto:support@splurgeapp.com');
@@ -64,32 +70,16 @@ const TermsAndPolicies = ({ navigation }) => {
         showsVerticalScrollIndicator={false} 
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.headerSection}>
-          <Text style={styles.mainTitle}>Terms & Policies</Text>
-          <Text style={styles.subTitle}>
-            Last updated: November 2025
-          </Text>
-          <Text style={styles.description}>
-            Welcome to Splurge. Transparency is key to our relationship. Please read how we operate below.
-          </Text>
-        </View>
+        {PrivacyPolicyLoading && (
+            <ActivityIndicator size="large" color={colors.theme} style={{ marginTop: 20 }} />
+        )}
 
-        <View style={styles.cardsContainer}>
-          {policies.map((item) => (
-            <View key={item.id} style={styles.card}>
-              <View style={styles.cardHeader}>
-                <View style={styles.iconContainer}>
-                  <MaterialCommunityIcons 
-                    name={item.icon} 
-                    size={24} 
-                    color={colors.theme} 
-                  />
-                </View>
-                <Text style={styles.cardTitle}>{item.title}</Text>
-              </View>
-              <Text style={styles.cardContent}>{item.content}</Text>
-            </View>
-          ))}
+        <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
+          <RenderHTML
+            contentWidth={width}      
+            source={{ html: htmlContent }}
+            tagsStyles={htmlStyles}
+          />
         </View>
 
         <View style={styles.contactSection}>

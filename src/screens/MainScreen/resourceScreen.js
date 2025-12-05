@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import VideoScreen from "../../screens/MainScreen/learnTabs/Videos";
 import FounderScreen from "../../screens/MainScreen/learnTabs/founders";
-import ArticleScreen from "../../screens/MainScreen/learnTabs/Arricles";
+import ArticleScreen from "./learnTabs/Articles";
 import { ThemeContext } from "../../components/ThemeContext"; 
 import getResourceStyles from "../../styles/MainScreen/resourceStyle";
 
@@ -61,7 +61,8 @@ const ResourceScreen = () => {
             tabBarLabelStyle: {
                 fontSize: 13,
                 fontWeight: '700',
-                textTransform: 'capitalize'
+                textTransform: 'capitalize',
+                fontFamily: 'serif',
             },
             tabBarPressColor: "transparent",
           }}
