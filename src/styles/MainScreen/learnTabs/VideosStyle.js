@@ -38,16 +38,30 @@ const getVideoTabStyles = (colors, isDark = false) => {
     },
 
     thumbnailBox: {
-      width: 50,
-      height: 50,
-      borderRadius: 14,
+      width: 110,
+      height: 70,
+      borderRadius: 10,
+      overflow: 'hidden',
       backgroundColor: colors.background,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: 16,
+      marginRight: 10,
       borderWidth: 1,
       borderColor: colors.border,
+      justifyContent: 'center',
     },
+    
+    thumbnailImage: {
+      width: '100%',
+      height: '100%',
+      borderRadius: 10,
+    },
+    
+    playIconOverlay: {
+      position: 'absolute',
+      top: '35%',
+      left: '40%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },    
 
     largeThumbnail: {
       width: 100,

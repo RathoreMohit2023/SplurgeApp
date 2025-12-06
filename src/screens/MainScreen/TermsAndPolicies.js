@@ -7,7 +7,6 @@ import {
   Linking,
   StatusBar,
   useWindowDimensions,
-  ActivityIndicator
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -17,6 +16,8 @@ import { ThemeContext } from "../../components/ThemeContext";
 import { PrivacyPolicyApi } from '../../Redux/Api/PrivacyPolicyApi';
 import { useDispatch, useSelector } from 'react-redux';
 import RenderHTML from 'react-native-render-html';
+import DashedLoader from '../../components/DashedLoader';
+import { HelpAndSupportApi } from '../../Redux/Api/HelpAndSupportApi';
 
 const TermsAndPolicies = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -25,16 +26,21 @@ const TermsAndPolicies = ({ navigation }) => {
   const { LoginData } = useSelector(state => state.Login);
   const { PrivacyPolicyLoading, PrivacyPolicyData } = useSelector(
     state => state.PrivacyPolicy
-  );
+  );      
+  const { HelpAndSupportLoading, HelpAndSupportData } = useSelector(state => state.HelpAndSupport);
+
+  const isLoading = PrivacyPolicyLoading || HelpAndSupportLoading;
+
   const textColor = colors.text;   
-
-  
   const dispatch = useDispatch();
-
   const { width } = useWindowDimensions();
 
   useEffect(() => {
     dispatch(PrivacyPolicyApi(LoginData.token))
+  }, []);
+
+  useEffect(() => {
+    dispatch(HelpAndSupportApi(LoginData.token))
   }, []);
 
   const htmlContent = PrivacyPolicyData?.content?.[0]?.content || "";
@@ -46,10 +52,12 @@ const TermsAndPolicies = ({ navigation }) => {
     p:  { fontSize: 15, lineHeight: 24, color: textColor },
     li: { color: textColor },
   };
+
+  const support = HelpAndSupportData?.support?.[0] || {};
   
 
   const handleEmailSupport = () => {
-    Linking.openURL('mailto:support@splurgeapp.com');
+    Linking.openURL(`mailto:${support.email}`);
   };
 
   return (
@@ -70,10 +78,6 @@ const TermsAndPolicies = ({ navigation }) => {
         showsVerticalScrollIndicator={false} 
         contentContainerStyle={styles.scrollContent}
       >
-        {PrivacyPolicyLoading && (
-            <ActivityIndicator size="large" color={colors.theme} style={{ marginTop: 20 }} />
-        )}
-
         <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
           <RenderHTML
             contentWidth={width}      
@@ -94,7 +98,7 @@ const TermsAndPolicies = ({ navigation }) => {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.contactTitle}>Contact Support</Text>
-              <Text style={styles.contactSubtitle}>support@splurgeapp.com</Text>
+              <Text style={styles.contactSubtitle}> {support.email || "Email not available"}</Text> 
             </View>
             <MaterialCommunityIcons name="chevron-right" size={24} color="rgba(255,255,255,0.7)" />
           </TouchableOpacity>
@@ -102,6 +106,7 @@ const TermsAndPolicies = ({ navigation }) => {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+      {isLoading && <DashedLoader color={colors.primary} size={100} />}
     </View>
   );
 };

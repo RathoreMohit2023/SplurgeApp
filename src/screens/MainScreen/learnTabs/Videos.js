@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Play, Clock, CheckCircle2 } from 'lucide-react-native';
 import getVideoTabStyles from "../../../styles/MainScreen/learnTabs/VideosStyle"; 
@@ -14,7 +14,7 @@ const Videos = () => {
   const resourceStyle = useMemo(() => getVideoTabStyles(colors), [colors]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const { LoginData } = useSelector(state => state.Login);
-  const { GetVideoLoading, GetVideoData } = useSelector(state => state.GetVideo);
+  const { GetVideoData } = useSelector(state => state.GetVideo);
 
   const dispatch = useDispatch();
 
@@ -24,11 +24,23 @@ const Videos = () => {
   
   const videos = GetVideoData?.utube_vedios || [];
 
+  { /* Convert Video Link to thumbanail */}
+  
+  const getYoutubeId = (url) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+  
+  const getThumbnail = (url) => {
+    const VideoID = getYoutubeId(url);
+    return VideoID
+      ? `https://img.youtube.com/vi/${VideoID}/hqdefault.jpg`
+      : null ; 
+  };
+
   return (
     <View style={resourceStyle.tabContainer}>
-      {GetVideoLoading && (
-        <ActivityIndicator size="large" color={colors.theme} style={{ marginTop: 20 }} />
-      )}
        <FlatList
         data={videos}
         keyExtractor={(item) => item.id?.toString()}
@@ -41,7 +53,14 @@ const Videos = () => {
             onPress={() => setSelectedVideo(item.url)}
           >
             <View style={resourceStyle.thumbnailBox}>
-              <Play size={24} color={colors.theme} />
+              <Image 
+                source={{uri: getThumbnail(item.url)}}
+                style = {resourceStyle.thumbnailImage}
+                resizeMode='cover'
+              />
+              <View style={resourceStyle.playIconOverlay}>
+                <Play size={24} color={colors.theme} />
+              </View>
             </View>
 
             <View style={{ flex: 1 }}>
@@ -65,7 +84,6 @@ const Videos = () => {
         videoUrl={selectedVideo}
         onClose={() => setSelectedVideo(null)}
       />
-
     </View>
   )
 }

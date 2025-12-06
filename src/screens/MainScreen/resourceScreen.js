@@ -8,15 +8,19 @@ import FounderScreen from "../../screens/MainScreen/learnTabs/founders";
 import ArticleScreen from "./learnTabs/Articles";
 import { ThemeContext } from "../../components/ThemeContext"; 
 import getResourceStyles from "../../styles/MainScreen/resourceStyle";
+import DashedLoader from "../../components/DashedLoader";
+import { useSelector } from "react-redux";
 
 const Tab = createMaterialTopTabNavigator();
 
 const ResourceScreen = () => {
   const { colors, themeType } = useContext(ThemeContext);
-
   const styles = useMemo(() => getResourceStyles(colors), [colors]);
-
   const insets = useSafeAreaInsets();
+    const {GetVideoLoading } = useSelector(state => state.GetVideo);
+    const { GetFounderloading } = useSelector(state => state.GetFounder);
+    const {GetArticleloading } = useSelector(state => state.GetArticle);
+  const isLoading = GetVideoLoading || GetFounderloading || GetArticleloading;
 
   return (
     <View style={styles.container}>
@@ -73,6 +77,7 @@ const ResourceScreen = () => {
           <Tab.Screen name="Articles" component={ArticleScreen} />
         </Tab.Navigator>
       </View>
+      {isLoading && <DashedLoader color={colors.primary} size={100} />}
     </View>
   );
 };

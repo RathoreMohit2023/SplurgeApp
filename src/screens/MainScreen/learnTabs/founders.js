@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useMemo } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PlayCircle, Clock, CheckCircle2 } from 'lucide-react-native';
 import getFoundersStyle from "../../../styles/MainScreen/learnTabs/founderStyle"; // Import Style Function
@@ -14,8 +14,7 @@ const Founders = () => {
   const styles = useMemo(() => getFoundersStyle(colors), [colors]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const { LoginData } = useSelector(state => state.Login);
-  const { GetFounderloading, GetFounderData } = useSelector(state => state.GetFounder);
-
+  const { GetFounderData } = useSelector(state => state.GetFounder);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -23,14 +22,24 @@ const Founders = () => {
   }, []);
 
   const videos = GetFounderData?.founderVedio || [];
+  
+  { /* Convert Video Link to thumbanail */}
+
+  const getYoutubeId = (url) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+  
+  const getThumbnail = (url) => {
+    const VideoID = getYoutubeId(url);
+    return VideoID
+      ? `https://img.youtube.com/vi/${VideoID}/hqdefault.jpg`
+      : null ; 
+  };
 
   return (
     <View style={styles.tabContainer}>
-
-      {GetFounderloading && (
-        <ActivityIndicator size="large" color={colors.theme} style={{ marginTop: 20 }} />
-      )}
-
       <FlatList
         data={videos}
         keyExtractor={(item) => item.id.toString()}
@@ -42,8 +51,15 @@ const Founders = () => {
             activeOpacity={0.7}
             onPress={() => setSelectedVideo(item.url)}  
           >
-            <View style={styles.largeThumbnail}>
-              <PlayCircle size={32} color={colors.theme} />
+            <View style={styles.thumbnailBox}>
+              <Image 
+                source={{uri: getThumbnail(item.url)}}
+                style = {styles.thumbnailImage}
+                resizeMode='cover'
+              />
+              <View style={styles.playIconOverlay}>
+                <PlayCircle size={32} color={colors.theme} />
+              </View>
             </View>
 
             <View style={{ flex: 1 }}>

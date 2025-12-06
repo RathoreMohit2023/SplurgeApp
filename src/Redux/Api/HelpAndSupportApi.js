@@ -14,11 +14,11 @@ export const HelpAndSupportApi = createAsyncThunk(
     }
     try {
       const response = await axios.get(url, {
-        headers,
+        headers,                
       });
       console.log("HelpAndSupportApi response:", response.data);
       
-      const result = response.data;
+      const result = response.data;   
       return result;
     } catch (error) {
       console.error("HelpAndSupportApi error:", error);
