@@ -13,23 +13,35 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import AppHeader from '../../components/Header';
 import getPersonalInfoStyle from "../../styles/MainScreen/PersonalInfoStyle";
 import { ThemeContext } from "../../components/ThemeContext";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useSelector } from 'react-redux';
+import DashedLoader from '../../components/DashedLoader';
+import { EditProfileApi } from '../../Redux/Api/EditProfileApi';
 
 const PersonalInfoScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getPersonalInfoStyle(colors), [colors]);
   const [profileImage, setProfileImage] = useState("");
-  const { GetUserDetailsData } = useSelector((state) => state.GetUserDetails);
-  
+  const { GetUserDetailsData, GetUserDetailsLoading } = useSelector((state) => state.GetUserDetails);
+  const { EditProfileLoading, EditProfileData } = useSelector(state => state.EditProfile);
+
   const insets = useSafeAreaInsets();
 
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    bio: '',
+  });
+  const [interests, setInterests] = useState([]);
+  const [currentInterest, setCurrentInterest] = useState('');
+
   const openCamera = () => {
-    const options = {
+    const options = { 
       mediaType: 'photo',
       saveToPhotos: true,  
       quality: 0.8,
@@ -80,41 +92,6 @@ const PersonalInfoScreen = ({ navigation }) => {
       { cancelable: true }
     );
   };  
-  
-  const [form, setForm] = useState({
-    name: "Arjun Patel",
-    email: "arjun.patel@gmail.com",
-    phone: "+91 98765 43210",
-    location: 'San Francisco, CA',
-    bio: 'Digital nomad & tech enthusiast.',
-  });
-
-  // const [interests, setInterests] = useState(['Finance', 'Technology', 'Travel']);
-  const [interests, setInterests] = useState([]);
-  const [currentInterest, setCurrentInterest] = useState('');
-
-  // useEffect(() => {
-  //   if (GetUserDetailsData?.user_details?.length > 0) {
-  //     const user = GetUserDetailsData.user_details[0];
-  
-  //     setForm({
-  //       name: user.fullname || '',
-  //       email: user.email || '',
-  //       phone: user.mobile || '',
-  //       location: '',
-  //       bio: '',
-  //     });
-  
-  //     try {
-  //       if (user.interest) {
-  //         setInterests(JSON.parse(user.interest));
-  //       }
-  //     } catch (err) {
-  //       console.log("Error parsing interests", err);
-  //       setInterests([]);
-  //     }
-  //   }
-  // }, [GetUserDetailsData]);
 
   useEffect(() => {
     if (GetUserDetailsData?.user_details?.length > 0) {
@@ -312,6 +289,7 @@ const PersonalInfoScreen = ({ navigation }) => {
           <View style={{ height: 40 }} />
         </ScrollView>
       </KeyboardAvoidingView>
+      {GetUserDetailsLoading && <DashedLoader color={colors.primary} size={100} />}
     </View>
   );
 };

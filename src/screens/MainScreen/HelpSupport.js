@@ -16,6 +16,7 @@ import getHelpSupportStyle from "../../styles/MainScreen/HelpSupportStyle";
 import { ThemeContext } from "../../components/ThemeContext"; 
 import { HelpAndSupportApi } from '../../Redux/Api/HelpAndSupportApi';
 import { useDispatch, useSelector } from 'react-redux';
+import DashedLoader from '../../components/DashedLoader';
 
 const HelpSupport = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -107,11 +108,6 @@ const HelpSupport = ({ navigation }) => {
               We are dedicated to providing the best financial tools for your lifestyle.
             </Text>
         </View>
-
-        {HelpAndSupportLoading && (
-          <ActivityIndicator size="large" color={colors.theme} style={{ marginTop: 20 }} />
-        )}
-
         {/* Contact Details Card */}
         <View style={styles.card}>
           <Text style={styles.sectionHeader}>Contact Us</Text>
@@ -154,6 +150,7 @@ const HelpSupport = ({ navigation }) => {
         </View>
 
       </ScrollView>
+      {HelpAndSupportLoading && <DashedLoader color={colors.primary} size={100} />}
     </View>
   );
 };

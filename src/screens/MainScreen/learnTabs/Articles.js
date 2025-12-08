@@ -15,7 +15,7 @@ const Articles = () => {
   const styles = useMemo(() => getArticlesStyle(colors), [colors]);
   const navigation = useNavigation();
   const { LoginData } = useSelector(state => state.Login);
-  const { GetArticleloading, GetArticleData } = useSelector(state => state.GetArticle);
+  const { GetArticleData } = useSelector(state => state.GetArticle);
 
   const dispatch = useDispatch();
 
@@ -27,11 +27,6 @@ const Articles = () => {
 
   return (
     <View style={styles.tabContainer}>
-
-      {GetArticleloading && (
-        <ActivityIndicator size="large" color={colors.theme} style={{ marginTop: 20 }} />
-      )}
-
       <FlatList
         data={articles}
         keyExtractor={(item) => item.id}
@@ -56,19 +51,19 @@ const Articles = () => {
             <View style={{ flex: 1 }}>
               <Text style={styles.titleText} numberOfLines={2}>{item.title}</Text>
 
-              <View style={styles.row}>
-                {/* <View style={styles.metaRow}>
+              {/* <View style={styles.row}>
+                <View style={styles.metaRow}>
                     <Clock size={12} color={colors.textSecondary} />
                     <Text style={styles.subText}>{item.readTime}</Text>
-                </View> */}
+                </View> 
                 
-                {/* {item.completed && (
+                {item.completed && (
                     <View style={styles.badge}>
                     <CheckCircle2 size={14} color={colors.success} />
                     <Text style={styles.badgeText}>Read</Text>
                     </View>
-                )} */}
-              </View>
+                )}
+              </View> */}
             </View>
           </TouchableOpacity>
         )}
