@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Modal, View, Text, FlatList, TouchableOpacity } from 'react-native';
 import {
   X,
@@ -93,6 +93,41 @@ const formatDate = dateString => {
 const AllTransactionsModal = ({ visible, onClose, data = [] }) => {
   const { colors } = useContext(ThemeContext);
 
+  // MODIFIED: Filter transactions to show only the current month's data
+  const currentMonthTransactions = useMemo(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    if (!data) {
+      return [];
+    }
+
+    return data.filter(transaction => {
+      let parts = transaction.date.split(/[-/]/);
+      let transactionDate;
+
+      if (parts[0].length === 4) {
+        // YYYY-MM-DD format
+        transactionDate = new Date(parts[0], parts[1] - 1, parts[2]);
+      } else {
+        // DD-MM-YYYY format
+        transactionDate = new Date(parts[2], parts[1] - 1, parts[0]);
+      }
+
+      // Agar date valid nahi hai toh use filter se bahar rakhein
+      if (isNaN(transactionDate)) {
+        return false;
+      }
+
+      // Check karein ki transaction ka saal aur mahina current saal aur mahine se match karta hai ya nahi
+      return (
+        transactionDate.getFullYear() === currentYear &&
+        transactionDate.getMonth() === currentMonth
+      );
+    });
+  }, [data]); // Yeh calculation tabhi run hoga jab 'data' prop change hoga
+
   return (
     <Modal
       visible={visible}
@@ -132,7 +167,7 @@ const AllTransactionsModal = ({ visible, onClose, data = [] }) => {
                 color: colors.text,
               }}
             >
-              All Transactions
+              This Month's Transactions
             </Text>
             <TouchableOpacity onPress={onClose}>
               <X size={24} color={colors.textSecondary} />
@@ -140,7 +175,8 @@ const AllTransactionsModal = ({ visible, onClose, data = [] }) => {
           </View>
 
           <FlatList
-            data={data}
+            // MODIFIED: Use the filtered data array
+            data={currentMonthTransactions}
             keyExtractor={item => item.id.toString()}
             showsVerticalScrollIndicator={false}
             ItemSeparatorComponent={() => (
@@ -154,8 +190,7 @@ const AllTransactionsModal = ({ visible, onClose, data = [] }) => {
             )}
             renderItem={({ item }) => {
               const IconComponent = categoryIcons[item.category] || DollarSign;
-              // Assuming all transactions are debits as type is not provided
-              const isCredit = false;
+              const isCredit = false; // Assuming all transactions are debits
 
               return (
                 <View
@@ -171,6 +206,7 @@ const AllTransactionsModal = ({ visible, onClose, data = [] }) => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       flex: 1,
+                      marginRight: 8, // Added for spacing
                     }}
                   >
                     <View
@@ -191,6 +227,7 @@ const AllTransactionsModal = ({ visible, onClose, data = [] }) => {
                           color: colors.text,
                         }}
                         numberOfLines={1}
+                        ellipsizeMode="tail" // Truncate long descriptions
                       >
                         {item.description}
                       </Text>
@@ -210,7 +247,6 @@ const AllTransactionsModal = ({ visible, onClose, data = [] }) => {
                       fontSize: 16,
                       fontWeight: '700',
                       color: isCredit ? colors.success : colors.text,
-                      marginLeft: 10,
                       fontFamily: 'serif',
                     }}
                   >
@@ -223,7 +259,7 @@ const AllTransactionsModal = ({ visible, onClose, data = [] }) => {
             ListEmptyComponent={
               <View style={{ alignItems: 'center', paddingVertical: 40 }}>
                 <Text style={{ color: colors.textSecondary }}>
-                  No transactions found.
+                  No transactions found for this month.
                 </Text>
               </View>
             }

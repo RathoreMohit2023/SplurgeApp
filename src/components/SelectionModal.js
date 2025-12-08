@@ -13,8 +13,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Colors from '../Assets/theme/color'; // Ensure this path is correct
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Colors from '../Assets/theme/color'; 
 
 const { height, width } = Dimensions.get('window');
 

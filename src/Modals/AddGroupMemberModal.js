@@ -4,14 +4,13 @@ import {
   Text,
   Modal,
   TouchableOpacity,
-  Platform,
-  KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import { X, UserPlus, ChevronDown, User } from "lucide-react-native";
 
-import SelectionModal from '../components/SelectionModal';
-import getAddGroupMemberModalStyle from "../styles/Modals/AddGroupMemberModalStyle"; // Import Style Function
-import { ThemeContext } from "../components/ThemeContext"; // Import Context
+import MultiSelectionModal from "./MultiSelectionModal";
+import getAddGroupMemberModalStyle from "../styles/Modals/AddGroupMemberModalStyle";
+import { ThemeContext } from "../components/ThemeContext";
 
 const AddGroupMemberModal = ({ 
   visible, 
@@ -20,34 +19,50 @@ const AddGroupMemberModal = ({
   friends = [] 
 }) => {
   const { colors } = useContext(ThemeContext);
-
   const styles = useMemo(() => getAddGroupMemberModalStyle(colors), [colors]);
 
-  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectionVisible, setSelectionVisible] = useState(false);
   const [error, setError] = useState("");
   
   const handleAdd = () => {
-    if (!selectedFriend) {
-      setError("Please select a friend to add.");
+    if (selectedFriends.length === 0) {
+      setError("Please select at least one friend to add.");
       return;
     }
-    onSubmit(selectedFriend);
+    onSubmit(selectedFriends);
     resetForm();
   };
 
   const resetForm = () => {
-    setSelectedFriend(null);
+    setSelectedFriends([]);
     setError("");
     onClose();
   };
 
-  const handleSelectName = (name) => {
-    const friendObj = friends.find((f) => f.fullname === name);
-    if (friendObj) {
-      setSelectedFriend(friendObj);
+  const handleConfirmSelection = (selectedNames) => {
+    const friendObjects = friends.filter(friend => selectedNames.includes(friend.fullname));
+    setSelectedFriends(friendObjects);
+    if(friendObjects.length > 0){
       setError("");
     }
+  };
+  
+  // NEW: Chip se friend ko deselect karne ke liye function
+  const handleDeselectFriend = (friendId) => {
+    const updatedFriends = selectedFriends.filter(friend => friend.id !== friendId);
+    setSelectedFriends(updatedFriends);
+  };
+
+  const getDisplayText = () => {
+    const count = selectedFriends.length;
+    if (count === 0) {
+      return "Select friends...";
+    }
+    if (count === 1) {
+      return selectedFriends[0].fullname;
+    }
+    return `${count} friends selected`;
   };
 
   return (
@@ -58,15 +73,13 @@ const AddGroupMemberModal = ({
       onRequestClose={resetForm}
       statusBarTranslucent={true}
     >
-      <View
-        style={styles.overlay}
-      >
+      <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>Add Member</Text>
-              <Text style={styles.subtitle}>Select a friend to join the group</Text>
+              <Text style={styles.title}>Add Members</Text>
+              <Text style={styles.subtitle}>Select friends to join the group</Text>
             </View>
             <TouchableOpacity onPress={resetForm} style={styles.closeBtn}>
               <X size={22} color={colors.textSecondary} />
@@ -74,13 +87,10 @@ const AddGroupMemberModal = ({
           </View>
 
           <View style={styles.form}>
-            <Text style={styles.label}>Select Friend</Text>
+            <Text style={styles.label}>Select Friends</Text>
             
             <TouchableOpacity
-              style={[
-                styles.selector, 
-                error ? styles.selectorError : null
-              ]}
+              style={[styles.selector, error ? styles.selectorError : null]}
               onPress={() => setSelectionVisible(true)}
               activeOpacity={0.7}
             >
@@ -91,15 +101,31 @@ const AddGroupMemberModal = ({
                 <Text 
                   style={[
                     styles.selectorText, 
-                    !selectedFriend && styles.placeholderText
+                    selectedFriends.length === 0 && styles.placeholderText
                   ]}
                 >
-                  {selectedFriend ? selectedFriend.fullname : "Search friends..."}
+                  {getDisplayText()}
                 </Text>
               </View>
               <ChevronDown size={20} color={colors.textSecondary} />
             </TouchableOpacity>
             
+            {/* NEW: Yahan par selected friends ke chips dikhaye jayenge */}
+            {selectedFriends.length > 0 && (
+              <View style={styles.chipDisplayContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {selectedFriends.map((friend) => (
+                    <View key={friend.id} style={styles.chip}>
+                      <Text style={styles.chipText}>{friend.fullname}</Text>
+                      <TouchableOpacity onPress={() => handleDeselectFriend(friend.id)}>
+                        <X size={14} color={colors.theme} />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
           </View>
 
@@ -117,20 +143,19 @@ const AddGroupMemberModal = ({
               activeOpacity={0.8}
             >
               <UserPlus size={18} color="#fff" style={{ marginRight: 8 }} />
-              <Text style={styles.addBtnText}>Add Member</Text>
+              <Text style={styles.addBtnText}>Add Members ({selectedFriends.length})</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      <SelectionModal
+      <MultiSelectionModal
         visible={selectionVisible}
         onClose={() => setSelectionVisible(false)}
-        title="Select Friend"
-        placeholder="Search by name..."
+        title="Select Friends"
         data={friends?.map(f => f.fullname)}
-        onSelect={handleSelectName}
-        selectedItem={selectedFriend?.fullname}
+        onSelect={handleConfirmSelection}
+        selectedItems={selectedFriends.map(f => f.fullname)}
       />
     </Modal>
   );

@@ -70,7 +70,7 @@ const DashBoardScreen = ({ navigation }) => {
       dispatch(GetTransectionApi({ token, id: userId }));
       dispatch(GetMonthlyBudgetApi({ token, id: userId }));
       dispatch(GetFriendsApi({ token, id: userId }));
-      dispatch(GetGroupsApi({ token, id: userId }));
+      dispatch(GetGroupsApi( token ));
       dispatch(GetvideoApi(token));
       dispatch(GetFounderApi(token));
     }
@@ -122,7 +122,7 @@ const DashBoardScreen = ({ navigation }) => {
       weeklyAverage,
       percentageChange,
       currentMonthName,
-      currentMonthTxns, // Return current month transactions to be used later
+      currentMonthTxns,
     };
   }, [allTransactions]);
 
@@ -142,8 +142,8 @@ const DashBoardScreen = ({ navigation }) => {
   const percentage = goalAmount > 0 ? (dynamicStats.totalSpentThisMonth / goalAmount) * 100 : 0;
   const remaining = goalAmount - dynamicStats.totalSpentThisMonth;
 
-  // --- CORRECTED: Recent transactions now uses the filtered list ---
-  const recentTransactions = dynamicStats.currentMonthTxns.slice(0, 4);
+  // --- MODIFIED: Show up to 5 recent transactions ---
+  const recentTransactions = dynamicStats.currentMonthTxns.slice(0, 5);
 
   const handleAddItem = async (newItem) => {
     const token = LoginData?.token;
@@ -284,7 +284,8 @@ const DashBoardScreen = ({ navigation }) => {
       <View style={styles.sectionContainer}>
         <View style={styles.rowBetween}>
           <Text style={styles.sectionTitle}>Main Goal</Text>
-          <TouchableOpacity style={styles.linkButton} onPress={() => openGoalModal(hasGoal)}>
+          <TouchableOpacity style={styles.rowLink} onPress={() => openGoalModal(hasGoal)}>
+            <Target size={20} color={colors.theme} />
             <Text style={styles.linkText}>{hasGoal ? "Edit Goal" : "Add Goal"}</Text>
           </TouchableOpacity>
         </View>
@@ -317,11 +318,16 @@ const DashBoardScreen = ({ navigation }) => {
             const IconComponent = categoryIcons[item.category] || DollarSign;
             return (
               <View key={item.id} style={styles.transactionRow}>
-                <View style={styles.row}>
+                <View style={styles.transactionInfo}>
                   <View style={styles.iconCircle}><IconComponent size={20} color={colors.theme} /></View>
-                  <View style={styles.transactionDetails}><Text style={styles.transactionTitle}>{item.description}</Text><Text style={styles.transactionSub}>{item.category} • {formatDate(item.date)}</Text></View>
+                  <View style={styles.transactionDetails}>
+                      <Text style={styles.transactionTitle} numberOfLines={2}>{item.description}</Text>
+                      <Text style={styles.transactionSub}>{item.category} • {formatDate(item.date)}</Text>
+                  </View>
                 </View>
-                <Text style={styles.transactionAmount}>-₹{Number(item.amount).toLocaleString()}</Text>
+                <View>
+                  <Text style={styles.transactionAmount}>-₹{Number(item.amount).toLocaleString()}</Text>
+                </View>
               </View>
             );
           })
@@ -333,20 +339,32 @@ const DashBoardScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>Wishlist</Text>
+        <View style={styles.rowBetween}>
+          <Text style={styles.sectionTitle}>Wishlist</Text>
+          <TouchableOpacity style={styles.rowLink} onPress={() => setWishlistModal(true)}>
+          <ArrowUpRight size={24} color={colors.theme} />
+            <Text style={styles.linkText}>Add wishlist</Text>
+          </TouchableOpacity>
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 20 }}>
           {wishlistItems.map(item => (
             <View key={item.id} style={styles.wishlistCard}>
-              <View style={styles.rowBetween}><View style={styles.wishlistIcon}><Target size={16} color={colors.theme} /><Text style={styles.wishlistPrice}>₹{parseFloat(item.price).toLocaleString()}</Text></View></View>
-              <Text style={styles.wishlistName} numberOfLines={1}>{item.name}</Text><Text style={styles.wishlistName} numberOfLines={1}>{item.description}</Text>
+              <View>
+                <View style={styles.rowBetween}>
+                    <View style={styles.wishlistIcon}><Target size={16} color={colors.theme} /></View>
+                    <Text style={styles.wishlistPrice}>₹{parseFloat(item.price).toLocaleString()}</Text>
+                </View>
+                {/* MODIFIED: Removed numberOfLines to allow text to wrap */}
+                <Text style={styles.wishlistName}>{item.name}</Text>
+                <Text style={styles.wishlistDescription}>{item.description}</Text>
+              </View>
             </View>
           ))}
-          <TouchableOpacity style={styles.addWishlistCard} onPress={() => setWishlistModal(true)}><ArrowUpRight size={24} color={colors.theme} /><Text style={styles.addWishlistText}>Add New</Text></TouchableOpacity>
         </ScrollView>
       </View>
 
       <AddWishListModal visible={wishlistModal} onClose={() => setWishlistModal(false)} onSave={handleAddItem} />
-      <AllTransactionsModal visible={showTransactions} onClose={() => setShowTransactions(false)} data={recentTransactions} />
+      <AllTransactionsModal visible={showTransactions} onClose={() => setShowTransactions(false)} data={allTransactions} />
       
       <AddGoalModal
         visible={goalModalVisible}

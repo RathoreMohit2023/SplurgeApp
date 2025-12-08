@@ -47,10 +47,7 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         fontWeight: '700',
         fontFamily : 'serif',
     },
-    transactionDetails: {
-        // justifyContent: 'space-between',
-    },
-
+    
     // --- Hero Card ---
     heroCard: {
         backgroundColor: colors.tintedThemeColor,
@@ -59,7 +56,6 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         marginBottom: 15,
         borderWidth: 1,
         borderColor: colors.border,
-       
     },
     heroIconBg: {
         width: 40,
@@ -148,9 +144,16 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
     },
-    row: {
+    rowLink: {
         flexDirection: "row",
+        justifyContent: "space-between",
         alignItems: "center",
+        borderWidth: 1,
+        borderColor: colors.theme,
+        borderRadius: 12,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        marginBottom: 10,
     },
     sectionTitle: {
         color: colors.text,
@@ -172,6 +175,7 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
         fontFamily : 'serif',
+        marginLeft: 4,
     },
 
     // --- Goal Card ---
@@ -205,12 +209,13 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         fontSize: 16,
         fontFamily : 'serif',
     },
-    progressBarContainer: {
-        height: 6,
-        backgroundColor: "rgba(0,0,0,0.2)",
+    progressBarBackground: {
+        height: 10,
         borderRadius: 10,
-        marginVertical: 16,
-        overflow: 'hidden',
+        backgroundColor: "rgba(255,255,255,0.2)",
+        overflow: "hidden",
+        marginTop: 16,
+        marginBottom: 8,
     },
     progressBarFill: {
         height: '100%',
@@ -220,16 +225,25 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
     textMutedSmall: {
         color: "rgba(255,255,255,0.8)",
         fontSize: 12,
-        paddingTop: 6,
         fontFamily : 'serif',
     },
+    row: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
 
-    // --- Transactions ---
+    // --- MODIFIED: Transactions ---
     transactionRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 20,
+    },
+    transactionInfo: {
+        flex: 1, // Allows this section to grow
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 8, // Adds space between text and amount
     },
     iconCircle: {
         width: 44,
@@ -242,9 +256,8 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         borderWidth: 1,
         borderColor: colors.border,
     },
-    iconCircleSuccess: {
-        backgroundColor: "rgba(0, 230, 118, 0.1)",
-        borderColor: "rgba(0, 230, 118, 0.2)",
+    transactionDetails: {
+        flex: 1, // Important for text wrapping
     },
     transactionTitle: {
         color: colors.text,
@@ -263,18 +276,12 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         fontFamily : 'serif',
-        // fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    },
-    textSuccess: {
-        color: colors.success,
-        fontFamily : 'serif',
     },
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         margin: 15,
-
     },
     emptyText: {
         color: colors.textSecondary,
@@ -282,28 +289,30 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         fontFamily : 'serif',
     },
 
-    // --- Wishlist ---
+    // --- MODIFIED: Wishlist ---
     wishlistCard: {
-        width: 140,
+        width: 150,
+        minHeight: 120, // Set a min-height for consistency
         backgroundColor: colors.tintedThemeColor,
         borderRadius: 18,
         padding: 14,
         marginRight: 12,
         borderWidth: 1,
         borderColor: colors.theme,
+        justifyContent: 'space-between', // Pushes content to top and bottom
     },
     addWishlistCard: {
         width: 80,
+        minHeight: 120,
         backgroundColor: "transparent",
         borderRadius: 18,
-        padding: 14,
         marginRight: 12,
         borderWidth: 2,
         borderStyle: 'dashed',
         borderColor: colors.theme,
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 8
+        gap: 8,
     },
     addWishlistText: {
         color: colors.theme,
@@ -311,62 +320,32 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         fontFamily : 'serif',
     },
     wishlistIcon: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        // marginBottom: 12,
-    },
-    wishlistPercent: {
-        color: colors.textSecondary,
-        fontSize: 12,
-        fontWeight: '600',
-        fontFamily : 'serif',
+        backgroundColor: colors.background,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     wishlistName: {
         color: colors.text,
         fontSize: 14,
         fontWeight: '600',
-        marginBottom: 4,
+        marginTop: 8,
         fontFamily : 'serif',
+    },
+    wishlistDescription: {
+        color: colors.textSecondary,
+        fontSize: 12,
+        fontFamily: 'serif',
+        marginTop: 2,
     },
     wishlistPrice: {
         color: colors.theme,
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: 'bold',
-        marginBottom: 12,
         fontFamily : 'serif',
     },
-    miniProgressBg: {
-        height: 4,
-        backgroundColor: colors.background,
-        borderRadius: 2,
-        overflow: 'hidden',
-    },
-    miniProgressFill: {
-        height: '100%',
-        backgroundColor: colors.theme,
-        borderRadius: 2,
-    },
-
-    editIcon: {
-        position: "absolute",
-        top: 4,
-        right: 8,
-        padding: 2.5,
-        backgroundColor: "#F2F2F2",
-        borderRadius: 8,
-        elevation: 3,
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      progressBarBackground: {
-        height: 10,
-        borderRadius: 10,
-        backgroundColor: "#ddd",
-        overflow: "hidden",
-        marginTop: 6,
-      },     
 });
 
 export default getDashBoardStyles;

@@ -1,11 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { BASE_URL, GetGroups_Url } from '../NWConfig';
+import { BASE_URL, GetGroupMembers_Url } from '../NWConfig';
 
-const url = `${BASE_URL}${GetGroups_Url}`;
+const url = `${BASE_URL}${GetGroupMembers_Url}`;
 
-export const GetGroupsApi = createAsyncThunk(
-  'GetGroups',
+export const GetGroupMembersApi = createAsyncThunk(
+  'GetGroupMembersApi',
   async (token) => {
     
     const headers = {
@@ -16,12 +16,12 @@ export const GetGroupsApi = createAsyncThunk(
       const response = await axios.get(url, {
         headers,
       });
-      console.log("GetGroupsApi response:", response.data);
+      console.log("GetGroupMembersApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetGroupsApi error:", error);
+      console.error("GetGroupMembersApi error:", error);
     }
   }
 );

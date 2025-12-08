@@ -40,6 +40,12 @@ import DeleteTransectionReducer from '../Slice/DeleteTransectionSlice';
 import AddMonthlyBudgetReducer from '../Slice/AddMonthlyBudgetSlice';
 import EditMonthlyBudgetReducer from '../Slice/EditMonthlyBudgetSlice';
 import GetMonthlyBudgetReducer from '../Slice/GetMonthlyBudgetSlice';
+import AddGroupMemberReducer from '../Slice/AddGroupMemberSlice';
+import GetGroupMembersReducer from '../Slice/GetGroupMemberSlice';
+import AddGroupExpenseReducer from '../Slice/AddGroupExpenseSlice';
+import GetGroupExpenseReducer from '../Slice/GetGroupExpenseSlice';
+import DeleteGroupMemberReducer from '../Slice/DeleteGroupMemberSlice';
+import DeleteGroupExpenseReducer from '../Slice/DeleteGroupExpenseSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
@@ -71,7 +77,13 @@ const rootReducer = combineReducers({
   DeleteTransection : DeleteTransectionReducer,
   AddMonthlyBudget : AddMonthlyBudgetReducer,
   EditMonthlyBudget : EditMonthlyBudgetReducer,
-  GetMonthlyBudget : GetMonthlyBudgetReducer
+  GetMonthlyBudget : GetMonthlyBudgetReducer,
+  AddGroupMember : AddGroupMemberReducer,
+  GetGroupMembers : GetGroupMembersReducer,
+  AddGroupMember : AddGroupExpenseReducer,
+  GetGroupExpense : GetGroupExpenseReducer,
+  DeleteGroupMember : DeleteGroupMemberReducer,
+  DeleteGroupExpense : DeleteGroupExpenseReducer
 });
 
 const persistConfig = {

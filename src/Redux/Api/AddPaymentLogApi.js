@@ -7,16 +7,14 @@ const url = `${BASE_URL}${AddPaymentLog_Url}`;
 
 export const AddPaymentLogApi = createAsyncThunk(
   'AddPaymentLogApi',
-  async (PostData) => {
+  async ({formData, token}) => {
     
-    const token = await AsyncStorage.getItem('Token');
-    const parsedToken = JSON.parse(token);
     const headers = {
         "Content-Type" : "multipart/form-data",
-        "Authorization": `Bearer ${parsedToken}`, 
+        "Authorization": `Bearer ${token}`, 
     }
     try {
-      const response = await axios.post(url, PostData, {
+      const response = await axios.post(url, formData, {
         headers
       });
       console.log("Response from AddPaymentLogApi:", response.data);
@@ -24,7 +22,7 @@ export const AddPaymentLogApi = createAsyncThunk(
       const result = response.data;
       return result;
     } catch (error) {
-      console.log('Error in AddPaymentLogApi:', error.response.data);
+     return error?.response?.data;
     }
   }
 );

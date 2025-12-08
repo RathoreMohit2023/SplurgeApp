@@ -259,6 +259,21 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         fontFamily : 'serif',
         marginTop: 2,
     },
+    emptyContainer: {
+        padding: 20,
+        alignItems: 'center',
+      },
+      emptyText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.text,
+      },
+      emptySubText: {
+        fontSize: 14,
+        color: colors.textSecondary,
+        marginTop: 4,
+      },
+      
 });
 
 export default getGroupDetailsStyle;

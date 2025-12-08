@@ -11,14 +11,14 @@ const DeleteTransectionSlice = createSlice({
 
   extraReducers: (builder) => {
     builder.addCase(DeleteTransactionApi.pending, (state, action) => {
-      state.AddTransactionLoading = true;
+      state.DeleteTransectionLoading = true;
     });
     builder.addCase(DeleteTransactionApi.fulfilled, (state, action) => {
-      state.AddTransactionLoading = false;
+      state.DeleteTransectionLoading = false;
       state.AddTransactionData = action.payload;
     });
     builder.addCase(DeleteTransactionApi.rejected, (state, action) => {
-      state.AddTransactionLoading = false;
+      state.DeleteTransectionLoading = false;
       state.isError = true;
     });
   },

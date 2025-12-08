@@ -139,6 +139,31 @@ const getAddGroupMemberModalStyle = (colors) => StyleSheet.create({
     fontSize: 15,
     fontFamily : 'serif',
   },
+  // Yeh styles aap apni getAddGroupMemberModalStyle function ke andar add karein
+
+chipDisplayContainer: {
+  marginTop: 12,
+  maxHeight: 70, // Container ki max height set karein
+},
+chip: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: colors.tintedThemeColor,
+  borderRadius: 16,
+  paddingVertical: 6,
+  paddingHorizontal: 12,
+  marginRight: 8,
+  marginBottom: 8, // Thoda sa neeche margin agar chips wrap hon
+  borderWidth: 1,
+  borderColor: colors.theme,
+},
+chipText: {
+  color: colors.theme,
+  fontSize: 14,
+  marginRight: 6,
+  fontFamily: 'serif',
+  fontWeight: '600',
+},
 });
 
 export default getAddGroupMemberModalStyle;

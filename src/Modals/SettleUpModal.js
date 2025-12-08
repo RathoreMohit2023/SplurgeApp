@@ -77,17 +77,17 @@ const SettleUpModal = ({ visible, onClose, onSave, friend }) => {
   <View style={styles.contextHeader}>
     <View style={styles.contextRow}>
       <Text style={styles.contextText}>
-        {paymentDirection === "paying" ? "You" : friend.name}
+        {paymentDirection === "paying" ? "You" : friend.fullname}
       </Text>
       <ArrowRight size={16} color={colors.textSecondary} style={styles.arrowIcon} />
       <Text style={styles.contextText}>
-        {paymentDirection === "paying" ? friend.name : "You"}
+        {paymentDirection === "paying" ? friend.fullname : "You"}
       </Text>
     </View>
     <Text style={styles.contextSubText}>
       {paymentDirection === "paying"
-        ? `You are paying ${friend.name}`
-        : `${friend.name} is paying you`}
+        ? `You are paying ${friend.fullname}`
+        : `${friend.fullname} is paying you`}
     </Text>
   </View>
 

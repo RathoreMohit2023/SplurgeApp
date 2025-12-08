@@ -10,16 +10,17 @@ const MultiSelectionModal = ({
   selectedItems = [],
   onClose,
   onSelect,
+  emptyMessage = "No Data Available",
 }) => {
   const { colors } = useContext(ThemeContext);
 
   const [tempSelected, setTempSelected] = useState([]);
 
   useEffect(() => {
-    if(visible){
+    if (visible) {
       setTempSelected(selectedItems);
     }
-  }, [visible])
+  }, [visible]);
 
   const toggleSelect = (item) => {
     if (tempSelected.includes(item)) {
@@ -35,89 +36,127 @@ const MultiSelectionModal = ({
   };
 
   return (
-    <Modal visible={visible}
-    statusBarTranslucent={true}
-    animationType="fade" transparent>
-  <View
-    style={{
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      justifyContent: "center",   
-      alignItems: "center",        
-      paddingHorizontal: 20,
-    }}
-  >
-    <View
-      style={{
-        backgroundColor: colors.card,
-        padding: 20,
-        width: "90%",              
-        borderRadius: 20,      
-        maxHeight: "70%",
-      }}
+    <Modal
+      visible={visible}
+      statusBarTranslucent={true}
+      animationType="fade"
+      transparent
     >
       <View
         style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginBottom: 15,
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 20,
         }}
       >
-        <Text
-          style={{ fontSize: 18, fontWeight: "700", color: colors.text }}
+        <View
+          style={{
+            backgroundColor: colors.card,
+            padding: 20,
+            width: "90%",
+            borderRadius: 20,
+            maxHeight: "70%",
+          }}
         >
-          {title}
-        </Text>
-
-        <TouchableOpacity onPress={onClose}>
-          <Icon name="close" size={24} color={colors.text} />
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={data}
-        // keyExtractor={(item) => item}
-        keyExtractor={(item, index) => index.toString()}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => {
-          // const isSelected = selectedItems.includes(item);
-          const isSelected = tempSelected.includes(item);
-
-          return (
-            <TouchableOpacity
-              style={{
-                paddingVertical: 12,
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-              onPress={() => toggleSelect(item)}
+          {/* HEADER */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 15,
+            }}
+          >
+            <Text
+              style={{ fontSize: 18, fontWeight: "700", color: colors.text }}
             >
-              <Text
+              {title}
+            </Text>
+
+            <TouchableOpacity onPress={onClose}>
+              <Icon name="close" size={24} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+
+          {/* LIST */}
+          <FlatList
+            data={data}
+            keyExtractor={(item, index) => index.toString()}
+            showsVerticalScrollIndicator={false}
+            
+            // --- CHANGES START HERE (Empty State Logic) ---
+            ListEmptyComponent={() => (
+              <View
                 style={{
-                  fontSize: 16,
-                  color: colors.text,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingVertical: 30,
                 }}
               >
-                {item}
-              </Text>
-
-              {isSelected ? (
-                <Icon name="checkbox-marked" size={24} color={colors.theme} />
-              ) : (
                 <Icon
-                  name="checkbox-blank-outline"
-                  size={24}
+                  name="clipboard-alert-outline"
+                  size={40}
                   color={colors.textSecondary}
+                  style={{ marginBottom: 10 }}
                 />
-              )}
-            </TouchableOpacity>
-          );
-        }}
-      />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: colors.textSecondary,
+                    textAlign: "center",
+                  }}
+                >
+                  {emptyMessage}
+                </Text>
+              </View>
+            )}
+            // --- CHANGES END HERE ---
 
-            {/* FOOTER BUTTONS */}
-            <View
+            renderItem={({ item }) => {
+              const isSelected = tempSelected.includes(item);
+
+              return (
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 12,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    borderBottomWidth: 0.5,
+                    borderBottomColor: colors.border || "#ccc", // Optional separator
+                  }}
+                  onPress={() => toggleSelect(item)}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: colors.text,
+                    }}
+                  >
+                    {item}
+                  </Text>
+
+                  {isSelected ? (
+                    <Icon
+                      name="checkbox-marked"
+                      size={24}
+                      color={colors.theme}
+                    />
+                  ) : (
+                    <Icon
+                      name="checkbox-blank-outline"
+                      size={24}
+                      color={colors.textSecondary}
+                    />
+                  )}
+                </TouchableOpacity>
+              );
+            }}
+          />
+
+          {/* FOOTER BUTTONS */}
+          <View
             style={{
               flexDirection: "row",
               justifyContent: "flex-end",
@@ -138,25 +177,28 @@ const MultiSelectionModal = ({
               </Text>
             </TouchableOpacity>
 
-            {/* Save */}
-            <TouchableOpacity
-              onPress={handleSave}
-              style={{
-                backgroundColor: colors.theme,
-                paddingVertical: 10,
-                paddingHorizontal: 22,
-                borderRadius: 10,
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: "600", color: "white" }}>
-                Save
-              </Text>
-            </TouchableOpacity>
+            {/* Save Button (Disabled if no data) */}
+            {data.length > 0 && (
+              <TouchableOpacity
+                onPress={handleSave}
+                style={{
+                  backgroundColor: colors.theme,
+                  paddingVertical: 10,
+                  paddingHorizontal: 22,
+                  borderRadius: 10,
+                }}
+              >
+                <Text
+                  style={{ fontSize: 16, fontWeight: "600", color: "white" }}
+                >
+                  Save
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
-    </View>
-  </View>
-</Modal>
-
+        </View>
+      </View>
+    </Modal>
   );
 };
 

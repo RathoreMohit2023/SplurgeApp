@@ -330,6 +330,48 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         backgroundColor: colors.background,
     },
 
+    friendCardActions: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        marginTop: 12,
+        gap: 12,
+    },
+    remindButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        backgroundColor: colors.background, // Slight contrast
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    remindButtonText: {
+        fontSize: 12,
+        fontFamily: 'serif',
+        fontWeight: '600',
+        marginLeft: 6,
+        color: colors.text,
+    },
+    settleButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        backgroundColor: colors.background, // Slight contrast
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    settleButtonText: {
+        fontSize: 12,
+        fontFamily: 'serif',
+        fontWeight: '600',
+        marginLeft: 6,
+        color: colors.text,
+    },
+
     // --- Logs ---
     logCard: {
         flexDirection: 'row',

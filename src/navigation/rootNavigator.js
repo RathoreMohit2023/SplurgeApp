@@ -26,6 +26,7 @@ import PersonalInfoScreen from "../screens/MainScreen/PersonalInfoScreen";
 import VideoPlayerScreen from "../components/VideoPlayer";
 import ModalVideoPlayer from "../Modals/ModalVideoPlayer";
 import PDFViewer from "../components/PDFViewer";
+import GroupExpense from "../screens/MainScreen/GroupExpense";
 
 const RootNavigator = () => {
     const Stack = createStackNavigator();
@@ -41,6 +42,7 @@ const RootNavigator = () => {
             <Stack.Screen name="themeSwithc heScreen" component={themeSwithcheScreen} />
             <Stack.Screen name="CalculatorScreen" component={CalculatorScreen} />
             <Stack.Screen name="groupSettle" component={groupSettle} />
+            <Stack.Screen name="GroupExpense" component={GroupExpense} />
             <Stack.Screen name="groupScreen" component={resourceScreen} />
             <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
             <Stack.Screen name="DashBoardScreen" component={DashBoardScreen} />

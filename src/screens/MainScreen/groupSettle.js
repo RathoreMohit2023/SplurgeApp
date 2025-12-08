@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   TextInput,
   StatusBar,
-  Alert,
 } from 'react-native';
 import { Text, Avatar, Snackbar, ProgressBar } from 'react-native-paper';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -32,93 +31,242 @@ import { AddFriendApi } from '../../Redux/Api/AddFriendApi';
 import { GetFriendsApi } from '../../Redux/Api/GetFriendsApi';
 import { AddGroupApi } from '../../Redux/Api/AddGroupApi';
 import { GetGroupsApi } from '../../Redux/Api/GetGroupsAPi';
+import { GetGroupMembersApi } from '../../Redux/Api/GetGroupMemberApi';
+import { GetGroupExpenseApi } from '../../Redux/Api/GetGroupExpenseApi';
+import { AddPaymentLogApi } from '../../Redux/Api/AddPaymentLogApi';
+import { GetPaymentLogApi } from '../../Redux/Api/GetPaymentLogApi';
 
 const GroupSettle = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getGroupSettleStyle(colors), [colors]);
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
+
+  const { LoginData } = useSelector(state => state.Login);
+  const { GetFriendsData } = useSelector(state => state.GetFriends || {});
+  const { GetGroupsData } = useSelector(state => state.GetGroups || {});
+  const { GetGroupExpenseData } = useSelector(
+    state => state.GetGroupExpense || {},
+  );
+  const { GetGroupMembersData } = useSelector(
+    state => state.GetGroupMembers || {},
+  );
+
+  const { GetPaymentLogData } = useSelector(state => state.GetPaymentLog || {});
+  const { DeleteGroupExpenseLoading } = useSelector(
+    state => state.DeleteGroupExpense || {},
+  )
 
   const [paymentFormOpen, setPaymentFormOpen] = useState(false);
   const [groupFormOpen, setGroupFormOpen] = useState(false);
   const [settleModalOpen, setSettleModalOpen] = useState(false);
-
   const [selectedFriend, setSelectedFriend] = useState(null);
-
   const [friendCode, setFriendCode] = useState('');
   const [snack, setSnack] = useState({ visible: false, message: '' });
-  const { LoginData } = useSelector(state => state.Login);
-  const { GetFriendsData } = useSelector(state => state.GetFriends || {});
-  const { GetGroupsData } = useSelector(state => state.GetGroups || {});
-  const [group, setGroup] = useState([]);
-  
-  const dispatch = useDispatch();
-
 
   const [friends, setFriends] = useState([]);
+  const [groups, setGroups] = useState([]);
 
+  const [groupMemberCounts, setGroupMemberCounts] = useState({});
+  const [myGroupIds, setMyGroupIds] = useState([]);
+  const [groupExpenses, setGroupExpenses] = useState([]);
 
-  const paymentLogs = [
-    {
-      id: '1',
-      friendId: '2',
-      friendName: 'Priya Sharma',
-      amount: 400,
-      description: 'Movie tickets',
-      type: 'owe',
-    },
-    {
-      id: '2',
-      friendId: '1',
-      friendName: 'Alex Kumar',
-      amount: 250,
-      description: 'Lunch',
-      type: 'owed',
-    },
-  ];
   const userCode = LoginData?.user?.code;
+  const userId = LoginData?.user?.id;
   const shareableLink = 'https://splurge.app/invite/2K4X9';
 
   const showSnack = message => setSnack({ visible: true, message });
-  const fetchFriends = () => {
-    if (LoginData?.token && LoginData?.user?.id) {
-      dispatch(GetFriendsApi({ token: LoginData.token, id: LoginData.user.id }));
-      dispatch(GetGroupsApi({ token: LoginData.token, id: LoginData.user.id }));
 
+  const fetchInitialData = () => {
+    if (LoginData?.token && LoginData?.user?.id) {
+      dispatch(
+        GetFriendsApi({ token: LoginData.token, id: LoginData.user.id }),
+      );
+      dispatch(GetGroupsApi(LoginData.token));
+      dispatch(GetGroupMembersApi(LoginData.token));
+      dispatch(GetPaymentLogApi(LoginData.token));
     }
-  }
+  };
 
   useEffect(() => {
-   fetchFriends();
+    fetchInitialData();
   }, []);
 
+  // --- Friend List Calculation Logic (Kept as requested) ---
   useEffect(() => {
-    if (GetFriendsData?.friends) {
-      setFriends(GetFriendsData.friends);
+    const rawFriends = GetFriendsData?.friends || [];
+    const logs = GetPaymentLogData?.payment_logs || [];
+
+    if (rawFriends.length > 0) {
+      const balanceMap = {};
+
+      logs.forEach(log => {
+        // Filter: Ensure we only calculate based on logs belonging to this user
+        if (String(log.user_id) === String(userId)) {
+          const amount = parseFloat(log.amount) || 0;
+          const friendId = log.friend_id;
+
+          if (!balanceMap[friendId]) balanceMap[friendId] = 0;
+
+          if (log.type === "They owe") {
+            balanceMap[friendId] += amount;
+          } else if (log.type === "I owe") {
+            balanceMap[friendId] -= amount;
+          }
+        }
+      });
+
+      const calculatedFriends = rawFriends.map(friend => {
+        const netBalance = balanceMap[friend.id] || 0;
+        return {
+          ...friend,
+          owes: netBalance > 0 ? netBalance : 0,
+          owed: netBalance < 0 ? Math.abs(netBalance) : 0,
+        };
+      });
+
+      setFriends(calculatedFriends);
     }
-  }, [GetFriendsData]);
+  }, [GetFriendsData, GetPaymentLogData, userId]);
+
+
+  // --- Recent Activity Logic (Dynamic) ---
+  const recentActivityLogs = useMemo(() => {
+    if (!GetPaymentLogData?.payment_logs || !userId) return [];
+
+    // 1. Filter logs where user_id matches logged-in user
+    const userLogs = GetPaymentLogData.payment_logs.filter(
+      log => String(log.user_id) === String(userId)
+    );
+
+    // 2. Map data for UI
+    const mappedLogs = userLogs.map(log => {
+      // Find friend name from existing friends list
+      const friend = friends.find(f => String(f.id) === String(log.friend_id));
+      const friendName = friend ? friend.fullname : 'Unknown User';
+      
+      // Determine direction: "They owe" = Incoming (Green), "I owe" = Outgoing (Red)
+      const isIncoming = log.type === "They owe"; 
+
+      return {
+        id: log.id,
+        friendName: friendName,
+        amount: parseFloat(log.amount).toFixed(2),
+        description: log.description,
+        date: log.date,
+        isIncoming: isIncoming,
+      };
+    });
+
+    // 3. Sort by Date (Newest first)
+    return mappedLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  }, [GetPaymentLogData, userId, friends]);
+
 
   useEffect(() => {
     if (GetGroupsData?.group_list) {
-      setGroup(GetGroupsData.group_list);
+      setGroups(GetGroupsData.group_list);
     }
   }, [GetGroupsData]);
 
+  useEffect(() => {
+    if (GetGroupMembersData?.members) {
+      const membersList = GetGroupMembersData.members;
+
+      const newCounts = {};
+      const foundMyGroupIds = [];
+
+      membersList.forEach(member => {
+        const gId = member.group_id;
+
+        if (newCounts[gId]) {
+          newCounts[gId] += 1;
+        } else {
+          newCounts[gId] = 1;
+        }
+
+        if (String(member.user_id) === String(userId)) {
+          if (!foundMyGroupIds.includes(gId)) {
+            foundMyGroupIds.push(gId);
+          }
+        }
+      });
+
+      setGroupMemberCounts(newCounts);
+      setMyGroupIds(foundMyGroupIds);
+    }
+  }, [GetGroupMembersData, userId]);
+
+  useEffect(() => {
+    if (groups.length > 0 && LoginData?.token) {
+      const fetchExpenses = async () => {
+        const expensePromises = groups.map(g =>
+          dispatch(
+            GetGroupExpenseApi({ token: LoginData.token, id: g.id }),
+          ).unwrap(),
+        );
+
+        try {
+          const expenseResults = await Promise.all(expensePromises);
+          let allExpenses = [];
+          expenseResults.forEach(result => {
+            if (result?.group && Array.isArray(result.group)) {
+              allExpenses = [...allExpenses, ...result.group];
+            }
+          });
+          setGroupExpenses(allExpenses);
+        } catch (error) {
+          console.log('Expense fetch error', error);
+        }
+      };
+      fetchExpenses();
+    }
+  }, [groups, LoginData?.token, dispatch, DeleteGroupExpenseLoading]);
+
+  useEffect(() => {
+    if (GetGroupExpenseData?.group) {
+      setGroupExpenses(prev => [...prev, ...GetGroupExpenseData.group]);
+    }
+  }, [GetGroupExpenseData]);
+
+  const groupSpentMap = useMemo(() => {
+    const map = {};
+    if (groupExpenses && groupExpenses.length > 0) {
+      const uniqueExpenses = [
+        ...new Map(groupExpenses.map(item => [item['id'], item])).values(),
+      ];
+
+      uniqueExpenses.forEach(expense => {
+        const gId = expense.group_id;
+        const amount = parseFloat(expense.amount) || 0;
+
+        if (map[gId]) {
+          map[gId] += amount;
+        } else {
+          map[gId] = amount;
+        }
+      });
+    }
+    return map;
+  }, [groupExpenses]);
+
   const handleCopyCode = () => {
     Clipboard.setString(userCode);
-    showSnack('Code copied!');
+    showSnack('Your Splurge ID copied!');
   };
 
   const handleCopyLink = () => {
     Clipboard.setString(shareableLink);
-    showSnack('Link copied!');
+    showSnack('Invite link copied!');
   };
 
-  const handleAddFriend = async() => {
+  const handleAddFriend = async () => {
     if (!friendCode.trim()) {
-      showSnack('Enter a valid friend code');
+      showSnack('Please enter a valid friend code');
       return;
     }
-    if (friendCode === userCode) {
+    if (friendCode.trim() === userCode) {
       showSnack('You cannot add yourself as a friend');
       return;
     }
@@ -127,65 +275,92 @@ const GroupSettle = ({ navigation }) => {
     formData.append('user_id', LoginData?.user?.id);
     formData.append('friend_code', friendCode);
     try {
-          const result = await dispatch(AddFriendApi({ formData, token })).unwrap();
-          if (result?.status === true || result?.status === "true") {
-            showSnack(result?.message);
-            setFriendCode('');
-            fetchFriends();
-          } else {
-            showSnack(result?.message);
-            fetchFriends();
-          }
-        } catch (error) {
-          showSnack("Something went wrong. Please try again.");
-        } finally {
-          // setToastVisible(true);
-        }
-  };
-
-  const handleViewGroup = groupId => {
-    try {
-      navigation.navigate('groupDetails', { id: groupId });
-    } catch (e) {
-      console.log('Navigation error: ', e);
-      showSnack(`Open group ${groupId}`);
-    }
-  };
-  const handleCreateGroup = async (data) => {
-    if (!data?.groupName || !data?.budget) {
-      showSnack("Please fill all required fields");
-      return;
-    }
-  
-    const token = LoginData?.token;
-  
-    const formData = new FormData();
-    formData.append("user_id", LoginData?.user?.id);
-    formData.append("group_name", data.groupName);
-    formData.append("group_budget", data.budget);
-    formData.append("description", data.description || "");
-  
-    try {
-      const result = await dispatch(AddGroupApi({ formData, token })).unwrap();
-  
-      if (result?.status === true || result?.status === "true") {
+      const result = await dispatch(AddFriendApi({ formData, token })).unwrap();
+      if (result?.status === true || result?.status === 'true') {
         showSnack(result?.message);
-        fetchFriends();
+        setFriendCode('');
+        dispatch(
+          GetFriendsApi({ token: LoginData.token, id: LoginData.user.id }),
+        );
       } else {
         showSnack(result?.message);
-        fetchFriends();
       }
-  
     } catch (error) {
-      showSnack("Something went wrong. Please try again.");
-    } finally {
-      // setGroupFormOpen(false);
+      showSnack('Something went wrong. Please try again.');
     }
   };
-  
+
+  const handleAddPaymentLog = async data => {
+    if (!LoginData?.user?.id) {
+      showSnack('User information missing. Please login again.');
+      return;
+    }
+    try {
+      const dateObj = new Date(data.date);
+      const formattedDate = dateObj.toISOString().split('T')[0];
+      let apiType = '';
+      if (data.type.value === 'i_owe_them') {
+        apiType = 'I owe';
+      } else {
+        apiType = 'They owe';
+      }
+
+      const formData = new FormData();
+      formData.append('user_id', LoginData.user.id);
+      formData.append('friend_id', data.friend.value);
+      formData.append('type', apiType);
+      formData.append('amount', data.amount);
+      formData.append('date', formattedDate);
+      formData.append('description', data.description);
+
+      const result = await dispatch(
+        AddPaymentLogApi({ formData, token: LoginData.token }),
+      ).unwrap();
+
+      if (result.status === true) {
+        showSnack('Payment log added successfully!');
+        setPaymentFormOpen(false);
+        fetchInitialData();
+      } else {
+        showSnack(result.message || 'Failed to add log');
+      }
+    } catch (error) {
+      console.error('Error creating payment log:', error);
+      showSnack('Something went wrong');
+    }
+  };
+
+  const handleViewGroup = group => {
+    navigation.navigate('groupDetails', { group: group });
+  };
+
+  const handleCreateGroup = async data => {
+    if (!data?.groupName || !data?.budget) {
+      showSnack('Please provide group name and budget');
+      return;
+    }
+    const token = LoginData?.token;
+    const formData = new FormData();
+    formData.append('user_id', LoginData?.user?.id);
+    formData.append('group_name', data.groupName);
+    formData.append('group_budget', data.budget);
+    formData.append('description', data.description || '');
+    try {
+      const result = await dispatch(AddGroupApi({ formData, token })).unwrap();
+      if (result?.status === true || result?.status === 'true') {
+        showSnack(result?.message);
+        fetchInitialData();
+        setGroupFormOpen(false);
+      } else {
+        showSnack(result?.message);
+      }
+    } catch (error) {
+      showSnack('Something went wrong. Please try again.');
+    }
+  };
 
   const handleRemind = friend => {
-    showSnack(`Reminder sent to ${friend.name} for ₹${friend.owes}`);
+    showSnack(`Reminder sent to ${friend.fullname}`);
   };
 
   const handleOpenSettle = friend => {
@@ -194,14 +369,6 @@ const GroupSettle = ({ navigation }) => {
   };
 
   const handleSettleUpSave = data => {
-    const updatedFriends = friends.map(f => {
-      if (f.id === data.friendId) {
-        return { ...f, owes: 0, owed: 0 };
-      }
-      return f;
-    });
-    setFriends(updatedFriends);
-
     showSnack('Settlement recorded successfully!');
   };
 
@@ -211,7 +378,6 @@ const GroupSettle = ({ navigation }) => {
         barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={colors.background}
       />
-
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -242,7 +408,6 @@ const GroupSettle = ({ navigation }) => {
                 <ArrowUpRight size={14} color={colors.text} />
               </TouchableOpacity>
             </View>
-
             <View style={styles.codeContainer}>
               <Text style={styles.codeText}>{userCode}</Text>
               <TouchableOpacity onPress={handleCopyCode} style={styles.copyBtn}>
@@ -257,7 +422,7 @@ const GroupSettle = ({ navigation }) => {
                 <UserPlus2 size={22} color={colors.theme} />
               </View>
               <TextInput
-                placeholder="Enter friend code (e.g., SPL-X9)"
+                placeholder="Enter friend code (e.g., SPL-12345)"
                 placeholderTextColor={colors.textDisabled}
                 value={friendCode}
                 onChangeText={setFriendCode}
@@ -277,10 +442,14 @@ const GroupSettle = ({ navigation }) => {
                 style={styles.linkBtn}
                 onPress={() => setPaymentFormOpen(true)}
               >
-                <Text style={styles.linkText}>+ Add Log</Text>
+                <Text style={styles.linkText}>+ Add Payment Log</Text>
               </TouchableOpacity>
             </View>
-
+            {friends?.length === 0 && (
+              <View style={styles.groupCard}>
+                <Text style={styles.progressLabel}>No friends found.</Text>
+              </View>
+            )}
             {friends?.map(friend => (
               <View
                 key={friend.id}
@@ -289,8 +458,8 @@ const GroupSettle = ({ navigation }) => {
                 <View style={styles.row}>
                   <Avatar.Text
                     size={48}
-                    label={friend?.fullname
-                      ?.split(' ')
+                    label={(friend.fullname || 'NA')
+                      .split(' ')
                       .map(n => n[0])
                       .join('')}
                     style={styles.avatar}
@@ -299,7 +468,7 @@ const GroupSettle = ({ navigation }) => {
                   <View style={styles.friendInfo}>
                     <Text style={styles.friendName}>{friend.fullname}</Text>
                     {friend.owed === 0 && friend.owes === 0 ? (
-                      <Text style={styles.settledText}>All settled up</Text>
+                      <Text style={styles.settledText}>No Log Found</Text>
                     ) : (
                       <View style={styles.statusRow}>
                         {friend.owes > 0 && (
@@ -322,7 +491,6 @@ const GroupSettle = ({ navigation }) => {
                       </View>
                     )}
                   </View>
-
                   <View style={styles.actionIcon}>
                     {friend.owes > 0 ? (
                       <TrendingUp size={20} color={colors.success} />
@@ -333,72 +501,31 @@ const GroupSettle = ({ navigation }) => {
                     )}
                   </View>
                 </View>
-
                 {(friend.owes > 0 || friend.owed > 0) && (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      marginTop: 15,
-                      borderTopWidth: 1,
-                      borderTopColor: colors.border,
-                      paddingTop: 10,
-                      justifyContent: 'flex-end',
-                    }}
-                  >
+                  <View style={styles.friendCardActions}>
                     {friend.owes > 0 && (
                       <TouchableOpacity
                         onPress={() => handleRemind(friend)}
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginRight: 15,
-                          paddingVertical: 5,
-                        }}
+                        style={styles.remindButton}
                       >
                         <Bell
                           size={16}
                           color={colors.theme}
                           style={{ marginRight: 6 }}
                         />
-                        <Text
-                          style={{
-                            color: colors.theme,
-                            fontSize: 13,
-                            fontWeight: '600',
-                          }}
-                        >
-                          Remind
-                        </Text>
+                        <Text style={styles.remindButtonText}>Remind</Text>
                       </TouchableOpacity>
                     )}
-
                     <TouchableOpacity
                       onPress={() => handleOpenSettle(friend)}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor: colors.background,
-                        paddingHorizontal: 12,
-                        paddingVertical: 6,
-                        borderRadius: 20,
-                        borderWidth: 1,
-                        borderColor: colors.theme,
-                      }}
+                      style={styles.settleButton}
                     >
                       <CheckCircle
                         size={16}
                         color={colors.text}
                         style={{ marginRight: 6 }}
                       />
-                      <Text
-                        style={{
-                          color: colors.text,
-                          fontSize: 13,
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        Settle Up
-                      </Text>
+                      <Text style={styles.settleButtonText}>Settle Up</Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -416,47 +543,106 @@ const GroupSettle = ({ navigation }) => {
                 <Text style={styles.linkText}>Create New</Text>
               </TouchableOpacity>
             </View>
+            {groups?.length === 0 && (
+              <View style={styles.groupCard}>
+                <Text style={styles.progressLabel}>No groups found.</Text>
+              </View>
+            )}
+            {groups?.map(group => {
+              const isAdmin = String(group.group_admin) === String(userId);
+              const isMember = myGroupIds.includes(group.id);
 
-            {group?.map(group => {
-              const percentage = Math.min(
-                100,
-                (group?.spent / group?.group_budget) * 100,
-              );
+              if (!isAdmin && !isMember) {
+                return null;
+              }
+
+              const budget = parseFloat(group.group_budget) || 0;
+              const totalSpent = groupSpentMap[group.id] || 0;
+              const percentage =
+                budget > 0 ? Math.min(100, (totalSpent / budget) * 100) : 0;
+              const remaining = budget - totalSpent;
+              const isOverBudget = remaining < 0;
+
+              let progressColor = colors.success;
+              if (percentage > 50) progressColor = colors.warning;
+              if (percentage > 85) progressColor = colors.error;
+
               return (
                 <TouchableOpacity
                   key={group.id}
                   activeOpacity={0.7}
-                  onPress={() => handleViewGroup(group.id)}
+                  onPress={() => handleViewGroup(group)}
                 >
                   <View style={styles.groupCard}>
                     <View style={styles.rowBetween}>
                       <View style={styles.row}>
-                        <View style={styles.groupIconBg}>
+                        <View
+                          style={[
+                            styles.groupIconBg,
+                            { backgroundColor: colors.tintedThemeColor },
+                          ]}
+                        >
                           <Users size={18} color={colors.theme} />
                         </View>
                         <View>
-                          <Text style={styles.groupName}>{group?.group_name}</Text>
+                          <Text style={styles.groupName}>
+                            {group.group_name}
+                          </Text>
                           <Text style={styles.groupMembers}>
-                            {group?.members} members
+                            {groupMemberCounts[group.id] || 0} members
                           </Text>
                         </View>
                       </View>
-                      <Text style={styles.amountText}>
-                        ₹{group?.spent?.toLocaleString()}
-                      </Text>
+
+                      <View style={{ alignItems: 'flex-end' }}>
+                        <Text
+                          style={[
+                            styles.amountText,
+                            {
+                              color: isOverBudget ? colors.error : colors.text,
+                            },
+                          ]}
+                        >
+                          ₹{Math.abs(remaining).toLocaleString()}
+                        </Text>
+                        <Text
+                          style={{ fontSize: 10, color: colors.textSecondary }}
+                        >
+                          {isOverBudget ? 'Over Budget' : 'Remaining'}
+                        </Text>
+                      </View>
                     </View>
 
                     <View style={styles.progressContainer}>
                       <View style={styles.rowBetween}>
-                        <Text style={styles.progressLabel}>Budget Used</Text>
-                        <Text style={styles.progressLabel}>
-                          {percentage?.toFixed(0)}%
+                        <Text
+                          style={[
+                            styles.progressLabel,
+                            { color: colors.textSecondary },
+                          ]}
+                        >
+                          Spent: ₹{totalSpent.toLocaleString()}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.progressLabel,
+                            { fontWeight: '700', color: progressColor },
+                          ]}
+                        >
+                          {percentage.toFixed(0)}%
                         </Text>
                       </View>
                       <ProgressBar
                         progress={percentage / 100}
-                        color={colors.theme}
-                        style={styles.progressBar}
+                        color={progressColor}
+                        style={[
+                          styles.progressBar,
+                          {
+                            height: 6,
+                            borderRadius: 3,
+                            backgroundColor: colors.border,
+                          },
+                        ]}
                       />
                     </View>
                   </View>
@@ -467,48 +653,55 @@ const GroupSettle = ({ navigation }) => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Recent Activity</Text>
-            {paymentLogs.map(log => (
-              <View key={log.id} style={styles.logCard}>
-                <View style={styles.row}>
-                  <View
-                    style={[
-                      styles.logIcon,
-                      {
-                        backgroundColor:
-                          log.type === 'owed'
-                            ? 'rgba(0, 230, 118, 0.1)'
-                            : 'rgba(207, 102, 121, 0.1)',
-                      },
-                    ]}
-                  >
-                    {log.type === 'owed' ? (
-                      <TrendingUp size={16} color={colors.success} />
-                    ) : (
-                      <TrendingDown size={16} color={colors.error} />
-                    )}
-                  </View>
-                  <View>
-                    <Text style={styles.logTitle}>
-                      {log.type === 'owed'
-                        ? `${log.friendName} owes you`
-                        : `You owe ${log.friendName}`}
-                    </Text>
-                    <Text style={styles.logDesc}>{log.description}</Text>
-                  </View>
+            {recentActivityLogs.length === 0 ? (
+                <View style={styles.groupCard}>
+                  <Text style={styles.progressLabel}>No recent activity found.</Text>
                 </View>
-                <Text
-                  style={[
-                    styles.logAmount,
-                    {
-                      color:
-                        log.type === 'owed' ? colors.success : colors.error,
-                    },
-                  ]}
-                >
-                  {log.type === 'owed' ? '+' : '-'}₹{log.amount}
-                </Text>
-              </View>
-            ))}
+            ) : (
+                recentActivityLogs.map(log => (
+                  <View key={log.id} style={styles.logCard}>
+                    <View style={styles.row}>
+                      <View
+                        style={[
+                          styles.logIcon,
+                          {
+                            backgroundColor:
+                              log.isIncoming
+                                ? 'rgba(0, 230, 118, 0.1)' // Green bg
+                                : 'rgba(207, 102, 121, 0.1)', // Red bg
+                          },
+                        ]}
+                      >
+                        {log.isIncoming ? (
+                          <TrendingUp size={16} color={colors.success} />
+                        ) : (
+                          <TrendingDown size={16} color={colors.error} />
+                        )}
+                      </View>
+                      <View>
+                        <Text style={styles.logTitle}>
+                          {log.isIncoming
+                            ? `${log.friendName} owes you`
+                            : `You owe ${log.friendName}`}
+                        </Text>
+                        <Text style={styles.logDesc}>{log.description}</Text>
+                        <Text style={{fontSize: 10, color: colors.textSecondary}}>{log.date}</Text>
+                      </View>
+                    </View>
+                    <Text
+                      style={[
+                        styles.logAmount,
+                        {
+                          color:
+                            log.isIncoming ? colors.success : colors.error,
+                        },
+                      ]}
+                    >
+                      {log.isIncoming ? '+' : '-'}₹{log.amount}
+                    </Text>
+                  </View>
+                ))
+            )}
           </View>
         </View>
       </ScrollView>
@@ -518,8 +711,7 @@ const GroupSettle = ({ navigation }) => {
         onClose={() => setPaymentFormOpen(false)}
         friends={friends}
         onSave={data => {
-          console.log('Payment Log Saved:', data);
-          setPaymentFormOpen(false);
+          handleAddPaymentLog(data);
         }}
       />
       <CreateGroupModal
@@ -527,14 +719,12 @@ const GroupSettle = ({ navigation }) => {
         onClose={() => setGroupFormOpen(false)}
         onSubmit={handleCreateGroup}
       />
-
       <SettleUpModal
         visible={settleModalOpen}
         onClose={() => setSettleModalOpen(false)}
         friend={selectedFriend}
         onSave={handleSettleUpSave}
       />
-
       <Snackbar
         visible={snack.visible}
         onDismiss={() => setSnack({ visible: false, message: '' })}
