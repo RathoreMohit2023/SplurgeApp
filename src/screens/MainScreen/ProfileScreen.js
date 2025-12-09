@@ -37,24 +37,14 @@ const ProfileScreen = ({ navigation }) => {
   const { GetUserDetailsData } = useSelector((state) => state.GetUserDetails);
   const [user, setUser] = useState('');
   const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
+  const { GetFriendsData } = useSelector(state => state.GetFriends || {});
   
 
   const [snack, setSnack] = useState({ visible: false, message: "" });
   const insets = useSafeAreaInsets();
   const allTransactions = GetTransactionData?.get_transactions || [];
+  const [totalFriends, setTotalFriends] = useState(0);
 
-
-  const dummyuser = {
-    name: "Arjun Patel",
-    email: "arjun.patel@gmail.com",
-    phone: "+91 98765 43210",
-    code: "SPL-2K4X9",
-    points: 1200,
-    rank: 3,
-    totalFriends: 0,
-    spent: "₹45,230",
-  };
-  
 
   const menuSections = [
     {
@@ -89,6 +79,12 @@ const ProfileScreen = ({ navigation }) => {
     }
   ];
 
+  useEffect(() => {
+    if (GetFriendsData?.friends?.length > 0) {
+      setTotalFriends(GetFriendsData?.friends?.length);
+    }
+  })
+
   const { currentMonthTransactions, currentMonthTotal } = useMemo(() => {
       const now = new Date();
       const currentYear = now.getFullYear();
@@ -113,7 +109,7 @@ const ProfileScreen = ({ navigation }) => {
 
     const stats = [
       { label: "Total Spent", value: currentMonthTotal, icon: CreditCard, color: "#FFD700" },
-      { label: "Friends", value: dummyuser?.totalFriends, icon: User, color: "#4FB6FF" },
+      { label: "Friends", value: totalFriends, icon: User, color: "#4FB6FF" },
     ];
 
   useEffect(() => {

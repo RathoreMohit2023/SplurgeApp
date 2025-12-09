@@ -55,7 +55,7 @@ const GroupSettle = ({ navigation }) => {
   const { GetPaymentLogData } = useSelector(state => state.GetPaymentLog || {});
   const { DeleteGroupExpenseLoading } = useSelector(
     state => state.DeleteGroupExpense || {},
-  )
+  );
 
   const [paymentFormOpen, setPaymentFormOpen] = useState(false);
   const [groupFormOpen, setGroupFormOpen] = useState(false);
@@ -92,7 +92,7 @@ const GroupSettle = ({ navigation }) => {
     fetchInitialData();
   }, []);
 
-  // --- Friend List Calculation Logic (Kept as requested) ---
+  // --- 1. Friend List Calculation Logic (Bi-Directional) ---
   useEffect(() => {
     const rawFriends = GetFriendsData?.friends || [];
     const logs = GetPaymentLogData?.payment_logs || [];
@@ -101,17 +101,31 @@ const GroupSettle = ({ navigation }) => {
       const balanceMap = {};
 
       logs.forEach(log => {
-        // Filter: Ensure we only calculate based on logs belonging to this user
-        if (String(log.user_id) === String(userId)) {
-          const amount = parseFloat(log.amount) || 0;
-          const friendId = log.friend_id;
+        const amount = parseFloat(log.amount) || 0;
 
+        // CASE 1: Log created BY ME (user_id == me)
+        if (String(log.user_id) === String(userId)) {
+          const friendId = log.friend_id;
           if (!balanceMap[friendId]) balanceMap[friendId] = 0;
 
-          if (log.type === "They owe") {
-            balanceMap[friendId] += amount;
-          } else if (log.type === "I owe") {
-            balanceMap[friendId] -= amount;
+          if (log.type === 'They owe') {
+            balanceMap[friendId] += amount; // I get money (+)
+          } else if (log.type === 'I owe') {
+            balanceMap[friendId] -= amount; // I pay money (-)
+          }
+        }
+        // CASE 2: Log created BY FRIEND involving ME (friend_id == me)
+        else if (String(log.friend_id) === String(userId)) {
+          const creatorId = log.user_id; // Here, the creator is the friend
+          if (!balanceMap[creatorId]) balanceMap[creatorId] = 0;
+
+          // Logic Inversion (Kyuki friend ne apne perspective se likha h)
+          if (log.type === 'They owe') {
+            // Friend says "They (Me) owe". Means I owe Friend.
+            balanceMap[creatorId] -= amount; // I pay money (-)
+          } else if (log.type === 'I owe') {
+            // Friend says "I (Friend) owe". Means Friend owes Me.
+            balanceMap[creatorId] += amount; // I get money (+)
           }
         }
       });
@@ -120,8 +134,8 @@ const GroupSettle = ({ navigation }) => {
         const netBalance = balanceMap[friend.id] || 0;
         return {
           ...friend,
-          owes: netBalance > 0 ? netBalance : 0,
-          owed: netBalance < 0 ? Math.abs(netBalance) : 0,
+          owes: netBalance > 0 ? netBalance : 0, // Friend owes me
+          owed: netBalance < 0 ? Math.abs(netBalance) : 0, // I owe friend
         };
       });
 
@@ -129,24 +143,30 @@ const GroupSettle = ({ navigation }) => {
     }
   }, [GetFriendsData, GetPaymentLogData, userId]);
 
-
-  // --- Recent Activity Logic (Dynamic) ---
   const recentActivityLogs = useMemo(() => {
     if (!GetPaymentLogData?.payment_logs || !userId) return [];
 
-    // 1. Filter logs where user_id matches logged-in user
-    const userLogs = GetPaymentLogData.payment_logs.filter(
-      log => String(log.user_id) === String(userId)
+    const relevantLogs = GetPaymentLogData.payment_logs.filter(
+      log =>
+        String(log.user_id) === String(userId) ||
+        String(log.friend_id) === String(userId),
     );
 
-    // 2. Map data for UI
-    const mappedLogs = userLogs.map(log => {
-      // Find friend name from existing friends list
-      const friend = friends.find(f => String(f.id) === String(log.friend_id));
-      const friendName = friend ? friend.fullname : 'Unknown User';
-      
-      // Determine direction: "They owe" = Incoming (Green), "I owe" = Outgoing (Red)
-      const isIncoming = log.type === "They owe"; 
+    const mappedLogs = relevantLogs.map(log => {
+      let friendName = 'Unknown';
+      let isIncoming = false;
+
+      if (String(log.user_id) === String(userId)) {
+        const friend = friends.find(
+          f => String(f.id) === String(log.friend_id),
+        );
+        friendName = friend ? friend.fullname : 'Unknown User';
+        isIncoming = log.type === 'They owe';
+      } else {
+        const friend = friends.find(f => String(f.id) === String(log.user_id));
+        friendName = friend ? friend.fullname : 'Unknown User';
+        isIncoming = log.type === 'I owe';
+      }
 
       return {
         id: log.id,
@@ -154,13 +174,13 @@ const GroupSettle = ({ navigation }) => {
         amount: parseFloat(log.amount).toFixed(2),
         description: log.description,
         date: log.date,
+        created_at: log.created_at,
         isIncoming: isIncoming,
+        createdByMe: String(log.user_id) === String(userId),
       };
     });
 
-    // 3. Sort by Date (Newest first)
-    return mappedLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+    return mappedLogs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }, [GetPaymentLogData, userId, friends]);
 
 
@@ -284,6 +304,9 @@ const GroupSettle = ({ navigation }) => {
         );
       } else {
         showSnack(result?.message);
+        dispatch(
+          GetFriendsApi({ token: LoginData.token, id: LoginData.user.id }),
+        );
       }
     } catch (error) {
       showSnack('Something went wrong. Please try again.');
@@ -323,6 +346,7 @@ const GroupSettle = ({ navigation }) => {
         fetchInitialData();
       } else {
         showSnack(result.message || 'Failed to add log');
+        fetchInitialData();
       }
     } catch (error) {
       console.error('Error creating payment log:', error);
@@ -353,6 +377,7 @@ const GroupSettle = ({ navigation }) => {
         setGroupFormOpen(false);
       } else {
         showSnack(result?.message);
+        fetchInitialData();
       }
     } catch (error) {
       showSnack('Something went wrong. Please try again.');
@@ -478,14 +503,14 @@ const GroupSettle = ({ navigation }) => {
                               { color: colors.success },
                             ]}
                           >
-                            Owes you ₹{friend.owes}
+                            Owes you ₹{friend.owes.toFixed(2)}
                           </Text>
                         )}
                         {friend.owed > 0 && (
                           <Text
                             style={[styles.statusText, { color: colors.error }]}
                           >
-                            You owe ₹{friend.owed}
+                            You owe ₹{friend.owed.toFixed(2)}
                           </Text>
                         )}
                       </View>
@@ -653,55 +678,71 @@ const GroupSettle = ({ navigation }) => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Recent Activity</Text>
-            {recentActivityLogs.length === 0 ? (
-                <View style={styles.groupCard}>
-                  <Text style={styles.progressLabel}>No recent activity found.</Text>
-                </View>
-            ) : (
-                recentActivityLogs.map(log => (
-                  <View key={log.id} style={styles.logCard}>
-                    <View style={styles.row}>
-                      <View
+            <View
+                style={[
+                  styles.logContainer,
+                  recentActivityLogs.length > 5 && { height: 500 }
+                ]}
+              >
+              <ScrollView 
+                nestedScrollEnabled={true} 
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 10 }}
+              >
+                {recentActivityLogs.length === 0 ? (
+                  <View style={styles.groupCard}>
+                    <Text style={styles.progressLabel}>No recent activity found.</Text>
+                  </View>
+                ) : (
+                  recentActivityLogs?.map(log => (
+                    <View key={log.id} style={styles.logCard}>
+                      <View style={styles.row}>
+                        <View
+                          style={[
+                            styles.logIcon,
+                            {
+                              backgroundColor:
+                                log.isIncoming
+                                  ? colors.success 
+                                  : colors.error, 
+                            },
+                          ]}
+                        >
+                          {log.isIncoming ? (
+                            <TrendingUp size={16} color={colors.white} />
+                          ) : (
+                            <TrendingDown size={16} color={colors.white} />
+                          )}
+                        </View>
+                        <View>
+                          <Text style={styles.logTitle}>
+                            {log.isIncoming
+                              ? `${log.friendName} owes you`
+                              : `You owe ${log.friendName}`}
+                          </Text>
+                          <Text style={styles.logDesc}>
+                            {log.description}
+                            {!log.createdByMe && <Text style={{fontSize: 10, color: colors.textSecondary}}> (Added by them)</Text>}
+                          </Text>
+                          <Text style={{fontSize: 10, color: colors.textSecondary}}>{log.date}</Text>
+                        </View>
+                      </View>
+                      <Text
                         style={[
-                          styles.logIcon,
+                          styles.logAmount,
                           {
-                            backgroundColor:
-                              log.isIncoming
-                                ? 'rgba(0, 230, 118, 0.1)' // Green bg
-                                : 'rgba(207, 102, 121, 0.1)', // Red bg
+                            color:
+                              log.isIncoming ? colors.success : colors.error,
                           },
                         ]}
                       >
-                        {log.isIncoming ? (
-                          <TrendingUp size={16} color={colors.success} />
-                        ) : (
-                          <TrendingDown size={16} color={colors.error} />
-                        )}
-                      </View>
-                      <View>
-                        <Text style={styles.logTitle}>
-                          {log.isIncoming
-                            ? `${log.friendName} owes you`
-                            : `You owe ${log.friendName}`}
-                        </Text>
-                        <Text style={styles.logDesc}>{log.description}</Text>
-                        <Text style={{fontSize: 10, color: colors.textSecondary}}>{log.date}</Text>
-                      </View>
+                        {log.isIncoming ? '+' : '-'}₹{log.amount}
+                      </Text>
                     </View>
-                    <Text
-                      style={[
-                        styles.logAmount,
-                        {
-                          color:
-                            log.isIncoming ? colors.success : colors.error,
-                        },
-                      ]}
-                    >
-                      {log.isIncoming ? '+' : '-'}₹{log.amount}
-                    </Text>
-                  </View>
-                ))
-            )}
+                  ))
+                )}
+              </ScrollView>
+            </View>
           </View>
         </View>
       </ScrollView>

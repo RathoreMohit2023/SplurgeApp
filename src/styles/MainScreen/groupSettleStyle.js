@@ -157,6 +157,15 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         fontFamily: 'serif',
         fontWeight: "700",
     },
+    logContainer: {
+        marginTop: 12,
+        backgroundColor: colors.tintedThemeColor,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
     linkText: {
         color: colors.theme,
         fontSize: 14,
@@ -393,7 +402,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         color: colors.text,
         fontSize: 14,
         fontFamily: 'serif',
-        fontWeight: '600',
+        fontWeight: 'bold',
     },
     logDesc: {
         color: colors.textSecondary,
