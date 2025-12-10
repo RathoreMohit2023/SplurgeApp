@@ -22,11 +22,13 @@ const getLoginStyle = colors =>
       fontWeight: 'bold',
       color: colors.text, // Dynamic Text
       marginBottom: 8,
+      fontFamily: 'serif',
     },
     tagline: {
       fontSize: 16,
       color: colors.textSecondary, // Dynamic Secondary Text
       marginBottom: 40,
+      fontFamily: 'serif',
     },
     formContainer: {
       width: '100%',
@@ -39,6 +41,7 @@ const getLoginStyle = colors =>
         color: colors.theme, // Dynamic Theme Color
         fontWeight: "600",
         fontSize: 14,
+        fontFamily: 'serif',
     },
     rowBetween: {
       flexDirection: "row",
@@ -57,6 +60,7 @@ const getLoginStyle = colors =>
       color: colors.text,
       fontSize: 14,
       marginLeft: 8,
+      fontFamily: 'serif',
     },
     
     primaryBtn: {
@@ -76,6 +80,7 @@ const getLoginStyle = colors =>
       color: '#fff', // Button text always white usually
       fontSize: 18,
       fontWeight: 'bold',
+      fontFamily: 'serif',
     },
     dividerContainer: {
       flexDirection: 'row',
@@ -91,6 +96,7 @@ const getLoginStyle = colors =>
       marginHorizontal: 10,
       color: colors.textDisabled, // Placeholder/Disabled color
       fontSize: 12,
+      fontFamily: 'serif',
     },
     googleBtn: {
       backgroundColor: colors.surface, // Surface color for cards/buttons
@@ -106,6 +112,7 @@ const getLoginStyle = colors =>
       color: colors.text,
       fontSize: 16,
       fontWeight: '600',
+      fontFamily: 'serif',
     },
     footerContainer: {
       flexDirection: 'row',
@@ -115,11 +122,13 @@ const getLoginStyle = colors =>
     footerText: {
       color: colors.textSecondary,
       fontSize: 14,
+      fontFamily: 'serif',
     },
     signUpText: {
       color: colors.theme,
       fontWeight: 'bold',
       fontSize: 14,
+      fontFamily: 'serif',
     },
     loaderContainer: {
       position: 'absolute',

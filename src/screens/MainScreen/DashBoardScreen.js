@@ -466,46 +466,50 @@ const DashBoardScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.sectionContainer}>
-        <View style={styles.rowBetween}>
-          <Text style={styles.sectionTitle}>Recent Transactions</Text>
-          <TouchableOpacity onPress={() => setShowTransactions(true)}>
-            <Text style={styles.linkText}>See All</Text>
-          </TouchableOpacity>
-        </View>
-        {recentTransactions.length > 0 ? (
-          recentTransactions.map(item => {
-            const IconComponent = categoryIcons[item.category] || DollarSign;
-            return (
-              <View key={item.id} style={styles.transactionRow}>
-                <View style={styles.transactionInfo}>
-                  <View style={styles.iconCircle}>
-                    <IconComponent size={20} color={colors.theme} />
-                  </View>
-                  <View style={styles.transactionDetails}>
-                    <Text style={styles.transactionTitle} numberOfLines={2}>
-                      {item.description}
-                    </Text>
-                    <Text style={styles.transactionSub}>
-                      {item.category} • {formatDate(item.date)}
-                    </Text>
-                  </View>
-                </View>
-                <View>
-                  <Text style={styles.transactionAmount}>
-                    -₹{Number(item.amount).toLocaleString()}
-                  </Text>
-                </View>
-              </View>
-            );
-          })
-        ) : (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              No transactions for this month yet.
+  <View style={styles.rowBetween}>
+    <Text style={styles.sectionTitle}>Recent Transactions</Text>
+    <TouchableOpacity onPress={() => setShowTransactions(true)}>
+      <Text style={styles.linkText}>See All</Text>
+    </TouchableOpacity>
+  </View>
+
+  {recentTransactions.length > 0 ? (
+    [...recentTransactions].reverse().map(item => {
+      const IconComponent = categoryIcons[item.category] || DollarSign;
+      return (
+        <View key={item.id} style={styles.transactionRow}>
+          <View style={styles.transactionInfo}>
+            <View style={styles.iconCircle}>
+              <IconComponent size={20} color={colors.theme} />
+            </View>
+
+            <View style={styles.transactionDetails}>
+              <Text style={styles.transactionTitle} numberOfLines={2}>
+                {item.description}
+              </Text>
+              <Text style={styles.transactionSub}>
+                {item.category} • {formatDate(item.date)}
+              </Text>
+            </View>
+          </View>
+
+          <View>
+            <Text style={styles.transactionAmount}>
+              -₹{Number(item.amount).toLocaleString()}
             </Text>
           </View>
-        )}
-      </View>
+        </View>
+      );
+    })
+  ) : (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>
+        No transactions for this month yet.
+      </Text>
+    </View>
+  )}
+</View>
+
 
       <View style={styles.sectionContainer}>
         <View style={styles.rowBetween}>

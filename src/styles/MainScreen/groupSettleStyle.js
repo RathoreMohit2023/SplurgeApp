@@ -123,7 +123,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         flex: 1,
         color: colors.text,
         paddingHorizontal: 12,
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'serif',
         height: 50,
     },

@@ -28,11 +28,13 @@ const getSignUpStyle = (colors) => StyleSheet.create({
     fontSize: 32, 
     fontWeight: "bold", 
     color: colors.text, 
-    marginBottom: 5 
+    marginBottom: 5,
+    fontFamily: 'serif',
   },
   subtitle: { 
     fontSize: 16, 
-    color: colors.textSecondary 
+    color: colors.textSecondary,
+    fontFamily: 'serif',
   },
 
   // Form
@@ -58,13 +60,14 @@ const getSignUpStyle = (colors) => StyleSheet.create({
   },
   dropdownText: { 
     fontSize: 16,
-    // Color logic component mein dynamic hogi (placeholder vs selected)
+    fontFamily: 'serif',
   },
   errorText: { 
     color: colors.error, 
     fontSize: 12, 
     marginTop: 4, 
-    marginLeft: 12 
+    marginLeft: 12,
+    fontFamily: 'serif',
   },
   
   // Buttons
@@ -84,7 +87,8 @@ const getSignUpStyle = (colors) => StyleSheet.create({
   primaryBtnText: { 
     color: "#fff", 
     fontSize: 18, 
-    fontWeight: "bold" 
+    fontWeight: "bold",
+    fontFamily: 'serif',
   },
 
   // Footer
@@ -96,12 +100,14 @@ const getSignUpStyle = (colors) => StyleSheet.create({
   },
   footerText: { 
     color: colors.textSecondary, 
-    fontSize: 14 
+    fontSize: 14,
+    fontFamily: 'serif',
   },
   linkText: { 
     color: colors.theme, 
     fontWeight: "bold", 
-    fontSize: 14 
+    fontSize: 14,
+    fontFamily: 'serif',
   },
 });
 

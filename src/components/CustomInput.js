@@ -27,7 +27,7 @@ const CustomInput = ({
     ? colors.theme
     : colors.border;
 
-  const iconColor = isFocused ? colors.theme : colors.textSecondary;
+  const iconColor = isFocused ? colors.theme : colors.theme;
 
   return (
     <View style={{ marginBottom: 10 }}>

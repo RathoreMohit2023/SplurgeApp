@@ -1,9 +1,10 @@
+// ProfileScreen.js
+
 import React, { useState, useContext, useMemo, useEffect } from 'react';
 import {
   View,
   ScrollView,
   TouchableOpacity,
-  Alert,
   StatusBar,
   Image,
   Modal,
@@ -17,10 +18,9 @@ import {
   CreditCard,
   Shield,
   HelpCircle,
-  Settings,
   LogOut,
   Phone,
-  X, // Close Icon
+  X,
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ImageViewer from '@react-native-ohos/react-native-image-zoom-viewer';
@@ -29,6 +29,7 @@ import getProfileStyle from '../../styles/MainScreen/ProfileStyle';
 import { ThemeContext } from '../../components/ThemeContext';
 import { useSelector } from 'react-redux';
 import { Img_url } from '../../Redux/NWConfig';
+import CustomAlert from '../../components/CustomAlert'; // Adjust the path if necessary
 
 const ProfileScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -40,9 +41,8 @@ const ProfileScreen = ({ navigation }) => {
   const [user, setUser] = useState('');
   const [snack, setSnack] = useState({ visible: false, message: '' });
   const [totalFriends, setTotalFriends] = useState(0);
-
-  // --- Image Viewer State ---
   const [isImageModalVisible, setImageModalVisible] = useState(false);
+  const [isLogoutAlertVisible, setLogoutAlertVisible] = useState(false);
 
   const insets = useSafeAreaInsets();
   const allTransactions = GetTransactionData?.get_transactions || [];
@@ -113,7 +113,7 @@ const ProfileScreen = ({ navigation }) => {
   const stats = [
     {
       label: 'Total Spent',
-      value: currentMonthTotal.toFixed(0), // Format nicely
+      value: `₹${currentMonthTotal.toLocaleString(undefined, {maximumFractionDigits: 0})}`,
       icon: CreditCard,
       color: '#FFD700',
     },
@@ -127,19 +127,14 @@ const ProfileScreen = ({ navigation }) => {
   }, [GetUserDetailsData]);
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: () => {
-          navigation.navigate('signIn');
-        },
-      },
-    ]);
+    setLogoutAlertVisible(true);
+  };
+  
+  const confirmLogout = () => {
+    setLogoutAlertVisible(false);
+    navigation.navigate('signIn');
   };
 
-  // Prepare images array for the viewer
   const profileImages = useMemo(() => {
     if (user?.profile_photo) {
       return [{ url: Img_url + user.profile_photo }];
@@ -163,7 +158,6 @@ const ProfileScreen = ({ navigation }) => {
       >
         <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
           <View style={styles.profileHeader}>
-            {/* Clickable Avatar Container */}
             <TouchableOpacity 
               style={styles.avatarContainer}
               activeOpacity={0.8}
@@ -172,7 +166,7 @@ const ProfileScreen = ({ navigation }) => {
                   setImageModalVisible(true);
                 }
               }}
-              disabled={!user?.profile_photo} // Disable if no photo
+              disabled={!user?.profile_photo}
             >
               {user?.profile_photo ? (
                 <Image
@@ -208,7 +202,6 @@ const ProfileScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Stats Grid */}
         <View style={styles.statsContainer}>
           {stats.map((s, idx) => {
             const Icon = s.icon;
@@ -239,7 +232,7 @@ const ProfileScreen = ({ navigation }) => {
                   >
                     <View style={styles.menuLeft}>
                       <View style={styles.menuIconBox}>
-                        <item.icon size={18} color={colors.text} />
+                        <item.icon size={18} color={colors.theme} />
                       </View>
                       <Text style={styles.menuLabel}>{item.label}</Text>
                     </View>
@@ -262,7 +255,6 @@ const ProfileScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      {/* --- Image Viewer Modal --- */}
       <Modal
         visible={isImageModalVisible}
         transparent={true}
@@ -290,6 +282,16 @@ const ProfileScreen = ({ navigation }) => {
           )}
         />
       </Modal>
+
+      <CustomAlert
+        visible={isLogoutAlertVisible}
+        title="Logout"
+        message="Are you sure you want to logout?"
+        showCancel={true}
+        confirmText="Logout"
+        onCancel={() => setLogoutAlertVisible(false)}
+        onConfirm={confirmLogout}
+      />
 
       <Snackbar
         visible={snack.visible}

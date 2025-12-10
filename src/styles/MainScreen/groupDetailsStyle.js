@@ -97,10 +97,11 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     },
     totalBudgetLabel: {
         color: colors.text,
-        fontSize: 11,
+        fontSize: 12,
         fontFamily: 'serif',
         marginTop: 8,
-        textAlign: 'right'
+        textAlign: 'right',
+        fontWeight: 'bold',
     },
     description: {
         color: colors.textSecondary,
@@ -187,6 +188,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     settlementHighlight: {
         fontWeight: '700',
         color: colors.text,
+        fontFamily: 'serif',
     },
     settlementAmount: {
         fontSize: 15,

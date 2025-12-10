@@ -362,7 +362,7 @@ const PersonalInfoScreen = ({ navigation }) => {
                   <MaterialCommunityIcons
                     name="heart-outline"
                     size={22}
-                    color={errors.interest ? colors.error : colors.textSecondary}
+                    color={errors.interest ? colors.error : colors.theme}
                     style={{ marginRight: 10 }}
                   />
                   <Text
@@ -378,7 +378,7 @@ const PersonalInfoScreen = ({ navigation }) => {
                 <MaterialCommunityIcons
                   name="chevron-down"
                   size={22}
-                  color={errors.interest ? colors.error : colors.textSecondary}
+                  color={errors.interest ? colors.error : colors.theme}
                 />
               </TouchableOpacity>
               
@@ -397,7 +397,7 @@ const PersonalInfoScreen = ({ navigation }) => {
                         <MaterialCommunityIcons 
                           name="close-circle" 
                           size={18} 
-                          color={colors.textSecondary} 
+                          color={colors.theme} 
                         />
                       </TouchableOpacity>
                     </View>
