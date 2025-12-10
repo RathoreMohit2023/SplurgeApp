@@ -24,6 +24,8 @@ const getProfileStyle = (colors) => StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 50,
+        borderWidth: 2,
+        borderColor: colors.theme,
     },
     avatar: {
         backgroundColor: colors.tintedThemeColor,
