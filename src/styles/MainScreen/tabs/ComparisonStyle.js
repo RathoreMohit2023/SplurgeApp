@@ -18,6 +18,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontSize: 16,
     color: colors.text,
     fontWeight: 'bold',
+    fontFamily : 'serif',
   },
 
   // --- Headings ---
@@ -30,12 +31,14 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontSize: 22, 
     fontWeight: "800", 
     letterSpacing: -0.5,
+    fontFamily : 'serif',
   },
   sectionSubtitle: {
     color: colors.textSecondary,
     fontSize: 14,
     fontWeight: "500",
     marginTop: 2,
+    fontFamily : 'serif',
   },
 
   // --- Common Card Styles ---
@@ -56,6 +59,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: colors.text,
+    fontFamily : 'serif',
   },
 
   // --- AI Insight Card (Special) ---
@@ -88,6 +92,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     color: colors.primary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    fontFamily : 'serif',
   },
   aiContent: {
     paddingLeft: 4,
@@ -102,6 +107,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     color: colors.text,
     lineHeight: 22,
     marginBottom: 12,
+    fontFamily : 'serif',
   },
   aiSection: {
     marginTop: 12,
@@ -114,6 +120,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     marginBottom: 8,
+    fontFamily : 'serif',
   },
   bulletRow: {
     flexDirection: 'row',
@@ -126,6 +133,8 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 20,
     flex: 1,
+    fontFamily : 'serif',
+
   },
   // Suggestions Chips
   suggestionBadge: {
@@ -144,6 +153,8 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontSize: 13,
     color: colors.text,
     marginLeft: 8,
+    fontFamily : 'serif',
+
   },
 
   // --- Major Purchase Card ---
@@ -161,6 +172,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontSize: 15,
     color: colors.textSecondary,
     lineHeight: 22,
+    fontFamily : 'serif',
   },
   amountHighlight: {
     color: colors.text,
@@ -196,11 +208,12 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     marginBottom: 2,
+    fontFamily: 'serif',
   },
   itemPrice: {
     fontSize: 14,
     color: colors.textSecondary,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', // Techy feel for numbers
+    fontFamily: 'serif',
   },
   statusPill: {
     flexDirection: 'row',
@@ -236,6 +249,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    fontFamily : 'serif',
   },
   tradeOffValueBox: {
     flexDirection: 'row',
@@ -247,6 +261,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
     flex: 1,
+    fontFamily : 'serif',
   },
   tradeOffArrow: {
     paddingHorizontal: 8,
@@ -255,6 +270,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: colors.text,
+    fontFamily : 'serif',
   },
 
   // --- Empty State ---
@@ -268,6 +284,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 16,
     textAlign: 'center',
+    fontFamily : 'serif',
   },
 });
 

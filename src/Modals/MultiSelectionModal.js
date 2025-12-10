@@ -69,13 +69,13 @@ const MultiSelectionModal = ({
             }}
           >
             <Text
-              style={{ fontSize: 18, fontWeight: "700", color: colors.text }}
+              style={{ fontSize: 18, fontWeight: "700", color: colors.text, fontFamily: 'serif' }}
             >
               {title}
             </Text>
 
             <TouchableOpacity onPress={onClose}>
-              <Icon name="close" size={24} color={colors.text} />
+              <Icon name="close" size={24} color={colors.theme} />
             </TouchableOpacity>
           </View>
 
@@ -105,6 +105,7 @@ const MultiSelectionModal = ({
                     fontSize: 16,
                     color: colors.textSecondary,
                     textAlign: "center",
+                    fontFamily: 'serif',
                   }}
                 >
                   {emptyMessage}
@@ -132,6 +133,7 @@ const MultiSelectionModal = ({
                     style={{
                       fontSize: 16,
                       color: colors.text,
+                      fontFamily: 'serif',
                     }}
                   >
                     {item}
@@ -172,7 +174,7 @@ const MultiSelectionModal = ({
                 marginRight: 10,
               }}
             >
-              <Text style={{ fontSize: 16, color: colors.textSecondary }}>
+              <Text style={{ fontSize: 16, color: colors.textSecondary,fontFamily: 'serif', }}>
                 Cancel
               </Text>
             </TouchableOpacity>
@@ -189,7 +191,7 @@ const MultiSelectionModal = ({
                 }}
               >
                 <Text
-                  style={{ fontSize: 16, fontWeight: "600", color: "white" }}
+                  style={{ fontSize: 16, fontWeight: "600", color: "white",fontFamily: 'serif', }}
                 >
                   Save
                 </Text>

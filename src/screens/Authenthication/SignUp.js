@@ -187,7 +187,7 @@ const SignUp = ({ navigation }) => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Icon name="arrow-left" size={28} color={colors.text} />
+            <Icon name="arrow-left" size={28} color={colors.theme} />
           </TouchableOpacity>
           <Animated.View style={{ opacity: fade, transform: [{ translateY: slide }] }}>
             <Text style={styles.title}>Create Account</Text>
@@ -238,7 +238,7 @@ const SignUp = ({ navigation }) => {
                 <Icon 
                   name="heart-outline" 
                   size={24} 
-                  color={errors.interest ? colors.error : colors.textDisabled} 
+                  color={errors.interest ? colors.error : colors.theme} 
                   style={{ marginRight: 12 }}
                 />
                 <Text
