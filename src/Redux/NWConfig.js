@@ -1,5 +1,7 @@
 export const BASE_URL = 'https://stage.techsimba.in/splurge/public/api/';
 
+export const Img_url = 'https://stage.techsimba.in/splurge/public/uploads/users/';
+
 export const Login_Url = 'login';
 export const SignUp_Url = 'register';
 export const Forgote_Url = '';
@@ -23,6 +25,7 @@ export const EditProfile_Url = 'edit-user-details';
 export const EditTransection_Url = 'edit-transaction/';
 export const AddMonthlyBudget_Url = 'add-monthly-budget';
 export const EditMonthlyBudget_Url = 'edit-monthly-budget/';
+export const DeviceToken_Url = 'device-token';
 
 //  GET API
 export const GetTransection_Url = 'get-transactions/';

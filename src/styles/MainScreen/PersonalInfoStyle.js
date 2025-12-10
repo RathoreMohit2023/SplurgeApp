@@ -3,198 +3,122 @@ import { StyleSheet } from "react-native";
 const getPersonalInfoStyle = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background, // Dynamic Background
+    backgroundColor: colors.background,
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingTop: 10,
   },
-  
-  // Profile Avatar Styles
   profileSection: {
     alignItems: 'center',
-    marginVertical: 25,
+    marginVertical: 20,
   },
   avatarContainer: {
     position: 'relative',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   avatarPlaceholder: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: colors.tintedThemeColor, // Light purple tint
+    backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: colors.theme,
+    overflow: 'hidden',
   },
   avatarImage: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    resizeMode: "cover",
-  },  
+    width: '100%',
+    height: '100%',
+  },
   avatarInitials: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: colors.theme,
-    fontFamily: 'serif',
+    color: colors.textSecondary,
   },
   editBadge: {
     position: 'absolute',
     bottom: 0,
     right: 0,
     backgroundColor: colors.theme,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: colors.background, // Matches bg to create 'cutout' look
+    borderWidth: 2,
+    borderColor: colors.background,
   },
-  profileName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 4,
-    fontFamily: 'serif',
-  },
-  profileEmail: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    fontFamily: 'serif',
-  },
-
-  // Form Styles
   formSection: {
     marginTop: 10,
   },
-  inputGroup: {
-    marginBottom: 20,
+  dropdownContainer: {
+    marginBottom: 10,
   },
-  label: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 8,
-    fontWeight: '500',
-    fontFamily: 'serif',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface, // Changed to Surface for inputs
-    borderRadius: 12,
-    paddingHorizontal: 15,
+  dropdownTrigger: {
     borderWidth: 1,
     borderColor: colors.border,
-    height: 52,
-  },
-  multilineContainer: {
-    height: 100,
-    alignItems: 'flex-start',
+    borderRadius: 12,
     paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: colors.background,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  inputIcon: {
-    marginRight: 12,
-    marginTop: 2, 
-  },
-  input: {
-    flex: 1,
-    color: colors.text,
+  dropdownText: {
     fontSize: 16,
-    height: '100%',
     fontFamily: 'serif',
+    flex: 1,
+    marginRight: 10,
   },
-  multilineInput: {
-    textAlignVertical: 'top', 
-  },
-
-  // Chip Styles
+  // --- New Chip Styles ---
   chipsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginTop: 12,
-    gap: 8, 
+    paddingHorizontal: 4,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface, // Surface for chips
+    backgroundColor: colors.surface,
     borderRadius: 20,
-    paddingVertical: 6,
+    paddingVertical: 8,
     paddingHorizontal: 12,
+    marginRight: 8,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: colors.border,
   },
   chipText: {
-    color: colors.text,
     fontSize: 14,
-    fontWeight: '500',
+    color: colors.text,
+    marginRight: 8,
     fontFamily: 'serif',
   },
-
-  // Button Styles
+  // -----------------------
   saveButton: {
     backgroundColor: colors.theme,
-    height: 56,
-    borderRadius: 16,
-    justifyContent: 'center',
+    borderRadius: 12,
+    paddingVertical: 15,
     alignItems: 'center',
     marginTop: 20,
     shadowColor: colors.theme,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
   saveButtonText: {
-    color: '#FFF', // Always white on theme button
+    color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
-    fontFamily: 'serif',
   },
-
-  bottomSheetOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'flex-end',
-  },
-  
-  bottomSheet: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-  },
-  
-  sheetTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 10,
-    textAlign: 'center',
-    fontFamily: 'serif',
-  },
-  
-  sheetButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    borderRadius: 10,
-    marginVertical: 6,
-  },
-  
-  sheetButtonText: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#fff',
-    fontFamily: 'serif',
-  }
-  
 });
 
 export default getPersonalInfoStyle;

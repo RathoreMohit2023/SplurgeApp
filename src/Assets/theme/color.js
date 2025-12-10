@@ -79,7 +79,7 @@ const Colors = {
     ...commonColors,
     background: "#080808",
     surface: "#1e1e1e",
-    card: "#2c2c2c",
+    card: "#111111FF",
     text: "#ffffff",
     textSecondary: "#b0b0b0",
     textDisabled: "#6e6e6e",

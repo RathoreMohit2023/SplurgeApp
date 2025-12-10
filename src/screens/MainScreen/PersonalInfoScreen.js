@@ -4,178 +4,266 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   StatusBar,
   KeyboardAvoidingView,
   Platform,
-  Alert,
-  Image
+  Image,
+  StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import AppHeader from '../../components/Header';
-import getPersonalInfoStyle from "../../styles/MainScreen/PersonalInfoStyle";
-import { ThemeContext } from "../../components/ThemeContext";
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { Snackbar } from 'react-native-paper';
+
+// Components
+import AppHeader from '../../components/Header';
+import CustomInput from '../../components/CustomInput';
 import DashedLoader from '../../components/DashedLoader';
+import MultiSelectionModal from '../../Modals/MultiSelectionModal';
+import ImagePickerModal from '../../components/ImagePickerModal';
+import { ThemeContext } from '../../components/ThemeContext';
+
+// API & Config
 import { EditProfileApi } from '../../Redux/Api/EditProfileApi';
+import { GetInterestApi } from '../../Redux/Api/GetInterestApi';
+import { GetUserDetailsApi } from '../../Redux/Api/GetUserDetailsApi';
+import { Img_url } from '../../Redux/NWConfig';
+import getPersonalInfoStyle from '../../styles/MainScreen/PersonalInfoStyle';
 
 const PersonalInfoScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
-  const styles = useMemo(() => getPersonalInfoStyle(colors), [colors]);
-  const [profileImage, setProfileImage] = useState("");
-  const { GetUserDetailsData, GetUserDetailsLoading } = useSelector((state) => state.GetUserDetails);
-  const { EditProfileLoading, EditProfileData } = useSelector(state => state.EditProfile);      
-
+  const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
+  const styles = useMemo(() => getPersonalInfoStyle(colors), [colors]);
 
+  // Redux State
+  const { GetUserDetailsData, GetUserDetailsLoading } = useSelector(
+    state => state.GetUserDetails,
+  );
+  const { LoginData } = useSelector(state => state.Login);
+  const { EditProfileLoading } = useSelector(state => state.EditProfile);
+  const { GetInterestData } = useSelector(state => state.GetInterest);
+
+  // Local State
+  const [profileImage, setProfileImage] = useState('');
+  const [photoFile, setPhotoFile] = useState(null);
+  const [snack, setSnack] = useState({ visible: false, message: '' });
+
+  // Form & Error State
   const [form, setForm] = useState({
-    name: '',
+    fullname: '',
     email: '',
-    phone: '',
+    mobile: '',
     location: '',
     bio: '',
+    interest: [],
   });
-  const [interests, setInterests] = useState([]);
-  const [currentInterest, setCurrentInterest] = useState('');
+  
+  // 1. New Error State
+  const [errors, setErrors] = useState({});
 
-  const openCamera = () => {
-    const options = { 
-      mediaType: 'photo',
-      saveToPhotos: true,         
-      quality: 0.8,
-    };
-  
-    launchCamera(options, (response) => {
-      if (response.didCancel) return;
-      if (response.errorMessage) return;
-  
-      const uri = response.assets[0].uri;
-      setProfileImage(uri);
-    });
-  };
-  
-  const openGallery = () => {
-    const options = {
-      mediaType: 'photo',
-      quality: 0.8,
-    };
-  
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) return;
-      if (response.errorMessage) return;
-  
-      const uri = response.assets[0].uri;
-      setProfileImage(uri);
-    });
+  // Modal States
+  const [isInterestModalVisible, setInterestModalVisible] = useState(false);
+  const [isImagePickerVisible, setImagePickerVisible] = useState(false);
+  const [clickedInterest, setClickedInterest] = useState(false);
+
+  // Prepare Interest List
+  const interestsList =
+    GetInterestData?.interests?.map(item => item.interest_name) || [];
+
+  const showSnack = message => setSnack({ visible: true, message });
+
+  const fetchInitialData = () => {
+    if (LoginData?.token && LoginData?.user?.id) {
+      dispatch(GetUserDetailsApi(LoginData.token));
+    }
   };
 
-  const openImagePickerOptions = () => {
-    Alert.alert(
-      "Select Option",
-      "Choose a method to upload your profile photo",
-      [
-        {
-          text: "Open Camera",
-          onPress: openCamera
-        },
-        {
-          text: "Open Gallery",
-          onPress: openGallery
-        },
-        {
-          text: "Cancel",
-          style: "cancel"
-        }
-      ],
-      { cancelable: true }
-    );
-  };  
-
+  // Populate Data
   useEffect(() => {
     if (GetUserDetailsData?.user_details?.length > 0) {
       const user = GetUserDetailsData.user_details[0];
-  
-      setForm({
-        name: user.fullname || '',
-        email: user.email || '',
-        phone: user.mobile || '',
-        location: '',
-        bio: '',
-      });
-  
+      let parsedInterests = [];
+
       try {
         if (user.interest) {
-          const parsed = JSON.parse(user.interest);
-  
-          // Ensure parsed value is an array
-          if (Array.isArray(parsed)) {
-            setInterests(parsed);
-          } else {
-            setInterests([]); // fallback
+          let interestValue = user.interest;
+          if (typeof interestValue === 'string') {
+            interestValue = JSON.parse(interestValue);
           }
-        } else {
-          setInterests([]); // no interests found
+          if (typeof interestValue === 'string') {
+            interestValue = JSON.parse(interestValue);
+          }
+          if (Array.isArray(interestValue)) {
+            parsedInterests = interestValue.flatMap(item =>
+              typeof item === 'string' && item.includes(',')
+                ? item.split(',').map(i => i.trim())
+                : item,
+            );
+          }
         }
       } catch (err) {
-        console.log("Error parsing interests", err);
-        setInterests([]); // fallback on error
+        console.log('Error parsing interests:', err);
+      }
+
+      setForm({
+        fullname: user.fullname || '',
+        email: user.email || '',
+        mobile: user.mobile || '',
+        location: user.location || '',
+        bio: user.bio || '',
+        interest: parsedInterests,
+      });
+
+      if (user.profile_photo) {
+        setProfileImage(user.profile_photo);
       }
     }
   }, [GetUserDetailsData]);
-  
-  
 
-  const handleAddInterest = () => {
-    if (currentInterest.trim().length > 0) {
-      setInterests([...interests, currentInterest.trim()]);
-      setCurrentInterest('');
+  useEffect(() => {
+    if (clickedInterest && GetInterestData?.interests?.length > 0) {
+      setInterestModalVisible(true);
+    }
+  }, [GetInterestData, clickedInterest]);
+
+  // --- Image Handling ---
+  const handleImageResponse = response => {
+    if (response.didCancel || response.errorMessage) return;
+    const asset = response.assets[0];
+    setProfileImage(asset.uri);
+    setPhotoFile({
+      uri: asset.uri,
+      type: asset.type,
+      name: asset.fileName || `profile_${Date.now()}.jpg`,
+    });
+  };
+
+  const openCamera = () => {
+    launchCamera(
+      { mediaType: 'photo', saveToPhotos: true, quality: 0.8 },
+      handleImageResponse,
+    );
+  };
+
+  const openGallery = () => {
+    launchImageLibrary(
+      { mediaType: 'photo', quality: 0.8 },
+      handleImageResponse,
+    );
+  };
+
+  // --- Input Change Handler (Clears errors on type) ---
+  const handleInputChange = (key, value) => {
+    setForm(prev => ({ ...prev, [key]: value }));
+    // Clear error for this field when user types
+    if (errors[key]) {
+      setErrors(prev => ({ ...prev, [key]: '' }));
     }
   };
 
-  const handleRemoveInterest = (indexToRemove) => {
-    setInterests(interests.filter((_, index) => index !== indexToRemove));
+  const handleRemoveInterest = (interestToRemove) => {
+    const updatedInterests = form.interest.filter(item => item !== interestToRemove);
+    handleInputChange('interest', updatedInterests);
   };
 
-  const handleSave = () => {
+  // --- 2. Validation Function ---
+  const validateForm = () => {
+    let isValid = true;
+    let tempErrors = {};
 
+    // Fullname Validation
+    if (!form.fullname.trim()) {
+      tempErrors.fullname = "Full Name is required";
+      isValid = false;
+    }
+
+    // Email Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!form.email.trim()) {
+      tempErrors.email = "Email is required";
+      isValid = false;
+    } else if (!emailRegex.test(form.email)) {
+      tempErrors.email = "Please enter a valid email";
+      isValid = false;
+    }
+
+    // Mobile Validation
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!form.mobile) {
+      tempErrors.mobile = "Phone number is required";
+      isValid = false;
+    } else if (!mobileRegex.test(form.mobile)) {
+      tempErrors.mobile = "Enter a valid 10-digit number";
+      isValid = false;
+    }
+
+    // Location Validation
+    if (!form.location.trim()) {
+      tempErrors.location = "Location is required";
+      isValid = false;
+    }
+
+    // Interest Validation
+    if (form.interest.length === 0) {
+      tempErrors.interest = "Please select at least one interest";
+      isValid = false;
+    }
+
+    setErrors(tempErrors);
+    return isValid;
   };
 
-  const renderInput = (label, valueKey, icon, placeholder, multiline = false) => (
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={[styles.inputContainer, multiline && styles.multilineContainer]}>
-        <MaterialCommunityIcons 
-          name={icon} 
-          size={20} 
-          color={colors.textSecondary} 
-          style={styles.inputIcon} 
-        />
-        <TextInput
-          style={[styles.input, multiline && styles.multilineInput]}
-          value={form[valueKey]}
-          placeholder={placeholder}
-          placeholderTextColor={colors.textDisabled}
-          onChangeText={(text) => setForm({ ...form, [valueKey]: text })}
-          multiline={multiline}
-        />
-        <MaterialCommunityIcons 
-          name="pencil-outline" 
-          size={16} 
-          color={colors.border} 
-        />
-      </View>
-    </View>
-  );
+  // --- Save Handler ---
+  const handleSave = async () => {
+    // Run Validation
+    if (!validateForm()) {
+      showSnack("Please fix the errors before saving.");
+      return;
+    }
+
+    const token = LoginData?.token;
+    const userId = LoginData?.user?.id;
+    const formData = new FormData();
+    formData.append('id', userId);
+    formData.append('fullname', form.fullname);
+    formData.append('email', form.email);
+    formData.append('mobile', form.mobile);
+    formData.append('location', form.location);
+    formData.append('bio', form.bio);
+    formData.append('interest', JSON.stringify(form.interest));
+
+    if (photoFile) {
+      formData.append('image', {
+        uri: Platform.OS === 'android' ? photoFile.uri : photoFile.uri.replace('file://', ''),
+        type: photoFile.type,
+        name: photoFile.name,
+      });
+    }
+
+    try {
+      const result = await dispatch(EditProfileApi({ formData, token })).unwrap();
+      if (result?.status === true) {
+        showSnack(result?.message);
+        fetchInitialData();
+        navigation.goBack();
+      } else {
+        showSnack(result?.message);
+        fetchInitialData();
+      }
+    } catch (error) {
+      showSnack('Something went wrong. Please try again.');
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
-        backgroundColor={colors.background} 
+      <StatusBar
+        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
       />
-      
+
       <AppHeader
         showThemeToggle={true}
         navigation={navigation}
@@ -188,8 +276,8 @@ const PersonalInfoScreen = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
-        <ScrollView 
-          showsVerticalScrollIndicator={false} 
+        <ScrollView
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
           {/* Profile Image Section */}
@@ -197,99 +285,188 @@ const PersonalInfoScreen = ({ navigation }) => {
             <View style={styles.avatarContainer}>
               <View style={styles.avatarPlaceholder}>
                 {profileImage ? (
-                  <Image 
-                    source={{ uri: profileImage }} 
+                  <Image
+                    source={{ uri: photoFile ? profileImage : Img_url + profileImage }}
                     style={styles.avatarImage}
                   />
                 ) : (
                   <Text style={styles.avatarInitials}>
-                    {form.name?.split(" ").map((n) => n[0]).join("")}
+                    {form.fullname?.split(' ').map(n => n[0]).join('')}
                   </Text>
                 )}
               </View>
-
-              <TouchableOpacity 
-                style={styles.editBadge} 
+              <TouchableOpacity
+                style={styles.editBadge}
                 activeOpacity={0.8}
-                onPress={openImagePickerOptions}  
+                onPress={() => setImagePickerVisible(true)}
               >
                 <MaterialCommunityIcons name="camera" size={18} color="#FFF" />
               </TouchableOpacity>
             </View>
-
-            <Text style={styles.profileName}>{form.name}</Text>
-            <Text style={styles.profileEmail}>{form.email}</Text>
           </View>
 
           {/* Form Section */}
           <View style={styles.formSection}>
-            {renderInput('Full Name', 'name', 'account-outline', 'Enter your name')}
-            {renderInput('Email Address', 'email', 'email-outline', 'Enter email')}
-            {renderInput('Phone Number', 'phone', 'phone-outline', 'Enter phone number')}
-            {renderInput('Location', 'location', 'map-marker-outline', 'Enter city')}
+            <CustomInput
+              label="Full Name"
+              value={form.fullname}
+              onChangeText={text => handleInputChange('fullname', text)}
+              leftIcon="account-outline"
+              error={errors.fullname} // Pass error prop
+            />
 
-            {/* --- Interests Field Start --- */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Interests</Text>
-              
-              {/* Input Area */}
-              <View style={styles.inputContainer}>
-                <MaterialCommunityIcons 
-                  name="star-outline" 
-                  size={20} 
-                  color={colors.textSecondary} 
-                  style={styles.inputIcon} 
-                />
-                <TextInput
-                  style={styles.input}
-                  value={currentInterest}
-                  placeholder="Add an interest (e.g. Hiking)"
-                  placeholderTextColor={colors.textDisabled}
-                  onChangeText={setCurrentInterest}
-                  onSubmitEditing={handleAddInterest} // Add on Enter
-                />
-                <TouchableOpacity onPress={handleAddInterest}>
-                  <MaterialCommunityIcons 
-                    name="plus-circle" 
-                    size={24} 
-                    color={colors.theme} 
+            <CustomInput
+              label="Email Address"
+              value={form.email}
+              onChangeText={text => handleInputChange('email', text)}
+              leftIcon="email-outline"
+              keyboardType="email-address"
+              error={errors.email} // Pass error prop
+            />
+
+            <CustomInput
+              label="Phone Number"
+              value={form.mobile}
+              onChangeText={text => handleInputChange('mobile', text)}
+              leftIcon="phone-outline"
+              keyboardType="phone-pad"
+              error={errors.mobile} // Pass error prop
+            />
+
+            <CustomInput
+              label="Location"
+              value={form.location}
+              onChangeText={text => handleInputChange('location', text)}
+              leftIcon="map-marker-outline"
+              error={errors.location} // Pass error prop
+            />
+
+            {/* Interest Dropdown */}
+            <View style={styles.dropdownWrapper}> 
+              <TouchableOpacity
+                style={[
+                  styles.dropdownTrigger,
+                  errors.interest ? { borderColor: colors.error } : null // Highlight border on error
+                ]}
+                onPress={() => {
+                  setClickedInterest(true);
+                  if (interestsList.length === 0) {
+                    dispatch(GetInterestApi());
+                  } else {
+                    setInterestModalVisible(true);
+                  }
+                }}
+                activeOpacity={0.8}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <MaterialCommunityIcons
+                    name="heart-outline"
+                    size={22}
+                    color={errors.interest ? colors.error : colors.textSecondary}
+                    style={{ marginRight: 10 }}
                   />
-                </TouchableOpacity>
-              </View>
+                  <Text
+                    style={[
+                      styles.dropdownText,
+                      { color: colors.textDisabled },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    Select Interests
+                  </Text>
+                </View>
+                <MaterialCommunityIcons
+                  name="chevron-down"
+                  size={22}
+                  color={errors.interest ? colors.error : colors.textSecondary}
+                />
+              </TouchableOpacity>
+              
+              {/* Manual Error Text for Interest (matching CustomInput style) */}
+              {errors.interest && (
+                <Text style={styles.errorText}>{errors.interest}</Text>
+              )}
 
-              {/* Chips Display Area */}
-              <View style={styles.chipsContainer}>
-                {interests.map((interest, index) => (
-                  <View key={index} style={styles.chip}>
-                    <Text style={styles.chipText}>{interest}</Text>
-                    <TouchableOpacity onPress={() => handleRemoveInterest(index)}>
-                      <MaterialCommunityIcons 
-                        name="close-circle" 
-                        size={16} 
-                        color={colors.textSecondary} 
-                        style={{ marginLeft: 6 }}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
+              {/* Chips Container */}
+              {form.interest.length > 0 && (
+                <View style={styles.chipsContainer}>
+                  {form.interest.map((item, index) => (
+                    <View key={index} style={styles.chip}>
+                      <Text style={styles.chipText}>{item}</Text>
+                      <TouchableOpacity onPress={() => handleRemoveInterest(item)}>
+                        <MaterialCommunityIcons 
+                          name="close-circle" 
+                          size={18} 
+                          color={colors.textSecondary} 
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
-            {renderInput('Bio', 'bio', 'text-short', 'Tell us about yourself', true)}
+
+            <CustomInput
+              label="Bio"
+              value={form.bio}
+              onChangeText={text => handleInputChange('bio', text)}
+              leftIcon="text-short"
+              multiline={true}
+              numberOfLines={3}
+            />
           </View>
 
-          {/* Save Button */}
-          <TouchableOpacity 
-            style={styles.saveButton} 
+          <TouchableOpacity
+            style={styles.saveButton}
             activeOpacity={0.8}
             onPress={handleSave}
           >
             <Text style={styles.saveButtonText}>Save Changes</Text>
           </TouchableOpacity>
-                
+
           <View style={{ height: 40 }} />
         </ScrollView>
       </KeyboardAvoidingView>
-      {GetUserDetailsLoading && <DashedLoader color={colors.primary} size={100} />}
+
+      {/* ... Modals and Loaders ... */}
+      <MultiSelectionModal
+        key={interestsList.length}
+        visible={isInterestModalVisible}
+        title="Choose Interests"
+        data={interestsList}
+        selectedItems={form.interest}
+        onClose={() => setInterestModalVisible(false)}
+        onSelect={items => handleInputChange('interest', items)}
+      />
+
+      <ImagePickerModal
+        visible={isImagePickerVisible}
+        onClose={() => setImagePickerVisible(false)}
+        onCameraPress={openCamera}
+        onGalleryPress={openGallery}
+      />
+
+      <Snackbar
+        visible={snack.visible}
+        onDismiss={() => setSnack({ visible: false, message: '' })}
+        duration={2000}
+        style={{
+          backgroundColor: colors.card,
+          marginBottom: insets.bottom + 80,
+        }}
+        theme={{ colors: { inversePrimary: colors.theme } }}
+        action={{
+          label: 'OK',
+          textColor: colors.theme,
+          onPress: () => setSnack({ visible: false, message: '' }),
+        }}
+      >
+        <Text style={{ color: colors.text }}>{snack.message}</Text>
+      </Snackbar>
+
+      {(GetUserDetailsLoading || EditProfileLoading) && (
+        <DashedLoader color={colors.primary} size={100} />
+      )}
     </View>
   );
 };

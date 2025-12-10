@@ -161,11 +161,28 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         marginTop: 12,
         backgroundColor: colors.tintedThemeColor,
         borderRadius: 16,
-        padding: 16,
+        padding: 8,
         marginBottom: 12,
         borderWidth: 1,
         borderColor: colors.border,
     },
+    // Update styles
+    logContent: {
+        flex: 1,
+        paddingRight: 6,
+    },
+    
+    logAmount: {
+        width: 80,
+        alignItems: "flex-end",
+        justifyContent: "center",
+    },
+    
+    logAmountText: {
+        fontSize: 14,
+        fontWeight: "700",
+    },
+    
     linkText: {
         color: colors.theme,
         fontSize: 14,

@@ -41,6 +41,13 @@ const getDashBoardStyles = (colors) => StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: colors.tintedThemeColor,
+        borderWidth: 1,
+        borderColor: colors.theme,
+    },
+    profileImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 25,
     },
     profileInitials: {
         color: colors.theme,

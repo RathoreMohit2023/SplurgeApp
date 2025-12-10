@@ -46,6 +46,7 @@ import AddGroupExpenseReducer from '../Slice/AddGroupExpenseSlice';
 import GetGroupExpenseReducer from '../Slice/GetGroupExpenseSlice';
 import DeleteGroupMemberReducer from '../Slice/DeleteGroupMemberSlice';
 import DeleteGroupExpenseReducer from '../Slice/DeleteGroupExpenseSlice';
+import DeviceTokenReducer from '../Slice/DeviceTokenSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
@@ -83,7 +84,8 @@ const rootReducer = combineReducers({
   AddGroupMember : AddGroupExpenseReducer,
   GetGroupExpense : GetGroupExpenseReducer,
   DeleteGroupMember : DeleteGroupMemberReducer,
-  DeleteGroupExpense : DeleteGroupExpenseReducer
+  DeleteGroupExpense : DeleteGroupExpenseReducer,
+  DeviceToken : DeviceTokenReducer,
 });
 
 const persistConfig = {
