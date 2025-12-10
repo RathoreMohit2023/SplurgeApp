@@ -3,7 +3,7 @@ import { StyleSheet, Platform } from "react-native";
 const getGroupDetailsStyle = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background, // Dynamic Background
+        backgroundColor: colors.background,
     },
     scrollContainer: {
         paddingHorizontal: 16,
@@ -26,9 +26,9 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         borderColor: colors.border,
     },
     headerTitle: {
-        color: colors.text, // Dynamic Text
+        color: colors.text,
         fontSize: 18,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         fontWeight: '700',
         flex: 1,
         textAlign: 'center',
@@ -37,7 +37,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
 
     // --- Hero Card ---
     heroCard: {
-        backgroundColor: colors.theme, // Always Purple
+        backgroundColor: colors.theme,
         borderRadius: 24,
         padding: 20,
         marginTop: 10,
@@ -54,29 +54,28 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         marginBottom: 20,
     },
     heroLabel: {
-        color: "rgba(255,255,255,0.8)", // Always Light because bg is Purple
+        color: "rgba(255,255,255,0.8)",
         fontSize: 14,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         fontWeight: '600',
         marginBottom: 4,
     },
     heroValue: {
-        color: "#FFFFFF", // Fixed White
+        color: "#FFFFFF",
         fontSize: 32,
         fontWeight: '800',
-        fontFamily : 'serif',
+        fontFamily: 'serif',
     },
     circularIcon: {
-        backgroundColor: colors.background, // Dynamic: White in Light, Black in Dark
+        backgroundColor: colors.background,
         width: 44,
         height: 44,
         borderRadius: 22,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    // Progress Container inside Hero
     progressContainer: {
-        backgroundColor: colors.background, // Dynamic: Matches circular icon
+        backgroundColor: colors.background,
         borderRadius: 16,
         padding: 12,
     },
@@ -86,24 +85,23 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         marginBottom: 8,
     },
     progressText: {
-        color: colors.text, 
+        color: colors.text,
         fontSize: 12,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         fontWeight: '600',
     },
     progressBar: {
         height: 6,
         borderRadius: 3,
-        backgroundColor: colors.border, 
+        backgroundColor: colors.border,
     },
     totalBudgetLabel: {
-        color:  colors.text, 
+        color: colors.text,
         fontSize: 11,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         marginTop: 8,
         textAlign: 'right'
     },
-
     description: {
         color: colors.textSecondary,
         fontSize: 14,
@@ -124,13 +122,12 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     sectionTitle: {
         color: colors.text,
         fontSize: 18,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         fontWeight: '700',
     },
     smallBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        // backgroundColor: colors.tintedThemeColor,
         paddingVertical: 6,
         paddingHorizontal: 12,
         borderRadius: 20,
@@ -141,13 +138,12 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         color: colors.theme,
         fontWeight: '600',
         fontSize: 12,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         marginLeft: 4,
     },
     addButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        // backgroundColor: colors.tintedThemeColor,
         borderWidth: 1,
         borderColor: colors.theme,
         paddingVertical: 6,
@@ -159,12 +155,49 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         color: colors.theme,
         fontWeight: '600',
         fontSize: 12,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
+    },
+
+    // --- Settlements Section (New) ---
+    settlementCard: {
+        backgroundColor: colors.tintedThemeColor,
+        borderRadius: 16,
+        padding: 12,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    settlementRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+    },
+    settlementAvatars: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    settlementText: {
+        flex: 1,
+        fontSize: 14,
+        color: colors.textSecondary,
+        fontFamily: 'serif',
+    },
+    settlementHighlight: {
+        fontWeight: '700',
+        color: colors.text,
+    },
+    settlementAmount: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: colors.theme,
+        fontFamily: 'serif',
     },
 
     // --- Members List ---
     listContainer: {
-        backgroundColor: colors.tintedThemeColor, // Changed to tintedThemeColor for better Light mode contrast
+        backgroundColor: colors.tintedThemeColor,
         borderRadius: 16,
         paddingHorizontal: 16,
         borderWidth: 1,
@@ -176,6 +209,14 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 14,
     },
+    memberAvatar: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: colors.background,
+        borderWidth: 1,
+        borderColor: colors.theme,
+    },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -183,18 +224,52 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     avatar: {
         backgroundColor: colors.background,
         borderWidth: 1,
-        borderColor: colors.border,
+        borderColor: colors.theme,
     },
     avatarLabel: {
         color: colors.theme,
         fontWeight: '700',
     },
+    memberNameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent : 'space-between'
+    },
     memberName: {
         color: colors.text,
         fontSize: 15,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         fontWeight: '600',
         marginBottom: 2,
+    },
+    // New stats in member row
+    memberStatsRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 4,
+        width: '100%',
+    },
+    roleText: {
+        fontSize: 11,
+        color: colors.textSecondary,
+        fontFamily: 'serif',
+    },
+    adminText: {
+        fontSize: 11,
+        color: colors.theme,
+        fontFamily: 'serif',
+        fontWeight: '700',
+        marginLeft: 4
+    },
+    balanceText: {
+        fontSize: 12,
+        fontWeight: '700',
+        fontFamily: 'serif',
+    },
+    spentText: {
+        fontSize: 11,
+        color: colors.text,
+        fontFamily: 'serif',
     },
     adminBadge: {
         backgroundColor: colors.tintedThemeColor,
@@ -203,12 +278,6 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         paddingVertical: 2,
         borderRadius: 4,
     },
-    adminText: {
-        color: colors.theme,
-        fontSize: 10,
-        fontFamily : 'serif',
-        fontWeight: '700',
-    },
     divider: {
         backgroundColor: colors.border,
         height: 1,
@@ -216,7 +285,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
 
     // --- Expenses List ---
     expenseCard: {
-        backgroundColor: colors.tintedThemeColor, // Changed to tintedThemeColor
+        backgroundColor: colors.tintedThemeColor,
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
@@ -237,43 +306,42 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     expenseTitle: {
         color: colors.text,
         fontSize: 16,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         fontWeight: '600',
         marginBottom: 4,
     },
     expenseSub: {
         color: colors.textSecondary,
         fontSize: 12,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
     },
     expenseAmount: {
         color: colors.text,
         fontSize: 16,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         fontWeight: '700',
         fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     },
     splitText: {
         color: colors.textSecondary,
         fontSize: 11,
-        fontFamily : 'serif',
+        fontFamily: 'serif',
         marginTop: 2,
     },
     emptyContainer: {
         padding: 20,
         alignItems: 'center',
-      },
-      emptyText: {
+    },
+    emptyText: {
         fontSize: 16,
         fontWeight: '600',
         color: colors.text,
-      },
-      emptySubText: {
+    },
+    emptySubText: {
         fontSize: 14,
         color: colors.textSecondary,
         marginTop: 4,
-      },
-      
+    },
 });
 
 export default getGroupDetailsStyle;

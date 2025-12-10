@@ -6,6 +6,7 @@ import {
   Alert,
   StatusBar,
   Image,
+  Modal,
 } from 'react-native';
 import { Text, Avatar, Snackbar, Divider } from 'react-native-paper';
 import {
@@ -19,8 +20,10 @@ import {
   Settings,
   LogOut,
   Phone,
+  X, // Close Icon
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ImageViewer from '@react-native-ohos/react-native-image-zoom-viewer';
 
 import getProfileStyle from '../../styles/MainScreen/ProfileStyle';
 import { ThemeContext } from '../../components/ThemeContext';
@@ -31,16 +34,18 @@ const ProfileScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getProfileStyle(colors), [colors]);
   const { GetUserDetailsData } = useSelector(state => state.GetUserDetails);
-  const [user, setUser] = useState('');
-  const { GetTransactionData, GetTransactionLoading } = useSelector(
-    state => state.GetTransaction,
-  );
+  const { GetTransactionData } = useSelector(state => state.GetTransaction);
   const { GetFriendsData } = useSelector(state => state.GetFriends || {});
-
+  
+  const [user, setUser] = useState('');
   const [snack, setSnack] = useState({ visible: false, message: '' });
+  const [totalFriends, setTotalFriends] = useState(0);
+
+  // --- Image Viewer State ---
+  const [isImageModalVisible, setImageModalVisible] = useState(false);
+
   const insets = useSafeAreaInsets();
   const allTransactions = GetTransactionData?.get_transactions || [];
-  const [totalFriends, setTotalFriends] = useState(0);
 
   const menuSections = [
     {
@@ -79,9 +84,9 @@ const ProfileScreen = ({ navigation }) => {
     if (GetFriendsData?.friends?.length > 0) {
       setTotalFriends(GetFriendsData?.friends?.length);
     }
-  });
+  }, [GetFriendsData]);
 
-  const { currentMonthTransactions, currentMonthTotal } = useMemo(() => {
+  const { currentMonthTotal } = useMemo(() => {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
@@ -100,11 +105,7 @@ const ProfileScreen = ({ navigation }) => {
       0,
     );
 
-    // Sort transactions by date, newest first
-    filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-
     return {
-      currentMonthTransactions: filteredTransactions,
       currentMonthTotal: total,
     };
   }, [allTransactions]);
@@ -112,7 +113,7 @@ const ProfileScreen = ({ navigation }) => {
   const stats = [
     {
       label: 'Total Spent',
-      value: currentMonthTotal,
+      value: currentMonthTotal.toFixed(0), // Format nicely
       icon: CreditCard,
       color: '#FFD700',
     },
@@ -138,6 +139,14 @@ const ProfileScreen = ({ navigation }) => {
     ]);
   };
 
+  // Prepare images array for the viewer
+  const profileImages = useMemo(() => {
+    if (user?.profile_photo) {
+      return [{ url: Img_url + user.profile_photo }];
+    }
+    return [];
+  }, [user]);
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -154,23 +163,34 @@ const ProfileScreen = ({ navigation }) => {
       >
         <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
           <View style={styles.profileHeader}>
-            <View style={styles.avatarContainer}>
+            {/* Clickable Avatar Container */}
+            <TouchableOpacity 
+              style={styles.avatarContainer}
+              activeOpacity={0.8}
+              onPress={() => {
+                if (user?.profile_photo) {
+                  setImageModalVisible(true);
+                }
+              }}
+              disabled={!user?.profile_photo} // Disable if no photo
+            >
               {user?.profile_photo ? (
                 <Image
                   source={{ uri: Img_url + user?.profile_photo }}
                   style={styles.profileImage}
                 />
-              ) : (<Avatar.Text
-                size={80}
-                label={user?.fullname
-                  ?.split(' ')
-                  .map(n => n[0])
-                  .join('')}
-                style={styles.avatar}
-                labelStyle={styles.avatarLabel}
-              />)}
-              
-            </View>
+              ) : (
+                <Avatar.Text
+                  size={80}
+                  label={user?.fullname
+                    ?.split(' ')
+                    .map(n => n[0])
+                    .join('')}
+                  style={styles.avatar}
+                  labelStyle={styles.avatarLabel}
+                />
+              )}
+            </TouchableOpacity>
 
             <View style={styles.userInfo}>
               <Text style={styles.userName}>{user?.fullname}</Text>
@@ -235,13 +255,41 @@ const ProfileScreen = ({ navigation }) => {
         ))}
 
         <View style={styles.footer}>
-          {/* <Text style={styles.versionText}>Version 1.0.0 • Build 2024</Text> */}
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <LogOut size={18} color={colors.error} />
             <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* --- Image Viewer Modal --- */}
+      <Modal
+        visible={isImageModalVisible}
+        transparent={true}
+        onRequestClose={() => setImageModalVisible(false)}
+      >
+        <ImageViewer
+          imageUrls={profileImages}
+          enableSwipeDown={true}
+          onSwipeDown={() => setImageModalVisible(false)}
+          renderHeader={() => (
+            <TouchableOpacity 
+               style={{
+                 position: 'absolute', 
+                 top: insets.top + 20, 
+                 right: 20, 
+                 zIndex: 999,
+                 padding: 10,
+                 backgroundColor: 'rgba(0,0,0,0.5)',
+                 borderRadius: 20
+               }} 
+               onPress={() => setImageModalVisible(false)}
+            >
+               <X size={24} color="white" />
+            </TouchableOpacity>
+          )}
+        />
+      </Modal>
 
       <Snackbar
         visible={snack.visible}

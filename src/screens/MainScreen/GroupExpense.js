@@ -14,6 +14,7 @@ import {
   Receipt,
   Wallet,
   User,
+  IndianRupee,
 } from 'lucide-react-native';
 import { useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -308,7 +309,7 @@ const GroupExpense = ({ navigation }) => {
         {/* Hero Section */}
         <View style={styles.heroContainer}>
           <View style={styles.iconCircle}>
-            <Receipt size={28} color={colors.theme} />
+            <IndianRupee size={28} color={colors.theme} />
           </View>
           <Text style={styles.amountLabel}>Total Bill</Text>
           <Text style={styles.totalAmount}>
@@ -383,9 +384,9 @@ const GroupExpense = ({ navigation }) => {
                       >
                         {memberName}
                       </Text>
-                      {isCurrentUser && (
+                      {/* {isCurrentUser && (
                         <Text style={styles.youTag}>Admin</Text>
-                      )}
+                      )} */}
                     </View>
                   </View>
 
@@ -405,7 +406,9 @@ const GroupExpense = ({ navigation }) => {
         </View>
 
         {/* Action Buttons */}
-        <View style={styles.actionsContainer}>
+        {
+          expense.created_by_user_id === LoginData?.user?.id && (
+            <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={[styles.actionButton, styles.deleteButton]}
             activeOpacity={0.7}
@@ -416,6 +419,9 @@ const GroupExpense = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
         </View>
+          )
+        }
+       
       </ScrollView>
 
       {/* Custom Alert Modal */}
