@@ -26,7 +26,7 @@ const PersonalInfoScreen = ({ navigation }) => {
   const styles = useMemo(() => getPersonalInfoStyle(colors), [colors]);
   const [profileImage, setProfileImage] = useState("");
   const { GetUserDetailsData, GetUserDetailsLoading } = useSelector((state) => state.GetUserDetails);
-  const { EditProfileLoading, EditProfileData } = useSelector(state => state.EditProfile);
+  const { EditProfileLoading, EditProfileData } = useSelector(state => state.EditProfile);      
 
   const insets = useSafeAreaInsets();
 
@@ -43,7 +43,7 @@ const PersonalInfoScreen = ({ navigation }) => {
   const openCamera = () => {
     const options = { 
       mediaType: 'photo',
-      saveToPhotos: true,  
+      saveToPhotos: true,         
       quality: 0.8,
     };
   

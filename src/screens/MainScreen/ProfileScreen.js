@@ -39,7 +39,7 @@ const ProfileScreen = ({ navigation }) => {
   const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
   const { GetFriendsData } = useSelector(state => state.GetFriends || {});
   
-
+  
   const [snack, setSnack] = useState({ visible: false, message: "" });
   const insets = useSafeAreaInsets();
   const allTransactions = GetTransactionData?.get_transactions || [];
