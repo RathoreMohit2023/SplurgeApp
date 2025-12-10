@@ -1,82 +1,343 @@
-import React, { useContext, useMemo } from "react";
-import { View, FlatList } from "react-native";
-import { Text } from "react-native-paper";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Sparkles } from "lucide-react-native";
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import {
+  View,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
+import { Text } from 'react-native-paper';
+import {
+  Sparkles,
+  ShoppingBag,
+  AlertCircle,
+  TrendingDown,
+  ArrowRight,
+  CheckCircle2,
+  XCircle,
+  BrainCircuit,
+} from 'lucide-react-native';
 
-// Imports
-import { ThemeContext } from "../../../components/ThemeContext"; 
-import getComparisonStyles from "../../../styles/MainScreen/tabs/ComparisonStyle"; 
-
-const comparisons = [
-  { id: "1", spent: 1200, item: "Travis Scott Ticket", price: 1500, emoji: "🎫" },
-  { id: "2", spent: 800, item: "3 Movie Tickets", price: 900, emoji: "🎬" },
-  { id: "3", spent: 1500, item: "Gym Membership", price: 1800, emoji: "💪" },
-  { id: "4", spent: 4000, item: "Flight to Goa", price: 3500, emoji: "✈️" },
-];
+import { ThemeContext } from '../../../components/ThemeContext';
+import getComparisonStyles from '../../../styles/MainScreen/tabs/ComparisonStyle';
+import GeminiService from '../../../services/GeminiService';
+import { useSelector } from 'react-redux';
 
 const ComparisonTab = () => {
-  // 1. Context se Colors lein
   const { colors } = useContext(ThemeContext);
-
-  // 2. Styles Memoize karein
   const styles = useMemo(() => getComparisonStyles(colors), [colors]);
-  
-  const insets = useSafeAreaInsets();
+
+  const { LoginData } = useSelector(state => state.Login);
+  const { GetWishlistData, GetWishlistLoading } = useSelector(
+    state => state.GetWishlist || {},
+  );
+  const { GetTransactionData, GetTransactionLoading } = useSelector(
+    state => state.GetTransaction || {},
+  );
+
+  const [aiData, setAiData] = useState(null);
+  const [isAiLoading, setIsAiLoading] = useState(true);
+
+  // --- DATA PROCESSING (Unchanged logic) ---
+  const currentMonthTransactions = useMemo(() => {
+    if (!GetTransactionData?.get_transactions) return [];
+    const now = new Date();
+    return GetTransactionData.get_transactions.filter(transaction => {
+      const transactionDate = new Date(transaction.date);
+      return (
+        transactionDate.getFullYear() === now.getFullYear() &&
+        transactionDate.getMonth() === now.getMonth()
+      );
+    });
+  }, [GetTransactionData]);
+
+  const totalSpent = useMemo(() => {
+    return currentMonthTransactions.reduce(
+      (sum, transaction) => sum + parseFloat(transaction.amount),
+      0,
+    );
+  }, [currentMonthTransactions]);
+
+  const formattedWishlist = useMemo(() => {
+    if (!GetWishlistData?.get_wishlists) return [];
+    return GetWishlistData.get_wishlists.map(item => ({
+      name: item.name,
+      price: parseFloat(item.price),
+    }));
+  }, [GetWishlistData]);
+
+  const parseInterest = raw => {
+    try {
+      if (!raw) return [];
+      let cleaned =
+        raw.startsWith('"') && raw.endsWith('"') ? raw.slice(1, -1) : raw;
+      cleaned = cleaned.replace(/\\/g, '');
+      const arr = JSON.parse(cleaned);
+      if (
+        arr.length === 1 &&
+        typeof arr[0] === 'string' &&
+        arr[0].includes(',')
+      ) {
+        return arr[0].split(',').map(i => i.trim());
+      }
+      return arr;
+    } catch (e) {
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchAiData = async () => {
+      if (GetWishlistLoading || GetTransactionLoading) return;
+      const interests = parseInterest(LoginData?.user?.interest);
+      if (
+        interests.length > 0 &&
+        totalSpent > 0 &&
+        formattedWishlist.length > 0
+      ) {
+        setIsAiLoading(true);
+        // const result = await GeminiService({ totalSpent, wishlist: formattedWishlist, interests });
+
+        const result = [];
+        setAiData(result);
+        setIsAiLoading(false);
+      } else {
+        setIsAiLoading(false);
+      }
+    };
+    fetchAiData();
+  }, [
+    LoginData,
+    currentMonthTransactions,
+    GetWishlistData,
+    GetWishlistLoading,
+    GetTransactionLoading,
+  ]);
+
+  // --- UI RENDER FUNCTIONS ---
+
+  const renderListHeader = () => (
+    <View style={styles.listHeaderContainer}>
+      {/* AI Insight Card */}
+      <View style={styles.aiCard}>
+        <View style={styles.cardHeaderRow}>
+          <View style={styles.iconCircleAI}>
+            <Sparkles size={18} color="#fff" />
+          </View>
+          <Text style={styles.cardTitleAI}>AI Financial Insight</Text>
+        </View>
+
+        <View style={styles.aiContent}>
+          {isAiLoading ? (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={styles.aiText}>Analyzing spending patterns...</Text>
+            </View>
+          ) : !aiData || !aiData.summary ? (
+            <Text style={styles.aiText}>
+              Spend a bit more this month to unlock AI insights.
+            </Text>
+          ) : (
+            <>
+              <Text style={styles.aiSummaryText}>{aiData.summary}</Text>
+
+              {/* Affordable Wishlist Section */}
+              {aiData.affordableWishlist?.length > 0 && (
+                <View style={styles.aiSection}>
+                  <Text style={styles.aiSectionTitle}>Within Reach:</Text>
+                  {aiData.affordableWishlist.map((item, index) => (
+                    <View key={index} style={styles.bulletRow}>
+                      <CheckCircle2
+                        size={14}
+                        color={colors.success}
+                        style={{ marginTop: 2 }}
+                      />
+                      <Text style={styles.aiText}>{item}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* AI Suggestions Section */}
+              {aiData.suggestions?.length > 0 && (
+                <View style={styles.aiSection}>
+                  <Text style={styles.aiSectionTitle}>
+                    Smart Recommendations:
+                  </Text>
+                  {aiData.suggestions.map((s, i) => (
+                    <View key={i} style={styles.suggestionBadge}>
+                      <BrainCircuit size={14} color={colors.primary} />
+                      <Text style={styles.suggestionText}>
+                        {s.name}{' '}
+                        <Text style={styles.suggestionPrice}>
+                          ({s.estimatedPrice})
+                        </Text>
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </>
+          )}
+        </View>
+      </View>
+
+      {renderMajorTransactionCard()}
+
+      <View style={styles.sectionHeaderContainer}>
+        <Text style={styles.sectionTitle}>Opportunity Cost</Text>
+        <Text style={styles.sectionSubtitle}>This Month</Text>
+      </View>
+    </View>
+  );
+
+  const renderMajorTransactionCard = () => {
+    if (currentMonthTransactions.length < 2 || !GetWishlistData?.get_wishlists)
+      return null;
+
+    const largestTransaction = [...currentMonthTransactions].sort(
+      (a, b) => parseFloat(b.amount) - parseFloat(a.amount),
+    )[0];
+    const largestAmount = parseFloat(largestTransaction.amount);
+
+    let affordableItems = GetWishlistData.get_wishlists.filter(
+      item => parseFloat(item.price) < largestAmount,
+    );
+    if (affordableItems.length <= 1) return null;
+
+    return (
+      <View style={styles.majorCard}>
+        <View style={styles.cardHeaderRow}>
+          <View
+            style={[
+              styles.iconCircle,
+              { backgroundColor: colors.error + '20' },
+            ]}
+          >
+            <AlertCircle size={18} color={colors.error} />
+          </View>
+          <Text style={styles.cardTitle}>Major Purchase Impact</Text>
+        </View>
+        <Text style={styles.majorText}>
+          Your expense of{' '}
+          <Text style={styles.amountHighlight}>
+            ₹{largestAmount.toLocaleString()}
+          </Text>{' '}
+          on{' '}
+          <Text style={{ fontStyle: 'italic' }}>
+            "{largestTransaction.description}"
+          </Text>{' '}
+          could have funded multiple wishlist items.
+        </Text>
+      </View>
+    );
+  };
+
+  const renderEmptyState = () => (
+    <View style={styles.emptyContainer}>
+      {GetWishlistLoading || GetTransactionLoading ? (
+        <ActivityIndicator color={colors.primary} size="large" />
+      ) : (
+        <>
+          <ShoppingBag
+            size={48}
+            color={colors.textSecondary}
+            style={{ opacity: 0.5 }}
+          />
+          <Text style={styles.emptyText}>
+            Add items to your wishlist to see comparisons.
+          </Text>
+        </>
+      )}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      {/* AI Insight Hero Card */}
-      <View style={styles.heroCard}>
-        <View style={styles.heroHeader}>
-            <Sparkles size={20} color="#B89600" />
-            <Text style={styles.heroTitle}>AI Insight</Text>
-        </View>
-        <Text style={styles.heroText}>
-          You spent <Text style={styles.heroHighlight}>₹1,200</Text> on snacks this week. 
-          That’s almost enough for a <Text style={styles.heroHighlight}>Concert Ticket!</Text>
-        </Text>
-      </View>
-
-      <Text style={styles.sectionTitle}>Opportunity Cost</Text>
-
       <FlatList
-        data={comparisons}
-        keyExtractor={(item) => item.id}
+        data={GetWishlistData?.get_wishlists || []}
+        keyExtractor={item => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+        ListHeaderComponent={renderListHeader}
+        ListEmptyComponent={renderEmptyState}
+        contentContainerStyle={styles.listContentContainer}
         renderItem={({ item }) => {
-          const isAffordable = item.spent >= item.price;
+          const itemPrice = parseFloat(item.price);
+
+          const bestFitTransactions =
+            currentMonthTransactions
+              ?.filter(t => parseFloat(t.amount) >= itemPrice)
+              .sort((a, b) => parseFloat(a.amount) - parseFloat(b.amount)) ||
+            [];
+
+          const canAfford = bestFitTransactions.length > 0;
+          const statusColor = canAfford ? colors.success : colors.error;
+
           return (
             <View style={styles.itemCard}>
-              <View style={styles.emojiBox}>
-                <Text style={{ fontSize: 24 }}>{item.emoji}</Text>
-              </View>
+              {/* Card Top: Item Info */}
+              <View style={styles.itemMainRow}>
+                <View style={styles.itemIconBox}>
+                  <ShoppingBag size={22} color={colors.primary} />
+                </View>
 
-              <View style={styles.centerInfo}>
-                <Text style={styles.itemName}>{item.item}</Text>
-                <Text style={styles.itemPrice}>Price: ₹{item.price.toLocaleString()}</Text>
-              </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.itemName} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.itemPrice}>
+                    ₹{itemPrice.toLocaleString()}
+                  </Text>
+                </View>
 
-              <View style={[
-                  styles.badge, 
-                  { 
-                    // Badge background dynamic opacity based logic
-                    backgroundColor: isAffordable 
-                        ? "rgba(0, 230, 118, 0.1)" 
-                        : "rgba(255, 183, 77, 0.1)" 
-                  }
-              ]}>  
-                <Text style={[                         
-                    styles.badgeText,
+                <View
+                  style={[
+                    styles.statusPill,
                     {
-                        // Colors from Context
-                        color: isAffordable ? colors.success : colors.warning 
-                    }
-                ]}>
-                    {isAffordable ? "Affordable" : "Close"}
-                </Text>
-              </View> 
+                      backgroundColor: canAfford
+                        ? colors.success + '15'
+                        : colors.error + '15',
+                      borderColor: canAfford
+                        ? colors.success + '40'
+                        : colors.error + '40',
+                    },
+                  ]}
+                >
+                  {canAfford ? (
+                    <CheckCircle2 size={12} color={colors.success} />
+                  ) : (
+                    <XCircle size={12} color={colors.error} />
+                  )}
+                  <Text style={[styles.statusText, { color: statusColor }]}>
+                    {canAfford ? 'Affordable' : 'Too Costly'}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Card Bottom: The Trade-off */}
+              {canAfford && bestFitTransactions.length > 0 && (
+                <View style={styles.tradeOffContainer}>
+                  <View style={styles.tradeOffHeader}>
+                    <TrendingDown size={14} color={colors.textSecondary} />
+                    <Text style={styles.tradeOffLabel}>
+                      Instead of spending on:
+                    </Text>
+                  </View>
+                  <View style={styles.tradeOffValueBox}>
+                    <Text style={styles.tradeOffItemName} numberOfLines={1}>
+                      {bestFitTransactions[0].description}
+                    </Text>
+                    <View style={styles.tradeOffArrow}>
+                      <ArrowRight size={14} color={colors.textSecondary} />
+                    </View>
+                    <Text style={styles.tradeOffPrice}>
+                      ₹
+                      {parseFloat(
+                        bestFitTransactions[0].amount,
+                      ).toLocaleString()}
+                    </Text>
+                  </View>
+                </View>
+              )}
             </View>
           );
         }}

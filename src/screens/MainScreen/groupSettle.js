@@ -679,19 +679,21 @@ const GroupSettle = ({ navigation }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Recent Activity</Text>
             <View
-                style={[
-                  styles.logContainer,
-                  recentActivityLogs.length > 5 && { height: 500 }
-                ]}
-              >
-              <ScrollView 
-                nestedScrollEnabled={true} 
+              style={[
+                styles.logContainer,
+                recentActivityLogs.length > 5 && { height: 500 },
+              ]}
+            >
+              <ScrollView
+                nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 10 }}
               >
                 {recentActivityLogs.length === 0 ? (
                   <View style={styles.groupCard}>
-                    <Text style={styles.progressLabel}>No recent activity found.</Text>
+                    <Text style={styles.progressLabel}>
+                      No recent activity found.
+                    </Text>
                   </View>
                 ) : (
                   recentActivityLogs?.map(log => (
@@ -701,10 +703,9 @@ const GroupSettle = ({ navigation }) => {
                           style={[
                             styles.logIcon,
                             {
-                              backgroundColor:
-                                log.isIncoming
-                                  ? colors.success 
-                                  : colors.error, 
+                              backgroundColor: log.isIncoming
+                                ? colors.success
+                                : colors.error,
                             },
                           ]}
                         >
@@ -714,7 +715,7 @@ const GroupSettle = ({ navigation }) => {
                             <TrendingDown size={16} color={colors.white} />
                           )}
                         </View>
-                        <View>
+                        <View style={styles.logContent}>
                           <Text style={styles.logTitle}>
                             {log.isIncoming
                               ? `${log.friendName} owes you`
@@ -722,22 +723,42 @@ const GroupSettle = ({ navigation }) => {
                           </Text>
                           <Text style={styles.logDesc}>
                             {log.description}
-                            {!log.createdByMe && <Text style={{fontSize: 10, color: colors.textSecondary}}> (Added by them)</Text>}
+                            {!log.createdByMe && (
+                              <Text
+                                style={{
+                                  fontSize: 10,
+                                  color: colors.textSecondary,
+                                }}
+                              >
+                                {' '}
+                                (Added by them)
+                              </Text>
+                            )}
                           </Text>
-                          <Text style={{fontSize: 10, color: colors.textSecondary}}>{log.date}</Text>
+                          <Text
+                            style={{
+                              fontSize: 10,
+                              color: colors.textSecondary,
+                            }}
+                          >
+                            {log.date}
+                          </Text>
+                        </View>
+                        <View style={styles.logAmount}>
+                          <Text
+                            style={[
+                              styles.logAmountText,
+                              {
+                                color: log.isIncoming
+                                  ? colors.success
+                                  : colors.error,
+                              },
+                            ]}
+                          >
+                            {log.isIncoming ? '+' : '-'}₹{log.amount}
+                          </Text>
                         </View>
                       </View>
-                      <Text
-                        style={[
-                          styles.logAmount,
-                          {
-                            color:
-                              log.isIncoming ? colors.success : colors.error,
-                          },
-                        ]}
-                      >
-                        {log.isIncoming ? '+' : '-'}₹{log.amount}
-                      </Text>
                     </View>
                   ))
                 )}
