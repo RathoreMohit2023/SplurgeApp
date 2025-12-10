@@ -14,44 +14,43 @@ import {
   Trash2,
   Receipt,
   TrendingUp,
+  ArrowRightLeft,
+  IndianRupee,
 } from 'lucide-react-native';
 import { useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
+
 import AddGroupMemberModal from '../../Modals/AddGroupMemberModal';
 import AddGroupExpenseModal from '../../Modals/AddGroupExpenseModal';
 import getGroupDetailsStyle from '../../styles/MainScreen/groupDetailsStyle';
+import DashedLoader from '../../components/DashedLoader';
+import CustomAlert from '../../components/CustomAlert';
 import { ThemeContext } from '../../components/ThemeContext';
-import { useDispatch, useSelector } from 'react-redux';
+
 import { GetGroupMembersApi } from '../../Redux/Api/GetGroupMemberApi';
 import { AddGroupMemberApi } from '../../Redux/Api/AddGroupMemberApi';
-import DashedLoader from '../../components/DashedLoader';
 import { AddGroupExpenseApi } from '../../Redux/Api/AddGroupExpenseApi';
 import { GetGroupExpenseApi } from '../../Redux/Api/GetGroupExpenseApi';
 import { DeleteGroupMemberApi } from '../../Redux/Api/DeleteGroupMembersApi';
-import CustomAlert from '../../components/CustomAlert';
 
 const GroupDetails = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
-  const { GetFriendsData } = useSelector(state => state.GetFriends || {});
-  const { GetGroupMembersData, GetGroupMembersLoading } = useSelector(
-    state => state.GetGroupMembers || {},
-  );
-  const { LoginData } = useSelector(state => state.Login || {});
-  const { GetGroupExpenseData, GetGroupExpenseLoading } = useSelector(
-    state => state.GetGroupExpense || {},
-  );
-  const { AddGroupExpenseLoading } = useSelector(
-    state => state.AddGroupExpense || {},
-  );
   const styles = useMemo(() => getGroupDetailsStyle(colors), [colors]);
   const dispatch = useDispatch();
-  const loading = GetGroupExpenseLoading || AddGroupExpenseLoading || GetGroupMembersLoading;
   const route = useRoute();
   const insets = useSafeAreaInsets();
   const group = route?.params?.group;
 
+  const { GetFriendsData } = useSelector(state => state.GetFriends || {});
+  const { GetGroupMembersData, GetGroupMembersLoading } = useSelector(state => state.GetGroupMembers || {});
+  const { LoginData } = useSelector(state => state.Login || {});
+  const { GetGroupExpenseData, GetGroupExpenseLoading } = useSelector(state => state.GetGroupExpense || {});
+  const { AddGroupExpenseLoading } = useSelector(state => state.AddGroupExpense || {});
+
+  const loading = GetGroupExpenseLoading || AddGroupExpenseLoading || GetGroupMembersLoading;
+
   const [expenseFormOpen, setExpenseFormOpen] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState(null);
   const [friendList, setFriendList] = useState([]);
   const [snack, setSnack] = useState({ visible: false, message: '' });
   const [modalVisible, setModalVisible] = useState(false);
@@ -59,7 +58,6 @@ const GroupDetails = ({ navigation }) => {
   const [groupExpenses, setGroupExpenses] = useState([]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [deleteMember, setDeleteMember] = useState(null);
-  
 
   const fetchGroupData = () => {
     if (LoginData?.token && group?.id) {
@@ -93,12 +91,80 @@ const GroupDetails = ({ navigation }) => {
     }
   }, [GetFriendsData]);
 
-  console.log("Group Members:", groupMembers);
-  
+  // --- Calculations for Settlements and Stats ---
+  const { totalSpent, remaining, percentage, memberStats, settlements } = useMemo(() => {
+    let total = 0;
+    const balances = {};
+    const personalSpent = {};
+
+    groupMembers.forEach(m => {
+      balances[m.user_id] = 0;
+      personalSpent[m.user_id] = 0;
+    });
+
+    groupExpenses.forEach(exp => {
+      const amount = parseFloat(exp.amount);
+      total += amount;
+
+      if (balances[exp.paid_by_user_id] !== undefined) {
+        balances[exp.paid_by_user_id] += amount;
+      }
+
+      if (exp.splitexpense && Array.isArray(exp.splitexpense)) {
+        exp.splitexpense.forEach(split => {
+          const owed = parseFloat(split.owed_amount);
+          if (balances[split.user_id] !== undefined) {
+            balances[split.user_id] -= owed;
+          }
+          if (personalSpent[split.user_id] !== undefined) {
+            personalSpent[split.user_id] += owed;
+          }
+        });
+      }
+    });
+
+    const budget = parseFloat(group?.group_budget) || 0;
+    const perc = budget > 0 ? Math.min(100, (total / budget) * 100) : 0;
+    const rem = budget - total;
+
+    let debtors = [];
+    let creditors = [];
+
+    Object.keys(balances).forEach(userId => {
+      const val = balances[userId];
+      if (val < -0.01) debtors.push({ userId: parseInt(userId), amount: val });
+      if (val > 0.01) creditors.push({ userId: parseInt(userId), amount: val });
+    });
+
+    debtors.sort((a, b) => a.amount - b.amount);
+    creditors.sort((a, b) => b.amount - a.amount);
+
+    const plan = [];
+    let i = 0;
+    let j = 0;
+
+    while (i < debtors.length && j < creditors.length) {
+      const debtor = debtors[i];
+      const creditor = creditors[j];
+      const amount = Math.min(Math.abs(debtor.amount), creditor.amount);
+
+      const debtorName = groupMembers.find(m => m.user_id === debtor.userId)?.user?.fullname || 'Unknown';
+      const creditorName = groupMembers.find(m => m.user_id === creditor.userId)?.user?.fullname || 'Unknown';
+
+      plan.push({ from: debtorName, to: creditorName, amount: amount });
+
+      debtor.amount += amount;
+      creditor.amount -= amount;
+
+      if (Math.abs(debtor.amount) < 0.01) i++;
+      if (creditor.amount < 0.01) j++;
+    }
+
+    return { totalSpent: total, remaining: rem, percentage: perc, memberStats: { balances, personalSpent }, settlements: plan };
+  }, [groupExpenses, groupMembers, group]);
 
   const handleAddMember = async selectedFriends => {
     const token = LoginData?.token;
-    
     if (!token || !group?.id) {
       showSnack('Authentication or group information is missing.');
       return;
@@ -121,16 +187,14 @@ const GroupDetails = ({ navigation }) => {
     finalMembersPayload = [...finalMembersPayload, ...newMembers];
 
     if (finalMembersPayload.length === 0) {
-       showSnack("No members selected to add.");
-       return;
+      showSnack("No members selected to add.");
+      return;
     }
 
     const apiPayload = { group_id: group.id, members: finalMembersPayload };
 
     try {
-      const result = await dispatch(
-        AddGroupMemberApi({ payload: apiPayload, token }),
-      ).unwrap();
+      const result = await dispatch(AddGroupMemberApi({ payload: apiPayload, token })).unwrap();
       if (result?.status === true || result?.status === 'true') {
         showSnack(result?.message || 'Members added successfully!');
         fetchGroupData();
@@ -144,10 +208,7 @@ const GroupDetails = ({ navigation }) => {
   };
 
   const handleViewExpense = expense => {
-    navigation.navigate('GroupExpense', {
-      expense: expense, 
-      members: groupMembers,
-    });
+    navigation.navigate('GroupExpense', { expense: expense, members: groupMembers });
   };
 
   const handleSaveExpense = async expenseData => {
@@ -156,9 +217,7 @@ const GroupDetails = ({ navigation }) => {
       showSnack('Authentication or group data is missing.');
       return;
     }
-    const payer = groupMembers.find(
-      m => m.user?.fullname === expenseData.paidBy,
-    );
+    const payer = groupMembers.find(m => m.user?.fullname === expenseData.paidBy);
     if (!payer) {
       showSnack('Could not identify who paid. Please select again.');
       return;
@@ -171,9 +230,7 @@ const GroupDetails = ({ navigation }) => {
       date: expenseData.date,
     };
     try {
-      const result = await dispatch(
-        AddGroupExpenseApi({ payload: apiPayload, token, groupId: group.id }),
-      ).unwrap();
+      const result = await dispatch(AddGroupExpenseApi({ payload: apiPayload, token, groupId: group.id })).unwrap();
       if (result?.status === true || result?.status === 'true') {
         showSnack(result?.message || 'Expense added successfully!');
         setExpenseFormOpen(false);
@@ -191,31 +248,13 @@ const GroupDetails = ({ navigation }) => {
     return friendList.filter(friend => !memberUserIds.has(friend.id));
   }, [friendList, groupMembers]);
 
-  const totalSpent = useMemo(
-    () =>
-      groupExpenses.reduce(
-        (sum, expense) => sum + parseFloat(expense.amount),
-        0,
-      ),
-    [groupExpenses],
-  );
-
-  const budget = parseFloat(group?.group_budget) || 0;
-  const percentage =
-    budget > 0 ? Math.min(100, (totalSpent / budget) * 100) : 0;
-  const remaining = budget - totalSpent;
-
   const showSnack = message => setSnack({ visible: true, message });
-  const handleBack = () =>
-    navigation.canGoBack()
-      ? navigation.goBack()
-      : navigation.navigate('settle');
-  
+  const handleBack = () => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('settle');
+
   const openAddExpenseModal = () => {
-    setSelectedExpense(null);
     setExpenseFormOpen(true);
   };
-  
+
   const handleDeleteMember = async (member) => {
     setDeleteMember(member);
     setAlertVisible(true);
@@ -223,14 +262,9 @@ const GroupDetails = ({ navigation }) => {
 
   const finalDeleteMember = async () => {
     const token = LoginData?.token;
-    const apiPayload = {
-      user_id: deleteMember.user_id,
-      group_id: deleteMember.group_id,
-    };
+    const apiPayload = { user_id: deleteMember.user_id, group_id: deleteMember.group_id };
     try {
-      const result = await dispatch(
-        DeleteGroupMemberApi({ payload: apiPayload, token }),
-      ).unwrap();
+      const result = await dispatch(DeleteGroupMemberApi({ payload: apiPayload, token })).unwrap();
       if (result?.status === true || result?.status === 'true') {
         showSnack(result?.message);
         setAlertVisible(false);
@@ -245,10 +279,7 @@ const GroupDetails = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'}
-        backgroundColor={colors.background}
-      />
+      <StatusBar barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
           <ArrowLeft size={24} color={colors.text} />
@@ -257,18 +288,15 @@ const GroupDetails = ({ navigation }) => {
           {group?.group_name || 'Group Details'}
         </Text>
       </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
-        style={styles.scrollContainer}
-      >
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 80 }} style={styles.scrollContainer}>
+        
+        {/* Hero Budget Card */}
         <View style={styles.heroCard}>
           <View style={styles.heroRow}>
             <View>
               <Text style={styles.heroLabel}>Remaining Budget</Text>
-              <Text style={styles.heroValue}>
-                ₹{remaining?.toLocaleString()}
-              </Text>
+              <Text style={styles.heroValue}>₹{remaining?.toLocaleString()}</Text>
             </View>
             <View style={styles.circularIcon}>
               <TrendingUp size={24} color={colors.text} />
@@ -276,100 +304,98 @@ const GroupDetails = ({ navigation }) => {
           </View>
           <View style={styles.progressContainer}>
             <View style={styles.progressLabels}>
-              <Text style={styles.progressText}>
-                Spent: ₹{totalSpent?.toLocaleString()}
-              </Text>
+              <Text style={styles.progressText}>Spent: ₹{totalSpent?.toLocaleString()}</Text>
               <Text style={styles.progressText}>{percentage?.toFixed(0)}%</Text>
             </View>
-            <ProgressBar
-              progress={percentage / 100}
-              color={colors.theme}
-              style={styles.progressBar}
-            />
-            <Text style={styles.totalBudgetLabel}>
-              Total Budget: ₹{budget?.toLocaleString()}
-            </Text>
+            <ProgressBar progress={percentage / 100} color={colors.theme} style={styles.progressBar} />
+            <Text style={styles.totalBudgetLabel}>Total Budget: ₹{parseFloat(group?.group_budget || 0).toLocaleString()}</Text>
           </View>
         </View>
-        {group?.description && (
-          <Text style={styles.description}>{group.description}</Text>
+
+        {group?.description && <Text style={styles.description}>{group.description}</Text>}
+
+        {/* Settlement Plan */}
+        {settlements.length > 0 && (
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Settlements</Text>
+            <View style={styles.settlementCard}>
+              {settlements.map((item, index) => (
+                <View key={index} style={[styles.settlementRow, index === settlements.length - 1 && { borderBottomWidth: 0 }]}>
+                  <View style={styles.settlementAvatars}>
+                    <Avatar.Text size={32} label={item.from.substring(0, 1)} style={[styles.avatar, { marginRight: 5, backgroundColor: colors.background }]} labelStyle={{ color: colors.error }} />
+                    <ArrowRightLeft size={16} color={colors.textSecondary} />
+                    <Avatar.Text size={32} label={item.to.substring(0, 1)} style={[styles.avatar, { marginLeft: 5, backgroundColor: colors.background }]} labelStyle={{ color: colors.success }} />
+                  </View>
+                  <Text style={styles.settlementText}>
+                    <Text style={styles.settlementHighlight}>{item.from}</Text> pays <Text style={styles.settlementHighlight}>{item.to}</Text>
+                  </Text>
+                  <Text style={styles.settlementAmount}>₹{item.amount.toFixed(0)}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
         )}
+
+        {/* Members List */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>
-              Members ({groupMembers.length})
-            </Text>
-            <TouchableOpacity
-              onPress={() => setModalVisible(true)}
-              style={styles.smallBtn}
-            >
+            <Text style={styles.sectionTitle}>Members ({groupMembers.length})</Text>
+            <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.smallBtn}>
               <UserPlus size={16} color={colors.theme} />
               <Text style={styles.smallBtnText}>Add</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.listContainer}>
-            {GetGroupMembersLoading ? (
-              <DashedLoader />
-            ) : groupMembers.length === 0 ? (
+            {groupMembers.length === 0 ? (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>
-                  No members have been added yet.
-                </Text>
+                <Text style={styles.emptyText}>No members added yet.</Text>
               </View>
             ) : (
-              groupMembers.map((member, index) => (
-                <View key={member.id}>
-                  <View style={styles.memberRow}>
-                    <View style={styles.row}>
-                      <Avatar.Text
-                        size={40}
-                        label={(member.user?.fullname || 'NA')
-                          .substring(0, 2)
-                          .toUpperCase()}
-                        style={styles.avatar}
-                        labelStyle={styles.avatarLabel}
-                      />
-                      <View style={{ marginLeft: 12 }}>
+              groupMembers.map((member, index) => {
+                const balance = memberStats?.balances[member.user_id] || 0;
+                const spent = memberStats?.personalSpent[member.user_id] || 0;
+                const isPositive = balance >= 0;
+                return (
+                  <View key={member.id}>
+                    <View style={styles.memberRow}>
+                      <Avatar.Text size={40} label={(member.user?.fullname || 'NA').substring(0, 2).toUpperCase()} style={styles.avatar} labelStyle={styles.avatarLabel} />
+                      <View style={{ marginLeft: 12, flex: 1 }}>
+                        <View style={styles.memberNameRow}>
                         <Text style={styles.memberName}>
-                          {member.user?.fullname || 'Unknown Member'}
-                          {member.user_id === LoginData?.user?.id && (
-                            <Text style={{ color: colors.textSecondary }}>
-                              {' '}
-                              (You)
-                            </Text>
-                          )}
+                          {member.user?.fullname || 'Unknown'} {member.user_id === LoginData?.user?.id && '(You)'}
                         </Text>
-                        <View style={styles.adminBadge}>
-                          <Text style={styles.adminText}>
-                            {member?.role?.charAt(0).toUpperCase() +
-                              member?.role?.slice(1)}
-                          </Text>
+                        {member.role !== 'admin' && (
+                        <TouchableOpacity onPress={() => handleDeleteMember(member)}>
+                          <Trash2 size={18} color={colors.error} />
+                        </TouchableOpacity>
+                      )}
+                        </View>
+                        
+                        <View style={styles.memberStatsRow}>
+                           <Text style={styles.roleText}>{member.role}</Text>
+                           {Math.abs(balance) > 0.5 && (
+                              <Text style={[styles.balanceText, { color: isPositive ? colors.success : colors.error }]}>
+                                {isPositive ? 'Gets back' : 'Owes'} ₹{Math.abs(balance).toFixed(0)}
+                              </Text>
+                           )}
+                           <Text style={styles.spentText}>Spent: ₹{spent.toFixed(0)}</Text>
                         </View>
                       </View>
+                      
                     </View>
-                    {member.role !== 'admin' && (
-                      <TouchableOpacity
-                        onPress={() => handleDeleteMember(member)}
-                      >
-                        <Trash2 size={18} color={colors.error} />
-                      </TouchableOpacity>
-                    )}
+                    {index < groupMembers.length - 1 && <Divider style={styles.divider} />}
                   </View>
-                  {index < groupMembers.length - 1 && (
-                    <Divider style={styles.divider} />
-                  )}
-                </View>
-              ))
+                );
+              })
             )}
           </View>
         </View>
+
+        {/* Expenses List */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Expenses</Text>
-            <TouchableOpacity
-              onPress={openAddExpenseModal}
-              style={styles.addButton}
-            >
+            <TouchableOpacity onPress={openAddExpenseModal} style={styles.addButton}>
               <Plus size={20} color={colors.text} />
               <Text style={styles.addButtonText}>Add Group Expense</Text>
             </TouchableOpacity>
@@ -382,43 +408,22 @@ const GroupDetails = ({ navigation }) => {
             </View>
           ) : (
             groupExpenses.map(expense => {
-              const payer = groupMembers.find(
-                m => m.user_id === expense.paid_by_user_id,
-              );
-              const paidByName =
-                payer?.user_id === LoginData?.user?.id
-                  ? 'You'
-                  : payer?.user?.fullname || 'Unknown';
+              const payer = groupMembers.find(m => m.user_id === expense.paid_by_user_id);
+              const paidByName = payer?.user_id === LoginData?.user?.id ? 'You' : payer?.user?.fullname || 'Unknown';
               return (
-                <TouchableOpacity
-                  key={expense.id}
-                  onPress={() => handleViewExpense(expense)}
-                  activeOpacity={0.7}
-                >
+                <TouchableOpacity key={expense.id} onPress={() => handleViewExpense(expense)} activeOpacity={0.7}>
                   <View style={styles.expenseCard}>
                     <View style={styles.row}>
                       <View style={styles.expenseIconBox}>
-                        <Receipt size={20} color={colors.theme} />
+                        <IndianRupee size={20} color={colors.theme} />
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text style={styles.expenseTitle}>
-                          {expense.description}
-                        </Text>
-                        <Text style={styles.expenseSub}>
-                          Paid by{' '}
-                          <Text style={{ color: colors.text }}>
-                            {paidByName}
-                          </Text>{' '}
-                          • {expense.date}
-                        </Text>
+                        <Text style={styles.expenseTitle}>{expense.description}</Text>
+                        <Text style={styles.expenseSub}>Paid by <Text style={{ color: colors.text }}>{paidByName}</Text> • {expense.date}</Text>
                       </View>
                       <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.expenseAmount}>
-                          ₹{parseFloat(expense.amount).toLocaleString()}
-                        </Text>
-                        <Text style={styles.splitText}>
-                          for {expense.splitexpense.length}
-                        </Text>
+                        <Text style={styles.expenseAmount}>₹{parseFloat(expense.amount).toLocaleString()}</Text>
+                        <Text style={styles.splitText}>for {expense.splitexpense.length}</Text>
                       </View>
                     </View>
                   </View>
@@ -429,45 +434,11 @@ const GroupDetails = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      <CustomAlert
-        visible={alertVisible}
-        title="Delete Member"
-        message="Are you sure you want to delete this Member?"
-        showCancel={true}
-        cancelText="Cancel"
-        confirmText="Delete"
-        onCancel={() => setAlertVisible(false)}
-        onConfirm={finalDeleteMember}
-      />
-
-      <AddGroupMemberModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onSubmit={handleAddMember}
-        friends={availableFriendsToAdd}
-      />
-      <AddGroupExpenseModal
-        visible={expenseFormOpen}
-        onClose={() => setExpenseFormOpen(false)}
-        onSubmit={handleSaveExpense}
-        groupMembers={groupMembers}
-        currentUser={groupMembers?.find(m => m.user_id === LoginData?.user?.id)}
-      />
-      <Snackbar
-        visible={snack.visible}
-        onDismiss={() => setSnack({ visible: false, message: '' })}
-        duration={2000}
-        style={{
-          backgroundColor: colors.card,
-          marginBottom: insets.bottom + 20,
-        }}
-        theme={{ colors: { inversePrimary: colors.theme } }}
-        action={{
-          label: 'OK',
-          textColor: colors.theme,
-          onPress: () => setSnack({ visible: false, message: '' }),
-        }}
-      >
+      <CustomAlert visible={alertVisible} title="Delete Member" message="Are you sure you want to delete this Member?" showCancel={true} cancelText="Cancel" confirmText="Delete" onCancel={() => setAlertVisible(false)} onConfirm={finalDeleteMember} />
+      <AddGroupMemberModal visible={modalVisible} onClose={() => setModalVisible(false)} onSubmit={handleAddMember} friends={availableFriendsToAdd} />
+      <AddGroupExpenseModal visible={expenseFormOpen} onClose={() => setExpenseFormOpen(false)} onSubmit={handleSaveExpense} groupMembers={groupMembers} currentUser={groupMembers?.find(m => m.user_id === LoginData?.user?.id)} />
+      
+      <Snackbar visible={snack.visible} onDismiss={() => setSnack({ visible: false, message: '' })} duration={2000} style={{ backgroundColor: colors.card, marginBottom: insets.bottom + 20 }} theme={{ colors: { inversePrimary: colors.theme } }} action={{ label: 'OK', textColor: colors.theme, onPress: () => setSnack({ visible: false, message: '' }) }}>
         <Text style={{ color: colors.text }}>{snack.message}</Text>
       </Snackbar>
       {loading && <DashedLoader color={colors.primary} size={100} />}
