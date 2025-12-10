@@ -93,6 +93,9 @@ const GroupDetails = ({ navigation }) => {
     }
   }, [GetFriendsData]);
 
+  console.log("Group Members:", groupMembers);
+  
+
   const handleAddMember = async selectedFriends => {
     const token = LoginData?.token;
     
@@ -101,10 +104,26 @@ const GroupDetails = ({ navigation }) => {
       return;
     }
 
-    const finalMembersPayload = selectedFriends.map(friend => ({
+    let finalMembersPayload = [];
+
+    if (groupMembers.length === 0) {
+      finalMembersPayload.push({
+        user_id: LoginData?.user?.id,
+        role: 'admin',
+      });
+    }
+
+    const newMembers = selectedFriends.map(friend => ({
       user_id: friend.id,
       role: 'member',
     }));
+
+    finalMembersPayload = [...finalMembersPayload, ...newMembers];
+
+    if (finalMembersPayload.length === 0) {
+       showSnack("No members selected to add.");
+       return;
+    }
 
     const apiPayload = { group_id: group.id, members: finalMembersPayload };
 
