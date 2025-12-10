@@ -1,5 +1,5 @@
 import React, { useState, useContext, useMemo, useEffect } from 'react';
-import { View, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
+import { View, ScrollView, TouchableOpacity, StatusBar, Image } from 'react-native';
 import {
   Text,
   Avatar,
@@ -16,11 +16,13 @@ import {
   TrendingUp,
   ArrowRightLeft,
   IndianRupee,
+  LogOut
 } from 'lucide-react-native';
 import { useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 
+// Components
 import AddGroupMemberModal from '../../Modals/AddGroupMemberModal';
 import AddGroupExpenseModal from '../../Modals/AddGroupExpenseModal';
 import getGroupDetailsStyle from '../../styles/MainScreen/groupDetailsStyle';
@@ -28,11 +30,13 @@ import DashedLoader from '../../components/DashedLoader';
 import CustomAlert from '../../components/CustomAlert';
 import { ThemeContext } from '../../components/ThemeContext';
 
+// API
 import { GetGroupMembersApi } from '../../Redux/Api/GetGroupMemberApi';
 import { AddGroupMemberApi } from '../../Redux/Api/AddGroupMemberApi';
 import { AddGroupExpenseApi } from '../../Redux/Api/AddGroupExpenseApi';
 import { GetGroupExpenseApi } from '../../Redux/Api/GetGroupExpenseApi';
 import { DeleteGroupMemberApi } from '../../Redux/Api/DeleteGroupMembersApi';
+import { Img_url } from '../../Redux/NWConfig';
 
 const GroupDetails = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -42,6 +46,7 @@ const GroupDetails = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const group = route?.params?.group;
 
+  // Redux Selectors
   const { GetFriendsData } = useSelector(state => state.GetFriends || {});
   const { GetGroupMembersData, GetGroupMembersLoading } = useSelector(state => state.GetGroupMembers || {});
   const { LoginData } = useSelector(state => state.Login || {});
@@ -50,6 +55,7 @@ const GroupDetails = ({ navigation }) => {
 
   const loading = GetGroupExpenseLoading || AddGroupExpenseLoading || GetGroupMembersLoading;
 
+  // Local State
   const [expenseFormOpen, setExpenseFormOpen] = useState(false);
   const [friendList, setFriendList] = useState([]);
   const [snack, setSnack] = useState({ visible: false, message: '' });
@@ -58,7 +64,9 @@ const GroupDetails = ({ navigation }) => {
   const [groupExpenses, setGroupExpenses] = useState([]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [deleteMember, setDeleteMember] = useState(null);
+  const [alertConfig, setAlertConfig] = useState({ title: '', message: '', btnText: '' });
 
+  // --- 1. Fetch Data ---
   const fetchGroupData = () => {
     if (LoginData?.token && group?.id) {
       dispatch(GetGroupMembersApi(LoginData.token));
@@ -70,6 +78,7 @@ const GroupDetails = ({ navigation }) => {
     fetchGroupData();
   }, [group]);
 
+  // --- 2. Process Group Members ---
   useEffect(() => {
     if (GetGroupMembersData?.members && group?.id) {
       const filteredMembers = GetGroupMembersData.members.filter(
@@ -79,19 +88,28 @@ const GroupDetails = ({ navigation }) => {
     }
   }, [GetGroupMembersData, group]);
 
+  // --- 3. Process Expenses ---
   useEffect(() => {
     if (GetGroupExpenseData?.group) {
       setGroupExpenses(GetGroupExpenseData.group);
     }
   }, [GetGroupExpenseData]);
 
+  // --- 4. Process Friends ---
   useEffect(() => {
     if (GetFriendsData?.friends) {
       setFriendList(GetFriendsData.friends);
     }
   }, [GetFriendsData]);
 
-  // --- Calculations for Settlements and Stats ---
+  // --- 5. Determine Current User Role ---
+  const currentUserMemberObj = useMemo(() => {
+    return groupMembers.find(m => m.user_id === LoginData?.user?.id);
+  }, [groupMembers, LoginData]);
+
+  const isCurrentUserAdmin = currentUserMemberObj?.role === 'admin';
+
+  // --- 6. Calculations (Settlements & Stats) ---
   const { totalSpent, remaining, percentage, memberStats, settlements } = useMemo(() => {
     let total = 0;
     const balances = {};
@@ -163,15 +181,16 @@ const GroupDetails = ({ navigation }) => {
     return { totalSpent: total, remaining: rem, percentage: perc, memberStats: { balances, personalSpent }, settlements: plan };
   }, [groupExpenses, groupMembers, group]);
 
+
+  // --- Handlers ---
+
   const handleAddMember = async selectedFriends => {
     const token = LoginData?.token;
-    if (!token || !group?.id) {
-      showSnack('Authentication or group information is missing.');
-      return;
-    }
+    if (!token || !group?.id) return showSnack('Missing info.');
 
     let finalMembersPayload = [];
 
+    // If group is technically empty (first time), make current user admin
     if (groupMembers.length === 0) {
       finalMembersPayload.push({
         user_id: LoginData?.user?.id,
@@ -186,10 +205,7 @@ const GroupDetails = ({ navigation }) => {
 
     finalMembersPayload = [...finalMembersPayload, ...newMembers];
 
-    if (finalMembersPayload.length === 0) {
-      showSnack("No members selected to add.");
-      return;
-    }
+    if (finalMembersPayload.length === 0) return showSnack("No members selected.");
 
     const apiPayload = { group_id: group.id, members: finalMembersPayload };
 
@@ -206,22 +222,17 @@ const GroupDetails = ({ navigation }) => {
       showSnack(error?.message || 'Something went wrong.');
     }
   };
-
   const handleViewExpense = expense => {
     navigation.navigate('GroupExpense', { expense: expense, members: groupMembers });
   };
 
   const handleSaveExpense = async expenseData => {
     const token = LoginData?.token;
-    if (!token || !group?.id) {
-      showSnack('Authentication or group data is missing.');
-      return;
-    }
+    if (!token || !group?.id) return showSnack('Missing info.');
+    
     const payer = groupMembers.find(m => m.user?.fullname === expenseData.paidBy);
-    if (!payer) {
-      showSnack('Could not identify who paid. Please select again.');
-      return;
-    }
+    if (!payer) return showSnack('Payer not found.');
+
     const apiPayload = {
       description: expenseData.description,
       amount: expenseData.amount,
@@ -232,31 +243,35 @@ const GroupDetails = ({ navigation }) => {
     try {
       const result = await dispatch(AddGroupExpenseApi({ payload: apiPayload, token, groupId: group.id })).unwrap();
       if (result?.status === true || result?.status === 'true') {
-        showSnack(result?.message || 'Expense added successfully!');
+        showSnack('Expense added successfully!');
         setExpenseFormOpen(false);
         fetchGroupData();
       } else {
-        showSnack(result?.message || 'Failed to add expense.');
+        showSnack(result?.message || 'Failed.');
       }
     } catch (error) {
-      showSnack(error?.message || 'Something went wrong while adding expense.');
+      showSnack(error?.message || 'Something went wrong.');
     }
   };
 
-  const availableFriendsToAdd = useMemo(() => {
-    const memberUserIds = new Set(groupMembers.map(member => member.user_id));
-    return friendList.filter(friend => !memberUserIds.has(friend.id));
-  }, [friendList, groupMembers]);
-
-  const showSnack = message => setSnack({ visible: true, message });
-  const handleBack = () => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('settle');
-
-  const openAddExpenseModal = () => {
-    setExpenseFormOpen(true);
-  };
-
+  // --- Logic for Delete/Leave ---
   const handleDeleteMember = async (member) => {
     setDeleteMember(member);
+    const isMe = member.user_id === LoginData?.user?.id;
+    
+    if (isMe) {
+        setAlertConfig({
+            title: "Leave Group",
+            message: "Are you sure you want to leave this group?",
+            btnText: "Leave"
+        });
+    } else {
+        setAlertConfig({
+            title: "Remove Member",
+            message: `Are you sure you want to remove ${member.user?.fullname}?`,
+            btnText: "Remove"
+        });
+    }
     setAlertVisible(true);
   }
 
@@ -268,18 +283,34 @@ const GroupDetails = ({ navigation }) => {
       if (result?.status === true || result?.status === 'true') {
         showSnack(result?.message);
         setAlertVisible(false);
-        fetchGroupData();
+        
+        // If I removed myself, go back
+        if (deleteMember.user_id === LoginData?.user?.id) {
+            navigation.goBack();
+        } else {
+            fetchGroupData();
+        }
       } else {
-        showSnack(result?.message || 'Failed to remove member.');
+        showSnack(result?.message || 'Failed.');
       }
     } catch (error) {
-      showSnack(error?.message || 'Something went wrong while removing member.');
+      showSnack(error?.message || 'Something went wrong.');
     }
   }
 
+  // --- Helpers ---
+  const availableFriendsToAdd = useMemo(() => {
+    const memberUserIds = new Set(groupMembers.map(member => member.user_id));
+    return friendList.filter(friend => !memberUserIds.has(friend.id));
+  }, [friendList, groupMembers]);
+
+  const showSnack = message => setSnack({ visible: true, message });
+  const handleBack = () => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('settle');
+  
   return (
     <View style={styles.container}>
       <StatusBar barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
+      
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
           <ArrowLeft size={24} color={colors.text} />
@@ -291,7 +322,7 @@ const GroupDetails = ({ navigation }) => {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 80 }} style={styles.scrollContainer}>
         
-        {/* Hero Budget Card */}
+        {/* Budget Hero */}
         <View style={styles.heroCard}>
           <View style={styles.heroRow}>
             <View>
@@ -314,7 +345,7 @@ const GroupDetails = ({ navigation }) => {
 
         {group?.description && <Text style={styles.description}>{group.description}</Text>}
 
-        {/* Settlement Plan */}
+        {/* Settlements */}
         {settlements.length > 0 && (
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>Settlements</Text>
@@ -340,11 +371,16 @@ const GroupDetails = ({ navigation }) => {
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Members ({groupMembers.length})</Text>
-            <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.smallBtn}>
-              <UserPlus size={16} color={colors.theme} />
-              <Text style={styles.smallBtnText}>Add</Text>
-            </TouchableOpacity>
+            
+            {/* Show Add Button ONLY if Current User is Admin */}
+            {isCurrentUserAdmin && (
+                <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.smallBtn}>
+                    <UserPlus size={16} color={colors.theme} />
+                    <Text style={styles.smallBtnText}>Add</Text>
+                </TouchableOpacity>
+            )}
           </View>
+
           <View style={styles.listContainer}>
             {groupMembers.length === 0 ? (
               <View style={styles.emptyContainer}>
@@ -355,24 +391,46 @@ const GroupDetails = ({ navigation }) => {
                 const balance = memberStats?.balances[member.user_id] || 0;
                 const spent = memberStats?.personalSpent[member.user_id] || 0;
                 const isPositive = balance >= 0;
+                const isMe = member.user_id === LoginData?.user?.id;
+                
+                // --- VISIBILITY LOGIC ---
+                // 1. If I am Admin: I can delete everyone (including myself -> Leave).
+                // 2. If I am Member: I can only delete myself (Leave).
+                const showDeleteAction = isCurrentUserAdmin || isMe;
+
                 return (
                   <View key={member.id}>
                     <View style={styles.memberRow}>
-                      <Avatar.Text size={40} label={(member.user?.fullname || 'NA').substring(0, 2).toUpperCase()} style={styles.avatar} labelStyle={styles.avatarLabel} />
+                      {
+                        member?.user?.profile_photo ? (
+                          <Image source={{ uri: Img_url + member.user?.profile_photo }} style={styles.memberAvatar} resizeMode="cover" />
+                        ) : (
+                          <Avatar.Text size={40} label={(member.user?.fullname || 'NA').substring(0, 2).toUpperCase()} style={styles.avatar} labelStyle={styles.avatarLabel} />
+                        )
+                      }
+                      
                       <View style={{ marginLeft: 12, flex: 1 }}>
                         <View style={styles.memberNameRow}>
-                        <Text style={styles.memberName}>
-                          {member.user?.fullname || 'Unknown'} {member.user_id === LoginData?.user?.id && '(You)'}
-                        </Text>
-                        {member.role !== 'admin' && (
-                        <TouchableOpacity onPress={() => handleDeleteMember(member)}>
-                          <Trash2 size={18} color={colors.error} />
-                        </TouchableOpacity>
-                      )}
+                            <Text style={styles.memberName}>
+                                {member.user?.fullname || 'Unknown'} {isMe && '(You)'}
+                            </Text>
+                            
+                            {/* Trash/Leave Icon */}
+                            {showDeleteAction && (
+                                <TouchableOpacity onPress={() => handleDeleteMember(member)}>
+                                    {isMe ? (
+                                        <LogOut size={18} color={colors.error} /> // Icon for leaving
+                                    ) : (
+                                        <Trash2 size={18} color={colors.error} /> // Icon for kicking
+                                    )}
+                                </TouchableOpacity>
+                            )}
                         </View>
                         
                         <View style={styles.memberStatsRow}>
-                           <Text style={styles.roleText}>{member.role}</Text>
+                           <Text style={ member?.role === 'admin' ? styles.adminText : styles.roleText}>
+                                {member.role?.charAt(0).toUpperCase() + member.role?.slice(1)}
+                           </Text>
                            {Math.abs(balance) > 0.5 && (
                               <Text style={[styles.balanceText, { color: isPositive ? colors.success : colors.error }]}>
                                 {isPositive ? 'Gets back' : 'Owes'} ₹{Math.abs(balance).toFixed(0)}
@@ -381,7 +439,6 @@ const GroupDetails = ({ navigation }) => {
                            <Text style={styles.spentText}>Spent: ₹{spent.toFixed(0)}</Text>
                         </View>
                       </View>
-                      
                     </View>
                     {index < groupMembers.length - 1 && <Divider style={styles.divider} />}
                   </View>
@@ -395,7 +452,7 @@ const GroupDetails = ({ navigation }) => {
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Expenses</Text>
-            <TouchableOpacity onPress={openAddExpenseModal} style={styles.addButton}>
+            <TouchableOpacity onPress={() => setExpenseFormOpen(true)} style={styles.addButton}>
               <Plus size={20} color={colors.text} />
               <Text style={styles.addButtonText}>Add Group Expense</Text>
             </TouchableOpacity>
@@ -434,13 +491,44 @@ const GroupDetails = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      <CustomAlert visible={alertVisible} title="Delete Member" message="Are you sure you want to delete this Member?" showCancel={true} cancelText="Cancel" confirmText="Delete" onCancel={() => setAlertVisible(false)} onConfirm={finalDeleteMember} />
-      <AddGroupMemberModal visible={modalVisible} onClose={() => setModalVisible(false)} onSubmit={handleAddMember} friends={availableFriendsToAdd} />
-      <AddGroupExpenseModal visible={expenseFormOpen} onClose={() => setExpenseFormOpen(false)} onSubmit={handleSaveExpense} groupMembers={groupMembers} currentUser={groupMembers?.find(m => m.user_id === LoginData?.user?.id)} />
+      {/* Modals & Alerts */}
+      <CustomAlert 
+        visible={alertVisible} 
+        title={alertConfig.title}
+        message={alertConfig.message}
+        showCancel={true} 
+        cancelText="Cancel" 
+        confirmText={alertConfig.btnText} 
+        onCancel={() => setAlertVisible(false)} 
+        onConfirm={finalDeleteMember} 
+      />
       
-      <Snackbar visible={snack.visible} onDismiss={() => setSnack({ visible: false, message: '' })} duration={2000} style={{ backgroundColor: colors.card, marginBottom: insets.bottom + 20 }} theme={{ colors: { inversePrimary: colors.theme } }} action={{ label: 'OK', textColor: colors.theme, onPress: () => setSnack({ visible: false, message: '' }) }}>
+      <AddGroupMemberModal 
+        visible={modalVisible} 
+        onClose={() => setModalVisible(false)} 
+        onSubmit={handleAddMember} 
+        friends={availableFriendsToAdd} 
+      />
+      
+      <AddGroupExpenseModal 
+        visible={expenseFormOpen} 
+        onClose={() => setExpenseFormOpen(false)} 
+        onSubmit={handleSaveExpense} 
+        groupMembers={groupMembers} 
+        currentUser={currentUserMemberObj} 
+      />
+      
+      <Snackbar 
+        visible={snack.visible} 
+        onDismiss={() => setSnack({ visible: false, message: '' })} 
+        duration={2000} 
+        style={{ backgroundColor: colors.card, marginBottom: insets.bottom + 20 }} 
+        theme={{ colors: { inversePrimary: colors.theme } }} 
+        action={{ label: 'OK', textColor: colors.theme, onPress: () => setSnack({ visible: false, message: '' }) }}
+      >
         <Text style={{ color: colors.text }}>{snack.message}</Text>
       </Snackbar>
+      
       {loading && <DashedLoader color={colors.primary} size={100} />}
     </View>
   );

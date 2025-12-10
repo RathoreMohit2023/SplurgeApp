@@ -107,10 +107,10 @@ const DashBoardScreen = ({ navigation }) => {
   const [toastMsg, setToastMsg] = useState('');
 
   const { LoginData } = useSelector(state => state.Login);
-  const { GetWishlistData } = useSelector(state => state.GetWishlist);
-  const { GetTransactionData } = useSelector(state => state.GetTransaction);
-  const { GetMonthlyBudgetData } = useSelector(state => state.GetMonthlyBudget);
-
+  const { GetWishlistData, GetWishlistLoading } = useSelector(state => state.GetWishlist);
+  const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
+  const { GetMonthlyBudgetData, GetMonthlyBudgetloading } = useSelector(state => state.GetMonthlyBudget);
+  const isLoading = GetTransactionLoading || GetWishlistLoading || GetMonthlyBudgetloading;
   const fetchApi = () => {
     if (LoginData?.token && LoginData?.user?.id) {
       const token = LoginData.token;

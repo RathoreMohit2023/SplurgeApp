@@ -27,6 +27,8 @@ import VideoPlayerScreen from "../components/VideoPlayer";
 import ModalVideoPlayer from "../Modals/ModalVideoPlayer";
 import PDFViewer from "../components/PDFViewer";
 import GroupExpense from "../screens/MainScreen/GroupExpense";
+import WeeklyAvg from "../screens/MainScreen/WeeklyAvg";
+import DailyAvg from "../screens/MainScreen/DailyAvg";
 
 const RootNavigator = () => {
     const Stack = createStackNavigator();
@@ -59,6 +61,9 @@ const RootNavigator = () => {
             <Stack.Screen name="VideoPlayerScreen" component={VideoPlayerScreen} />
             <Stack.Screen name="ModalVideoPlayer" component={ModalVideoPlayer} />
             <Stack.Screen name="PDFViewer" component={PDFViewer} options={{ title: "Document Viewer" }}/>
+            <Stack.Screen name="weeklyAvg" component={WeeklyAvg} />
+            <Stack.Screen name="DailyAvg" component={DailyAvg} />
+
         </Stack.Navigator>
     )
 };

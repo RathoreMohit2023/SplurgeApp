@@ -384,9 +384,9 @@ const GroupExpense = ({ navigation }) => {
                       >
                         {memberName}
                       </Text>
-                      {isCurrentUser && (
+                      {/* {isCurrentUser && (
                         <Text style={styles.youTag}>Admin</Text>
-                      )}
+                      )} */}
                     </View>
                   </View>
 
@@ -406,7 +406,9 @@ const GroupExpense = ({ navigation }) => {
         </View>
 
         {/* Action Buttons */}
-        <View style={styles.actionsContainer}>
+        {
+          expense.created_by_user_id === LoginData?.user?.id && (
+            <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={[styles.actionButton, styles.deleteButton]}
             activeOpacity={0.7}
@@ -417,6 +419,9 @@ const GroupExpense = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
         </View>
+          )
+        }
+       
       </ScrollView>
 
       {/* Custom Alert Modal */}

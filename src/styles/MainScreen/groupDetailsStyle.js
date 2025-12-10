@@ -209,6 +209,14 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 14,
     },
+    memberAvatar: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: colors.background,
+        borderWidth: 1,
+        borderColor: colors.theme,
+    },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -216,7 +224,7 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
     avatar: {
         backgroundColor: colors.background,
         borderWidth: 1,
-        borderColor: colors.border,
+        borderColor: colors.theme,
     },
     avatarLabel: {
         color: colors.theme,
@@ -241,6 +249,18 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         marginTop: 4,
         width: '100%',
     },
+    roleText: {
+        fontSize: 11,
+        color: colors.textSecondary,
+        fontFamily: 'serif',
+    },
+    adminText: {
+        fontSize: 11,
+        color: colors.theme,
+        fontFamily: 'serif',
+        fontWeight: '700',
+        marginLeft: 4
+    },
     balanceText: {
         fontSize: 12,
         fontWeight: '700',
@@ -257,12 +277,6 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 4,
-    },
-    adminText: {
-        color: colors.theme,
-        fontSize: 10,
-        fontFamily: 'serif',
-        fontWeight: '700',
     },
     divider: {
         backgroundColor: colors.border,
