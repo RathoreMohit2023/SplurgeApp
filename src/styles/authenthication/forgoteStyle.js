@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const getForgotPasswordStyle = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background, // Dynamic Background
+    backgroundColor: colors.background, 
   },
   scrollContainer: {
     flexGrow: 1,
@@ -45,6 +45,7 @@ const getForgotPasswordStyle = (colors) => StyleSheet.create({
     color: colors.text, // Dynamic Text
     marginBottom: 12,
     textAlign: "center",
+    fontFamily: 'serif',
   },
   subtitle: {
     fontSize: 15,
@@ -53,6 +54,7 @@ const getForgotPasswordStyle = (colors) => StyleSheet.create({
     lineHeight: 22,
     marginBottom: 30,
     width: "90%",
+    fontFamily: 'serif',
   },
   // Form Styles
   form: {
@@ -76,6 +78,7 @@ const getForgotPasswordStyle = (colors) => StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    fontFamily: 'serif',
   },
   // Success View Specifics
   emailHighlight: {
@@ -91,6 +94,7 @@ const getForgotPasswordStyle = (colors) => StyleSheet.create({
     color: colors.text,
     fontWeight: "600",
     fontSize: 16,
+    fontFamily: 'serif',
   },
   resendBtn: {
     marginTop: 24,
@@ -99,6 +103,7 @@ const getForgotPasswordStyle = (colors) => StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 14,
     textAlign: 'center',
+    fontFamily: 'serif',
   }
 });
 

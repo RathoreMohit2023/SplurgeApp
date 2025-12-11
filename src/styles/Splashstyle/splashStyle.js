@@ -8,16 +8,17 @@ const getSplashStyles = (colors) => StyleSheet.create({
         alignItems: "center",
     },
     logo: {
-        width: 200, // Apne hisab se adjust karein
+        width: 200, 
         height: 200,
         marginBottom: 20,
     },
     tagline: {
         fontSize: 18,
-        color: colors.theme, // Tagline color usually branding color (Purple) hona chahiye
-        fontWeight: "600",
+        color: colors.theme,
+        fontWeight: "bold",
         letterSpacing: 1.2,
         textAlign: "center",
+        fontFamily: 'serif',
     },
 });
 
