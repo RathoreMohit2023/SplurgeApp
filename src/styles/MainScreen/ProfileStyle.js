@@ -167,7 +167,7 @@ const getProfileStyle = (colors) => StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 8,
-        backgroundColor: colors.background, // Inset look
+        backgroundColor: colors.theme, // Inset look
         justifyContent: 'center',
         alignItems: 'center',
     },

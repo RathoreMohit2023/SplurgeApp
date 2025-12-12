@@ -190,6 +190,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         fontWeight: "600",
     },
     linkBtn: {
+        flexDirection: "row",
         backgroundColor : "transparent",
         padding: 8,
         borderRadius: 12,
@@ -217,6 +218,16 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    memberAvatar: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: colors.background,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.theme,
+    },
     avatar: {
         backgroundColor: colors.background,
         borderWidth: 1,
@@ -240,6 +251,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         color: colors.textSecondary,
         fontSize: 12,
         fontFamily: 'serif',
+        
     },
     statusRow: {
         flexDirection: 'row',
@@ -248,7 +260,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     statusText: {
         fontSize: 13,
         fontFamily: 'serif',
-        fontWeight: '600',
+        fontWeight: 'bold',
     },
     actionIcon: {
         width: 36,
@@ -349,6 +361,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
         fontSize: 11,
         fontFamily: 'serif',
         marginBottom: 6,
+        fontWeight: 'bold',
     },
     progressBar: {
         height: 6,
@@ -376,7 +389,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     remindButtonText: {
         fontSize: 12,
         fontFamily: 'serif',
-        fontWeight: '600',
+        fontWeight: 'bold',
         marginLeft: 6,
         color: colors.text,
     },
@@ -393,7 +406,7 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     settleButtonText: {
         fontSize: 12,
         fontFamily: 'serif',
-        fontWeight: '600',
+        fontWeight: 'bold',
         marginLeft: 6,
         color: colors.text,
     },

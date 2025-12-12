@@ -235,7 +235,7 @@ const LedgerTab = () => {
               <View style={styles.cardTopRow}>
                 <View style={styles.leftSection}>
                   <View style={styles.iconBox}>
-                    <IconComponent size={20} color={colors.theme} />
+                    <IconComponent size={20} color={colors.white} />
                   </View>
                   <View style={styles.textInfo}>
                     <Text style={styles.itemTitle} numberOfLines={1}>{item.description}</Text>

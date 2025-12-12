@@ -5,8 +5,17 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/Redux/Store/Store';
 import { Provider } from 'react-redux';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const App = () => {
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        '841623319340-hjts0mrogfelo99t6km4un0bd83bj77e.apps.googleusercontent.com',
+      offlineAccess: true,
+    });
+  }, []);
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>

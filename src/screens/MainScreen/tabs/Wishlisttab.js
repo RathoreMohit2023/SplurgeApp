@@ -2,7 +2,7 @@ import React, { useState, useContext, useMemo, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Pencil, Trash2, Gift, Plus } from 'lucide-react-native';
+import { Pencil, Trash2, Gift, Plus, Heart } from 'lucide-react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 import AddWishListModal from '../../../Modals/AddWishListModal';
@@ -159,7 +159,7 @@ const WishlistTab = () => {
         renderItem={({ item }) => (
             <View style={styles.card}>
               <View style={styles.iconContainer}>
-                <Gift size={24} color={colors.text} />
+                <Heart size={24} color={colors.white} />
               </View>
               <View style={styles.contentContainer}>
                 <View style={styles.rowBetween}>

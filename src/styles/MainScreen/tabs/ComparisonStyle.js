@@ -196,7 +196,7 @@ const getComparisonStyles = (colors) => StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: colors.background,
+    backgroundColor: colors.theme,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,

@@ -16,6 +16,11 @@
     "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-community/blur": "^4.4.1",
     "@react-native-community/checkbox": "^0.5.20",
+<<<<<<< HEAD
+=======
+    "@react-native-firebase/app": "^23.7.0",
+    "@react-native-firebase/messaging": "^23.7.0",
+>>>>>>> f40d613c784fef8c001bee1791be578de5765927
     "@react-native-google-signin/google-signin": "^16.0.0",
     "@react-native-ohos/react-native-image-zoom-viewer": "^3.0.2-rc.1",
     "@react-native/new-app-screen": "0.82.1",

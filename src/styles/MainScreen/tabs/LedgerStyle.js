@@ -66,7 +66,7 @@ const getLedgerStyles = (colors) => StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: colors.background,
+    backgroundColor: colors.theme,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 14,
