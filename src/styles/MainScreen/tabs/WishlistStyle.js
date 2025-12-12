@@ -83,7 +83,7 @@ const getWishlistStyles = (colors) => StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: colors.background, // Inset look
+    backgroundColor: colors.theme, // Inset look
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,

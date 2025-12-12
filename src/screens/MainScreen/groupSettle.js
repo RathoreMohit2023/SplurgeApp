@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   TextInput,
   StatusBar,
+  Image,
 } from 'react-native';
 import { Text, Avatar, Snackbar, ProgressBar } from 'react-native-paper';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -20,6 +21,7 @@ import {
   Bell,
   CheckCircle,
   User,
+  Plus,
 } from 'lucide-react-native';
 import AddPaymentLogModal from '../../Modals/AddPaymentLogModal';
 import CreateGroupModal from '../../Modals/CreateGroupModal';
@@ -35,6 +37,8 @@ import { GetGroupMembersApi } from '../../Redux/Api/GetGroupMemberApi';
 import { GetGroupExpenseApi } from '../../Redux/Api/GetGroupExpenseApi';
 import { AddPaymentLogApi } from '../../Redux/Api/AddPaymentLogApi';
 import { GetPaymentLogApi } from '../../Redux/Api/GetPaymentLogApi';
+import { Img_url } from '../../Redux/NWConfig';
+import { SettleUpApi } from '../../Redux/Api/SettleUpApi';
 
 const GroupSettle = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -177,12 +181,15 @@ const GroupSettle = ({ navigation }) => {
         created_at: log.created_at,
         isIncoming: isIncoming,
         createdByMe: String(log.user_id) === String(userId),
+        friendId: log.friend_id,
+        userId : log.user_id
       };
     });
 
-    return mappedLogs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return mappedLogs.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at),
+    );
   }, [GetPaymentLogData, userId, friends]);
-
 
   useEffect(() => {
     if (GetGroupsData?.group_list) {
@@ -393,8 +400,32 @@ const GroupSettle = ({ navigation }) => {
     setSettleModalOpen(true);
   };
 
-  const handleSettleUpSave = data => {
-    showSnack('Settlement recorded successfully!');
+  const handleSettleUpSave = async(data) => {
+    console.log(data, "handleSettleUpSave");
+    console.log(friends, "friends");
+    console.log(recentActivityLogs, "recentActivityLogs");
+    
+    
+    
+    const token = LoginData?.token;
+    const formData = new FormData();
+    formData.append('payment_log_id', data.id);
+    formData.append('sender_id', LoginData?.user?.id);
+    formData.append('receiver_id', selectedFriend.id);
+    formData.append('settled_amount', data.amount);
+    // try {
+    //   const result = await dispatch(SettleUpApi({ formData, token })).unwrap();
+    //   if (result?.status === true || result?.status === 'true') {
+    //     showSnack(result?.message);
+    //     fetchInitialData();
+    //     setGroupFormOpen(false);
+    //   } else {
+    //     showSnack(result?.message);
+    //     fetchInitialData();
+    //   }
+    // } catch (error) {
+    //   showSnack('Something went wrong. Please try again.');
+    // }
   };
 
   return (
@@ -467,7 +498,8 @@ const GroupSettle = ({ navigation }) => {
                 style={styles.linkBtn}
                 onPress={() => setPaymentFormOpen(true)}
               >
-                <Text style={styles.linkText}>+ Add Payment Log</Text>
+                <Plus size={20} color={colors.theme} />
+                <Text style={styles.linkText}> Add Payment Log</Text>
               </TouchableOpacity>
             </View>
             {friends?.length === 0 && (
@@ -481,15 +513,22 @@ const GroupSettle = ({ navigation }) => {
                 style={[styles.friendCard, { paddingBottom: 12 }]}
               >
                 <View style={styles.row}>
-                  <Avatar.Text
-                    size={48}
-                    label={(friend.fullname || 'NA')
-                      .split(' ')
-                      .map(n => n[0])
-                      .join('')}
-                    style={styles.avatar}
-                    labelStyle={styles.avatarLabel}
-                  />
+                  {friend?.profile_photo ? (
+                    <Image
+                      source={{ uri: Img_url + friend?.profile_photo }}
+                      style={styles.memberAvatar}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <Avatar.Text
+                      size={48}
+                      label={(friend.fullname || 'NA')
+                        .substring(0, 2)
+                        .toUpperCase()}
+                      style={styles.avatar}
+                      labelStyle={styles.avatarLabel}
+                    />
+                  )}
                   <View style={styles.friendInfo}>
                     <Text style={styles.friendName}>{friend.fullname}</Text>
                     {friend.owed === 0 && friend.owes === 0 ? (
@@ -547,7 +586,7 @@ const GroupSettle = ({ navigation }) => {
                     >
                       <CheckCircle
                         size={16}
-                        color={colors.text}
+                        color={colors.theme}
                         style={{ marginRight: 6 }}
                       />
                       <Text style={styles.settleButtonText}>Settle Up</Text>
@@ -565,6 +604,7 @@ const GroupSettle = ({ navigation }) => {
                 style={styles.linkBtn}
                 onPress={() => setGroupFormOpen(true)}
               >
+                <Plus size={20} color={colors.theme} />
                 <Text style={styles.linkText}>Create New</Text>
               </TouchableOpacity>
             </View>
@@ -604,10 +644,10 @@ const GroupSettle = ({ navigation }) => {
                         <View
                           style={[
                             styles.groupIconBg,
-                            { backgroundColor: colors.tintedThemeColor },
+                            { backgroundColor: colors.theme },
                           ]}
                         >
-                          <Users size={18} color={colors.theme} />
+                          <Users size={18} color={colors.white} />
                         </View>
                         <View>
                           <Text style={styles.groupName}>
@@ -651,7 +691,7 @@ const GroupSettle = ({ navigation }) => {
                         <Text
                           style={[
                             styles.progressLabel,
-                            { fontWeight: '700', color: progressColor },
+                            { fontWeight: 'bold', color: progressColor },
                           ]}
                         >
                           {percentage.toFixed(0)}%

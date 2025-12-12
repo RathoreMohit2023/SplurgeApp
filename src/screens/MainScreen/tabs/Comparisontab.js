@@ -277,7 +277,7 @@ const ComparisonTab = () => {
               {/* Card Top: Item Info */}
               <View style={styles.itemMainRow}>
                 <View style={styles.itemIconBox}>
-                  <ShoppingBag size={22} color={colors.primary} />
+                  <ShoppingBag size={22} color={colors.white} />
                 </View>
 
                 <View style={{ flex: 1 }}>

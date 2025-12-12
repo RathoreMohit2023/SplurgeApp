@@ -232,7 +232,7 @@ const ProfileScreen = ({ navigation }) => {
                   >
                     <View style={styles.menuLeft}>
                       <View style={styles.menuIconBox}>
-                        <item.icon size={18} color={colors.theme} />
+                        <item.icon size={18} color={colors.white} />
                       </View>
                       <Text style={styles.menuLabel}>{item.label}</Text>
                     </View>

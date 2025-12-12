@@ -47,6 +47,8 @@ import GetGroupExpenseReducer from '../Slice/GetGroupExpenseSlice';
 import DeleteGroupMemberReducer from '../Slice/DeleteGroupMemberSlice';
 import DeleteGroupExpenseReducer from '../Slice/DeleteGroupExpenseSlice';
 import DeviceTokenReducer from '../Slice/DeviceTokenSlice';
+import FcmReducer from '../Slice/FcmSlice';
+import NotificationReducer from '../Slice/NotificationSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
@@ -86,6 +88,8 @@ const rootReducer = combineReducers({
   DeleteGroupMember : DeleteGroupMemberReducer,
   DeleteGroupExpense : DeleteGroupExpenseReducer,
   DeviceToken : DeviceTokenReducer,
+  Fcm: FcmReducer,
+  Notifications: NotificationReducer
 });
 
 const persistConfig = {
@@ -108,6 +112,8 @@ const persistConfig = {
     'GetPaymentLog',    
     'AddFriend',
     'AddGroup',
+    'Fcm',
+    'Notifications',
   ],
   // blacklist: ["QuotationList", "ScheduleList"],
 };

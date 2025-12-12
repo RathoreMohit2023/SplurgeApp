@@ -6,7 +6,6 @@ export const Login_Url = 'login';
 export const SignUp_Url = 'register';
 export const Forgote_Url = '';
 
-
 // POST API
 export const AddTransaction_Url = 'add-transaction';
 export const AddWishlist_Url = 'add-wishlist';
@@ -20,12 +19,12 @@ export const AddFriend_Url = 'add-friend';
 export const AddGroup_Url = 'add-group';
 export const AddGroupMember_Url = 'add-group-members';
 export const AddGroupExpense_Url = 'add-group-expense/';
-export const SettleUp_Url = '';
+export const SettleUp_Url = 'settle/send-reminder';
 export const EditProfile_Url = 'edit-user-details';
 export const EditTransection_Url = 'edit-transaction/';
 export const AddMonthlyBudget_Url = 'add-monthly-budget';
 export const EditMonthlyBudget_Url = 'edit-monthly-budget/';
-export const DeviceToken_Url = 'device-token';
+export const DeviceToken_Url = 'save-device-token';
 
 //  GET API
 export const GetTransection_Url = 'get-transactions/';

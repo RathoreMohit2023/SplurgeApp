@@ -21,6 +21,7 @@ import ToastMessage from '../../components/ToastMessage';
 import DashedLoader from "../../components/DashedLoader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CheckBox from "@react-native-community/checkbox";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 
 const SignInScreen = ({ navigation }) => {
@@ -136,6 +137,56 @@ const SignInScreen = ({ navigation }) => {
     } 
   };
 
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      GoogleSignin.signOut();
+      const userInfo = await GoogleSignin.signIn();
+
+      const user = userInfo?.data?.user;
+      const postData = {
+        first_name: user?.givenName,
+        last_name: user?.familyName,
+        email: user?.email,
+        google_id: user?.id,
+        password: user?.givenName,
+      };
+
+      console.log("postData:", postData);
+      
+
+      // try {
+      //   AsyncStorage.setItem('userLoginData', JSON.stringify(postData));
+      // } catch (error) {
+      //   console.error('Error saving login data:', error);
+      // }
+
+      // dispatch(googleLoginApi(postData)).then(async data => {
+      //   if (data?.payload?.status === true) {
+      //     setModalToastVisible(true);
+      //     await AsyncStorage.setItem(
+      //       'User',
+      //       JSON.stringify(data.payload?.user),
+      //     );
+      //     await AsyncStorage.setItem(
+      //       'Token',
+      //       JSON.stringify(data.payload?.token),
+      //     );
+      //     dispatch(UserDetailsApi(data.payload?.token));
+      //     setTimeout(() => {
+      //       setModalToastVisible(false);
+      //     }, 1000);
+      //   } else {
+      //     setLoginFailed(true);
+      //   }
+      // });
+    } catch (error) {
+     console.log("Error:", error);
+     
+    }
+  };
+
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={styles.container}
@@ -220,7 +271,7 @@ const SignInScreen = ({ navigation }) => {
               <View style={styles.dividerLine} />
             </View>
 
-            <TouchableOpacity style={styles.googleBtn}>
+            <TouchableOpacity onPress={handleGoogleSignIn} style={styles.googleBtn}>
               <Text style={styles.googleBtnText}>Continue with Google</Text>
             </TouchableOpacity>
 

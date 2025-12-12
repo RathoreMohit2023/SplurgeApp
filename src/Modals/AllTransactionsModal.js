@@ -212,11 +212,11 @@ const AllTransactionsModal = ({ visible, onClose, data = [] }) => {
                     <View
                       style={{
                         padding: 10,
-                        backgroundColor: colors.tintedThemeColor,
+                        backgroundColor: colors.theme,
                         borderRadius: 40,
                       }}
                     >
-                      <IconComponent size={18} color={colors.text} />
+                      <IconComponent size={18} color={colors.white} />
                     </View>
                     <View style={{ marginLeft: 12, flex: 1 }}>
                       <Text

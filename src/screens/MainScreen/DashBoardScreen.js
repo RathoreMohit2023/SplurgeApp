@@ -38,6 +38,7 @@ import {
   Baby,
   Dog,
   ArrowUpRight,
+  Heart,
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
@@ -62,6 +63,8 @@ import { GetFounderApi } from '../../Redux/Api/GetFounderApi';
 import { GetArticleApi } from '../../Redux/Api/GetArticleApi';
 import { GetGroupsApi } from '../../Redux/Api/GetGroupsAPi';
 import { Img_url } from '../../Redux/NWConfig';
+import { DeviceTokenApi } from '../../Redux/Api/DeviceTokenApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const categoryIcons = {
   'Food & Groceries': Utensils,
@@ -110,11 +113,18 @@ const DashBoardScreen = ({ navigation }) => {
   const { GetWishlistData, GetWishlistLoading } = useSelector(state => state.GetWishlist);
   const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
   const { GetMonthlyBudgetData, GetMonthlyBudgetloading } = useSelector(state => state.GetMonthlyBudget);
+  const { fcmToken } = useSelector(state => state.Fcm);
   const isLoading = GetTransactionLoading || GetWishlistLoading || GetMonthlyBudgetloading;
-  const fetchApi = () => {
+  const fetchApi = async () => {
     if (LoginData?.token && LoginData?.user?.id) {
+      const fcmLocalToken = await AsyncStorage.getItem("fcm_token");
       const token = LoginData.token;
       const userId = LoginData.user.id;
+      const DeviceToken = fcmToken ? fcmToken : fcmLocalToken;
+      const postData = {
+        user_id: userId,
+        device_token: DeviceToken,
+      }
       dispatch(GetUserDetailsApi(token));
       dispatch(GetCategoriesApi(token));
       dispatch(GetWishlistApi({ token, id: userId }));
@@ -124,16 +134,16 @@ const DashBoardScreen = ({ navigation }) => {
       dispatch(GetGroupsApi(token));
       dispatch(GetvideoApi(token));
       dispatch(GetFounderApi(token));
+      dispatch(DeviceTokenApi({postData, token}));
     }
   };
-
+  
   useEffect(() => {
     fetchApi();
   }, [LoginData]);
 
   const allTransactions = GetTransactionData?.get_transactions || [];
 
-  // --- DYNAMIC CALCULATIONS ---
   const dynamicStats = useMemo(() => {
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -357,7 +367,7 @@ const DashBoardScreen = ({ navigation }) => {
       <View style={styles.heroCard}>
         <View style={styles.rowBetween}>
           <View style={styles.heroIconBg}>
-            <Wallet size={20} color={colors.theme} />
+            <Wallet size={20} color={colors.white} />
           </View>
         </View>
         <View style={styles.heroContent}>
@@ -480,7 +490,7 @@ const DashBoardScreen = ({ navigation }) => {
         <View key={item.id} style={styles.transactionRow}>
           <View style={styles.transactionInfo}>
             <View style={styles.iconCircle}>
-              <IconComponent size={20} color={colors.theme} />
+              <IconComponent size={20} color={colors.white} />
             </View>
 
             <View style={styles.transactionDetails}>
@@ -532,7 +542,7 @@ const DashBoardScreen = ({ navigation }) => {
               <View>
                 <View style={styles.rowBetween}>
                   <View style={styles.wishlistIcon}>
-                    <Target size={16} color={colors.theme} />
+                    <Heart size={16} color={colors.white} />
                   </View>
                   <Text style={styles.wishlistPrice}>
                     ₹{parseFloat(item.price).toLocaleString()}

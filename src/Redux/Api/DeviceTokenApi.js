@@ -6,7 +6,7 @@ const url = `${BASE_URL}${DeviceToken_Url}`;
 
 export const DeviceTokenApi = createAsyncThunk(
   'DeviceTokenApi',
-  async ({formData, token}) => {
+  async ({postData, token}) => {
     
     const headers = {
         "Content-Type" : "multipart/form-data",
@@ -14,7 +14,7 @@ export const DeviceTokenApi = createAsyncThunk(
     }
     
     try {
-      const response = await axios.post(url, formData, {
+      const response = await axios.post(url, postData, {
         headers
       });
       console.log("Response from DeviceTokenApi:", response.data);
