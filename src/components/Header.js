@@ -1,10 +1,11 @@
 import React, { useContext, useMemo } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Bell, Sun, Moon, ArrowLeft } from "lucide-react-native";
-import { useSelector } from "react-redux"; // <--- 1. Import useSelector
+import { useSelector, useDispatch } from "react-redux";
 import getHeaderStyle from "../styles/Components/headerStyle";
 import { ThemeContext } from "../components/ThemeContext";
 import { darkLogo, MainLogo } from "../Assets/Images/index";
+import { markAllAsRead } from "../Redux/Slice/NotificationSlice";
 
 const AppHeader = ({
   navigation,
@@ -18,22 +19,26 @@ const AppHeader = ({
 }) => {
   const { colors, themeType, toggleTheme } = useContext(ThemeContext);
   const headerStyle = useMemo(() => getHeaderStyle(colors), [colors]);
+  const dispatch = useDispatch();
 
-  // <--- 2. Redux se Notifications fetch karein
   const notificationList = useSelector((state) => state.Notifications.Notifications);
-
-  // <--- 3. Unread count calculate karein
   const unreadCount = notificationList.filter((n) => !n.read).length;
 
   const iconColor = colors.theme; 
-  // const textColor = colors.text; // Unused variable removed
-
   const handleThemeToggle = onThemeTogglePress || toggleTheme;
   const appLogo = themeType === "dark" ? darkLogo : MainLogo;
 
+  const handleNotificationClick = () => {
+    dispatch(markAllAsRead());
+    if (onNotificationPress) {
+      onNotificationPress();
+    } else {
+      navigation.navigate("notificationScreen");
+    }
+  };
+
   return (
     <View style={headerStyle.container}>
-
       <View style={headerStyle.leftSection}>
         {showBackButton ? (
           <TouchableOpacity
@@ -58,7 +63,7 @@ const AppHeader = ({
         {showThemeToggle && (
           <TouchableOpacity
             onPress={handleThemeToggle}
-            style={{ marginRight: showNotification ? 20 : 0 }} // Thoda gap badhaya taki badge overlap na ho
+            style={{ marginRight: showNotification ? 20 : 0 }}
           >
             {themeType === 'dark' ? (
                <Sun color={iconColor} size={28} />
@@ -70,12 +75,10 @@ const AppHeader = ({
 
         {showNotification && (
           <TouchableOpacity
-            onPress={onNotificationPress || (() => navigation.navigate("notificationScreen"))}
+            onPress={handleNotificationClick}
             style={styles.notificationBtn}
           >
             <Bell color={iconColor} size={28} />
-            
-            {/* <--- 4. Badge Logic: Agar unread count 0 se zyada hai toh dikhao */}
             {unreadCount > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>
@@ -90,10 +93,9 @@ const AppHeader = ({
   );
 };
 
-// <--- 5. Local Styles for Badge
 const styles = StyleSheet.create({
   notificationBtn: {
-    position: 'relative', // Zaroori hai taki absolute positioning kaam kare
+    position: 'relative',
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -101,14 +103,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -5,
     right: -6,
-    backgroundColor: '#FF3B30', // Red Alert Color
+    backgroundColor: '#FF3B30',
     borderRadius: 10,
     minWidth: 18,
     height: 18,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#fff', // White border taaki icon se alag dikhe
+    borderColor: '#fff',
     paddingHorizontal: 2,
     zIndex: 10,
   },

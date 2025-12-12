@@ -99,7 +99,9 @@ const GroupSettle = ({ navigation }) => {
   // --- 1. Friend List Calculation Logic (Bi-Directional) ---
   useEffect(() => {
     const rawFriends = GetFriendsData?.friends || [];
-    const logs = GetPaymentLogData?.payment_logs || [];
+    const logs = GetPaymentLogData?.payment_logs
+    .filter(log => log.status !== 'settled'
+    ) || [];
 
     if (rawFriends.length > 0) {
       const balanceMap = {};
