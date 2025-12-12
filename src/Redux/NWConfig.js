@@ -20,6 +20,7 @@ export const AddGroup_Url = 'add-group';
 export const AddGroupMember_Url = 'add-group-members';
 export const AddGroupExpense_Url = 'add-group-expense/';
 export const SettleUp_Url = 'settle/send-reminder';
+export const SettleUp_Respond_Url = 'settle/respond';
 export const EditProfile_Url = 'edit-user-details';
 export const EditTransection_Url = 'edit-transaction/';
 export const AddMonthlyBudget_Url = 'add-monthly-budget';

@@ -1,11 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { BASE_URL, SettleUp_Url } from '../NWConfig';
+import { BASE_URL, SettleUp_Respond_Url } from '../NWConfig';
 
-const url = `${BASE_URL}${SettleUp_Url}`;
+const url = `${BASE_URL}${SettleUp_Respond_Url}`;
 
-export const SettleUpApi = createAsyncThunk(
-  'SettleUpApi',
+export const SettleUpRespondApi = createAsyncThunk(
+  'SettleUpRespondApi',
   async ({formData, token}) => {
     
     const headers = {
@@ -16,7 +16,7 @@ export const SettleUpApi = createAsyncThunk(
       const response = await axios.post(url, formData, {
         headers
       });
-      console.log("Response from SettleUpApi:", response.data);
+      console.log("Response from SettleUpRespondApi:", response.data);
       
       const result = response.data;
       return result;

@@ -150,10 +150,11 @@ const GroupSettle = ({ navigation }) => {
   const recentActivityLogs = useMemo(() => {
     if (!GetPaymentLogData?.payment_logs || !userId) return [];
 
-    const relevantLogs = GetPaymentLogData.payment_logs.filter(
-      log =>
-        String(log.user_id) === String(userId) ||
-        String(log.friend_id) === String(userId),
+    const relevantLogs = GetPaymentLogData?.payment_logs
+    .filter(log =>
+      (String(log.user_id) === String(userId) ||
+       String(log.friend_id) === String(userId)) &&
+      log.status !== 'settled'
     );
 
     const mappedLogs = relevantLogs.map(log => {
@@ -401,31 +402,26 @@ const GroupSettle = ({ navigation }) => {
   };
 
   const handleSettleUpSave = async(data) => {
-    console.log(data, "handleSettleUpSave");
-    console.log(friends, "friends");
-    console.log(recentActivityLogs, "recentActivityLogs");
-    
-    
-    
     const token = LoginData?.token;
     const formData = new FormData();
-    formData.append('payment_log_id', data.id);
     formData.append('sender_id', LoginData?.user?.id);
     formData.append('receiver_id', selectedFriend.id);
     formData.append('settled_amount', data.amount);
-    // try {
-    //   const result = await dispatch(SettleUpApi({ formData, token })).unwrap();
-    //   if (result?.status === true || result?.status === 'true') {
-    //     showSnack(result?.message);
-    //     fetchInitialData();
-    //     setGroupFormOpen(false);
-    //   } else {
-    //     showSnack(result?.message);
-    //     fetchInitialData();
-    //   }
-    // } catch (error) {
-    //   showSnack('Something went wrong. Please try again.');
-    // }
+    console.log(formData, 'formData');
+    
+    try {
+      const result = await dispatch(SettleUpApi({ formData, token })).unwrap();
+      if (result?.status === true || result?.status === 'true') {
+        showSnack(result?.message);
+        fetchInitialData();
+        setGroupFormOpen(false);
+      } else {
+        showSnack(result?.message);
+        fetchInitialData();
+      }
+    } catch (error) {
+      showSnack('Something went wrong. Please try again.');
+    }
   };
 
   return (

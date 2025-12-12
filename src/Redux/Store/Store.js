@@ -49,6 +49,7 @@ import DeleteGroupExpenseReducer from '../Slice/DeleteGroupExpenseSlice';
 import DeviceTokenReducer from '../Slice/DeviceTokenSlice';
 import FcmReducer from '../Slice/FcmSlice';
 import NotificationReducer from '../Slice/NotificationSlice';
+import SettleUpRespondReducer from '../Slice/SettleUpRespondSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
@@ -89,7 +90,8 @@ const rootReducer = combineReducers({
   DeleteGroupExpense : DeleteGroupExpenseReducer,
   DeviceToken : DeviceTokenReducer,
   Fcm: FcmReducer,
-  Notifications: NotificationReducer
+  Notifications: NotificationReducer,
+  SettleUpRespond : SettleUpRespondReducer
 });
 
 const persistConfig = {
