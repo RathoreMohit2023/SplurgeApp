@@ -6,6 +6,7 @@ import {
   TextInput,
   StatusBar,
   Image,
+  Share
 } from 'react-native';
 import { Text, Avatar, Snackbar, ProgressBar } from 'react-native-paper';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -70,6 +71,8 @@ const GroupSettle = ({ navigation }) => {
 
   const [friends, setFriends] = useState([]);
   const [groups, setGroups] = useState([]);
+  console.log(groups, 'groups');
+  
 
   const [groupMemberCounts, setGroupMemberCounts] = useState({});
   const [myGroupIds, setMyGroupIds] = useState([]);
@@ -100,7 +103,7 @@ const GroupSettle = ({ navigation }) => {
   useEffect(() => {
     const rawFriends = GetFriendsData?.friends || [];
     const logs = GetPaymentLogData?.payment_logs
-    .filter(log => log.status !== 'settled'
+    ?.filter(log => log.status !== 'settled'
     ) || [];
 
     if (rawFriends.length > 0) {
@@ -286,9 +289,15 @@ const GroupSettle = ({ navigation }) => {
     showSnack('Your Splurge ID copied!');
   };
 
-  const handleCopyLink = () => {
-    Clipboard.setString(shareableLink);
-    showSnack('Invite link copied!');
+  const handleShareLink = async () => {
+    try {
+      await Share.share({
+        title: 'Join Splurge',
+        message: `Join Splurge with my code: ${userCode}`,
+      });
+    } catch (error) {
+      console.log("Sharing Error:", error);
+    }
   };
 
   const handleAddFriend = async () => {
@@ -446,7 +455,7 @@ const GroupSettle = ({ navigation }) => {
               <Text style={styles.title}>Group Settle</Text>
               <Text style={styles.subtitle}>Split bills, not friendships.</Text>
             </View>
-            <TouchableOpacity style={styles.headerIconBtn}>
+            <TouchableOpacity onPress={fetchInitialData} style={styles.headerIconBtn}>
               <History size={22} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
@@ -455,10 +464,10 @@ const GroupSettle = ({ navigation }) => {
             <View style={styles.heroTopRow}>
               <Text style={styles.heroLabel}>Your Splurge ID</Text>
               <TouchableOpacity
-                onPress={handleCopyLink}
+                onPress={handleShareLink}
                 style={styles.shareBadge}
               >
-                <Text style={styles.shareText}>Share Link</Text>
+                <Text style={styles.shareText}>Share Code</Text>
                 <ArrowUpRight size={14} color={colors.text} />
               </TouchableOpacity>
             </View>
