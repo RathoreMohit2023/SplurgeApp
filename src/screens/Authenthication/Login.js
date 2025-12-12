@@ -22,7 +22,6 @@ import DashedLoader from "../../components/DashedLoader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CheckBox from "@react-native-community/checkbox";
 
-
 const SignInScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getLoginStyle(colors), [colors]);
@@ -220,7 +219,7 @@ const SignInScreen = ({ navigation }) => {
               <View style={styles.dividerLine} />
             </View>
 
-            <TouchableOpacity style={styles.googleBtn}>
+            <TouchableOpacity style={styles.googleBtn} >
               <Text style={styles.googleBtnText}>Continue with Google</Text>
             </TouchableOpacity>
 

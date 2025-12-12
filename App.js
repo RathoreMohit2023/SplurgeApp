@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import MainApp from './src/MainApp';
 import { ThemeProvider } from './src/components/ThemeContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
