@@ -23,7 +23,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CheckBox from "@react-native-community/checkbox";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
-
 const SignInScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getLoginStyle(colors), [colors]);
