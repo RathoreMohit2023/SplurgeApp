@@ -43,6 +43,7 @@ import { AddGroupExpenseApi } from '../../Redux/Api/AddGroupExpenseApi';
 import { GetGroupExpenseApi } from '../../Redux/Api/GetGroupExpenseApi';
 import { DeleteGroupMemberApi } from '../../Redux/Api/DeleteGroupMembersApi';
 import { Img_url } from '../../Redux/NWConfig';
+import { GetGroupsApi } from '../../Redux/Api/GetGroupsAPi';
 
 const GroupDetails = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -82,12 +83,14 @@ const GroupDetails = ({ navigation }) => {
     message: '',
     btnText: '',
   });
+  
 
   // --- 1. Fetch Data ---
   const fetchGroupData = () => {
     if (LoginData?.token && group?.id) {
       dispatch(GetGroupMembersApi(LoginData.token));
       dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
+      dispatch(GetGroupsApi(LoginData.token));
     }
   };
 
@@ -124,7 +127,8 @@ const GroupDetails = ({ navigation }) => {
     return groupMembers.find(m => m.user_id === LoginData?.user?.id);
   }, [groupMembers, LoginData]);
 
-  const isCurrentUserAdmin = currentUserMemberObj?.role === 'admin';
+
+  const isCurrentUserAdmin = currentUserMemberObj?.role === 'admin' || group?.group_admin == LoginData?.user?.id;
 
   // --- 6. Calculations (Settlements & Stats) ---
   const { totalSpent, remaining, percentage, memberStats, settlements } =
@@ -336,17 +340,31 @@ const GroupDetails = ({ navigation }) => {
         }
       } else {
         showSnack(result?.message || 'Failed.');
+        fetchGroupData();
       }
     } catch (error) {
       showSnack(error?.message || 'Something went wrong.');
     }
   };
 
-  // --- Helpers ---
   const availableFriendsToAdd = useMemo(() => {
     const memberUserIds = new Set(groupMembers.map(member => member.user_id));
-    return friendList.filter(friend => !memberUserIds.has(friend.id));
-  }, [friendList, groupMembers]);
+
+    let list = friendList.filter(friend => !memberUserIds.has(friend.id));
+
+    if (LoginData?.user?.id && !memberUserIds.has(LoginData.user.id)) {
+      const currentUserObj = {
+        id: LoginData.user.id,
+        fullname: `${LoginData.user.fullname} (You)`, // Adding (You) for clarity
+        email: LoginData.user.email,
+        mobile: LoginData.user.mobile,
+        profile_photo: LoginData.user.profile_photo,
+      };
+      list = [currentUserObj, ...list];
+    }
+
+    return list;
+  }, [friendList, groupMembers, LoginData]);
 
   const showSnack = message => setSnack({ visible: true, message });
   const handleBack = () =>
@@ -539,16 +557,23 @@ const GroupDetails = ({ navigation }) => {
                         </View>
 
                         <View style={styles.memberStatsRow}>
-                          <Text
-                            style={
-                              member?.role === 'admin'
-                                ? styles.adminText
-                                : styles.roleText
-                            }
-                          >
-                            {member.role?.charAt(0).toUpperCase() +
-                              member.role?.slice(1)}
-                          </Text>
+                          {
+                            group?.group_admin == member?.user_id ? (
+                              <Text style={styles.adminText}>
+                                Admin
+                              </Text>
+                            ) : ( <Text
+                              style={
+                                member?.role === 'admin'
+                                  ? styles.adminText
+                                  : styles.roleText
+                              }
+                            >
+                              {member.role?.charAt(0).toUpperCase() +
+                                member.role?.slice(1)}
+                            </Text>)
+                          }
+                         
                           {Math.abs(balance) > 0.5 && (
                             <Text
                               style={[

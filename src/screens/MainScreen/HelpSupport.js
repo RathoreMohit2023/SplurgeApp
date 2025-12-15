@@ -5,8 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
-  StatusBar,
-  ActivityIndicator
+  StatusBar
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,62 +21,92 @@ const HelpSupport = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getHelpSupportStyle(colors), [colors]);
   const insets = useSafeAreaInsets();
+
   const { LoginData } = useSelector(state => state.Login);
-  const { HelpAndSupportLoading, HelpAndSupportData } = useSelector(state => state.HelpAndSupport);
+  const { HelpAndSupportLoading, HelpAndSupportData } = useSelector(
+    state => state.HelpAndSupport
+  );
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(HelpAndSupportApi(LoginData.token))
+    dispatch(HelpAndSupportApi(LoginData?.token));
   }, []);
 
   const support = HelpAndSupportData?.support?.[0] || {};
 
-  const contactDetails = [          
-    {
-      id: 'email', 
+  const normalizeArray = value => {
+    if (!value) return [];
+  
+    // If already array
+    if (Array.isArray(value)) return value;
+  
+    // If stringified array -> parse it
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [value];
+      } catch (e) {
+        return [value];
+      }
+    }
+  
+    return [value];
+  };
+  
+  const contactDetails = [
+    ...normalizeArray(support.email).map((email, index) => ({
+      id: `email-${index}`,
       icon: 'email-outline',
-      label: 'Email Support',
-      value: support.email,
-      action: () => Linking.openURL(`mailto:${support.email}`),
-    },
-    {
-      id: 'phone',
+      label: index === 0 ? 'Email Support' : 'Alternate Email',
+      value: email,
+      action: () => Linking.openURL(`mailto:${email}`),
+    })),
+
+    ...normalizeArray(support.contact).map((phone, index) => ({
+      id: `phone-${index}`,
       icon: 'phone-outline',
-      label: 'Customer Care',
-      value: support.contact,
-      action: () => Linking.openURL(`tel:${support.contact}`),
-    },
-    {
-      id: 'website',
-      icon: 'web',
-      label: 'Website',
-      value: support.website,
-      action: () => Linking.openURL(
-          support.website.startsWith("http")
-          ? support.website
-          : `https://${support.website}`
-      ),
-    },
-    {
-      id: 'address',
-      icon: 'map-marker-outline',
-      label: 'Headquarters',
-      value: support.location,
-      action: () =>
-        Linking.openURL(
-          `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-            support.location
-          )}`
-        )
-    },
-  ].filter(item => item.value);
+      label: index === 0 ? 'Customer Care' : 'Alternate Number',
+      value: phone,
+      action: () => Linking.openURL(`tel:${phone}`),
+    })),
+
+    ...(support.website
+      ? [{
+          id: 'website',
+          icon: 'web',
+          label: 'Website',
+          value: support.website,
+          action: () =>
+            Linking.openURL(
+              support.website.startsWith('http')
+                ? support.website
+                : `https://${support.website}`
+            ),
+        }]
+      : []),
+
+    ...(support.location
+      ? [{
+          id: 'address',
+          icon: 'map-marker-outline',
+          label: 'Headquarters',
+          value: support.location,
+          action: () =>
+            Linking.openURL(
+              `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                support.location
+              )}`
+            ),
+        }]
+      : []),
+  ];
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
-        backgroundColor={colors.background} 
+      <StatusBar
+        barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
       />
 
       <AppHeader
@@ -88,69 +117,90 @@ const HelpSupport = ({ navigation }) => {
         onBackPress={() => navigation.goBack()}
       />
 
-      {/* UPDATED SCROLLVIEW WITH BOTTOM PADDING */}
-      <ScrollView 
-        showsVerticalScrollIndicator={false} 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={[
-            styles.content, 
-            { paddingBottom: insets.bottom + 40 } // Adds safe area + 40px extra space
+          styles.content,
+          { paddingBottom: insets.bottom + 40 }
         ]}
       >
-        {/* Company Branding Section */}
+        {/* Branding */}
         <View style={styles.brandSection}>
-            <View style={styles.logoContainer}>
-                <MaterialCommunityIcons name="wallet-giftcard" size={40} color={colors.theme} />
-            </View>
-            <Text style={styles.appName}>Splurge</Text>
-            {/* <Text style={styles.appVersion}>Version 2.0.1</Text> */}
-            <Text style={styles.aboutText}>
-              Empowering you to track expenses, save money, and spend wisely. 
-              We are dedicated to providing the best financial tools for your lifestyle.
-            </Text>
+          <View style={styles.logoContainer}>
+            <MaterialCommunityIcons
+              name="wallet-giftcard"
+              size={40}
+              color={colors.theme}
+            />
+          </View>
+          <Text style={styles.appName}>Splurge</Text>
+          <Text style={styles.aboutText}>
+            Empowering you to track expenses, save money, and spend wisely.
+            We are dedicated to providing the best financial tools for your lifestyle.
+          </Text>
         </View>
-        {/* Contact Details Card */}
+
+        {/* Contact Card */}
         <View style={styles.card}>
           <Text style={styles.sectionHeader}>Contact Us</Text>
-          
+
           {contactDetails.map((item, index) => (
             <TouchableOpacity
               key={item.id}
               style={[
-                styles.row, 
+                styles.row,
                 index !== contactDetails.length - 1 && styles.separator
               ]}
               onPress={item.action}
               activeOpacity={0.7}
             >
               <View style={styles.iconBox}>
-                <MaterialCommunityIcons name={item.icon} size={22} color={colors.theme} />
+                <MaterialCommunityIcons
+                  name={item.icon}
+                  size={22}
+                  color={colors.theme}
+                />
               </View>
+
               <View style={styles.rowText}>
                 <Text style={styles.label}>{item.label}</Text>
                 <Text style={styles.value}>{item.value}</Text>
               </View>
+
               {item.id !== 'address' && (
-                <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textDisabled} />
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={20}
+                  color={colors.textDisabled}
+                />
               )}
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* Social Media / Footer */}
+        {/* Footer */}
         <View style={styles.footer}>
-            <Text style={styles.footerText}>Follow us on social media</Text>
-            <View style={styles.socialRow}>
-                {['twitter', 'facebook', 'instagram', 'linkedin'].map((social) => (
-                    <TouchableOpacity key={social} style={styles.socialIcon}>
-                        <MaterialCommunityIcons name={social} size={24} color={colors.textSecondary} />
-                    </TouchableOpacity>
-                ))}
-            </View>
-            <Text style={styles.copyright}>© 2025 Splurge Inc. All rights reserved.</Text>
+          <Text style={styles.footerText}>Follow us on social media</Text>
+          <View style={styles.socialRow}>
+            {['twitter', 'facebook', 'instagram', 'linkedin'].map(icon => (
+              <TouchableOpacity key={icon} style={styles.socialIcon}>
+                <MaterialCommunityIcons
+                  name={icon}
+                  size={24}
+                  color={colors.textSecondary}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={styles.copyright}>
+            © 2025 Splurge Inc. All rights reserved.
+          </Text>
         </View>
-
       </ScrollView>
-      {HelpAndSupportLoading && <DashedLoader color={colors.primary} size={100} />}
+
+      {HelpAndSupportLoading && (
+        <DashedLoader color={colors.primary} size={100} />
+      )}
     </View>
   );
 };

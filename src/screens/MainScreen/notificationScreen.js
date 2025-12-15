@@ -21,25 +21,30 @@ import {
   X,
 } from "lucide-react-native";
 
+// Imports
 import getNotificationStyle from "../../styles/MainScreen/NotificationStyle";
 import { ThemeContext } from "../../components/ThemeContext";
 import { markAsRead, clearNotifications, updateNotificationStatus } from "../../Redux/Slice/NotificationSlice";
 import { SettleUpRespondApi } from "../../Redux/Api/SettleUpRespondApi";
 import { GetPaymentLogApi } from "../../Redux/Api/GetPaymentLogApi";
 
+// Icon Helper
 const getIcon = (type, colors) => {
   switch (type) {
     case "settle_request": return <Wallet size={20} color={colors.primary} />;
     case "reminder": return <Edit3 size={20} color={colors.theme} />;
     case "debt": return <ArrowUpRight size={20} color={colors.error} />;
     case "alert": return <AlertTriangle size={20} color={colors.warning} />;
-    default: return <Bell size={20} color={colors.textSecondary} />;
+    default: return <Bell size={20} color={colors.Text} />;
   }
 };
 
 const NotificationScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
-  const styles = useMemo(() => getNotificationStyle(colors), [colors]);
+  
+  // Pass both colors and themeType to style generator
+  const styles = useMemo(() => getNotificationStyle(colors, themeType), [colors, themeType]);
+  
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
 
@@ -59,7 +64,6 @@ const NotificationScreen = ({ navigation }) => {
     const { data, id } = item;
     const { settle_payment_id, sender_id, receiver_id } = data;
     const token = LoginData?.token;
-
     if (!token) return;
 
     const formData = new FormData();
@@ -87,7 +91,6 @@ const NotificationScreen = ({ navigation }) => {
     const { data, id } = item;
     const { settle_payment_id, sender_id, receiver_id } = data;
     const token = LoginData?.token;
-
     if (!token) return;
 
     const formData = new FormData();
@@ -118,7 +121,7 @@ const NotificationScreen = ({ navigation }) => {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      activeOpacity={0.9}
+      activeOpacity={0.8}
       style={[styles.card, !item.read && styles.unreadCard]}
       onPress={() => dispatch(markAsRead(item.id))}
     >
@@ -141,54 +144,29 @@ const NotificationScreen = ({ navigation }) => {
         </Text>
 
         {item.type === "settle_request" && !item.status && (
-          <View style={{ flexDirection: "row", marginTop: 10, gap: 10 }}>
-            <TouchableOpacity
-              onPress={() => handleAccept(item)}
-              style={{
-                backgroundColor: colors.primary,
-                paddingVertical: 6,
-                paddingHorizontal: 12,
-                borderRadius: 6,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Check size={14} color="#FFF" style={{ marginRight: 4 }} />
-              <Text style={{ color: "#FFF", fontSize: 12, fontWeight: "600" }}>
-                Accept
-              </Text>
+          <View style={styles.actionButtonContainer}>
+            <TouchableOpacity onPress={() => handleAccept(item)} style={styles.btnAccept}>
+              <Check size={14} color="#FFF" style={{ marginRight: 6 }} />
+              <Text style={styles.btnTextWhite}>Accept</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => handleDecline(item)}
-              style={{
-                backgroundColor: colors.background,
-                borderWidth: 1,
-                borderColor: colors.border,
-                paddingVertical: 6,
-                paddingHorizontal: 12,
-                borderRadius: 6,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <X size={14} color={colors.textSecondary} style={{ marginRight: 4 }} />
-              <Text style={{ color: colors.text, fontSize: 12, fontWeight: "600" }}>
-                Decline
-              </Text>
+            <TouchableOpacity onPress={() => handleDecline(item)} style={styles.btnDecline}>
+              <X size={14} color={colors.textSecondary} style={{ marginRight: 6 }} />
+              <Text style={styles.btnTextDecline}>Decline</Text>
             </TouchableOpacity>
           </View>
         )}
 
         {item.status && (
-          <Text style={{ 
-            marginTop: 8, 
-            fontSize: 12, 
-            color: item.status === 'accepted' ? colors.success : colors.error,
-            fontWeight: '600'
-          }}>
-            {item.status === 'accepted' ? "Request Accepted" : "Request Declined"}
-          </Text>
+          <View style={[styles.statusTag, { 
+            backgroundColor: item.status === 'accepted' ? 'rgba(5, 205, 153, 0.1)' : 'rgba(238, 93, 80, 0.1)' 
+          }]}>
+            <Text style={[styles.statusText, { 
+              color: item.status === 'accepted' ? colors.success : colors.error 
+            }]}>
+              {item.status === 'accepted' ? "Accepted" : "Declined"}
+            </Text>
+          </View>
         )}
       </View>
 
@@ -204,11 +182,8 @@ const NotificationScreen = ({ navigation }) => {
       />
 
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
-        >
-          <ChevronLeft size={24} color={colors.text} />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <ChevronLeft size={24} color={colors.theme} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
         <View style={{ width: 40 }} />
@@ -216,12 +191,10 @@ const NotificationScreen = ({ navigation }) => {
 
       {rawNotifications.length > 0 && (
         <View style={styles.actionsRow}>
-          <TouchableOpacity
-            onPress={() => dispatch(clearNotifications())}
-            style={styles.actionBtn}
-          >
-            <Trash2 size={16} color={colors.textSecondary} />
-            <Text style={styles.actionText}>Clear All</Text>
+          <Text style={styles.subHeaderLabel}>RECENT</Text>
+          <TouchableOpacity onPress={() => dispatch(clearNotifications())} style={styles.clearBtn}>
+            <Trash2 size={14} color={colors.error} />
+            <Text style={styles.clearBtnText}>Clear All</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -230,18 +203,15 @@ const NotificationScreen = ({ navigation }) => {
         sections={sections}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        renderSectionHeader={({ section: { title } }) => (
-          <Text style={styles.sectionHeader}>{title}</Text>
-        )}
-        contentContainerStyle={[
-          styles.listContent,
-          { paddingBottom: insets.bottom + 20 },
-        ]}
+        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20 }]}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Bell size={48} color={colors.border} />
-            <Text style={styles.emptyTitle}>All caught up!</Text>
-            <Text style={styles.emptySub}>You have no new notifications.</Text>
+            <View style={styles.emptyIconBg}>
+              <Bell size={40} color={colors.primary} />
+            </View>
+            <Text style={styles.emptyTitle}>No Notifications</Text>
+            <Text style={styles.emptySub}>We'll let you know when something arrives.</Text>
           </View>
         }
       />
@@ -250,18 +220,15 @@ const NotificationScreen = ({ navigation }) => {
         visible={snack.visible}
         onDismiss={() => setSnack({ visible: false, message: "" })}
         duration={2000}
-        style={{
-          backgroundColor: colors.card,
-          marginBottom: insets.bottom + 20,
-        }}
-        theme={{ colors: { inversePrimary: colors.theme } }}
+        style={styles.snackbar}
+        theme={{ colors: { inversePrimary: colors.primary } }}
         action={{
           label: "OK",
-          textColor: colors.theme,
+          textColor: "#FFF",
           onPress: () => setSnack({ visible: false, message: "" }),
         }}
       >
-        <Text style={{ color: colors.text }}>{snack.message}</Text>
+        <Text style={{ color: "#FFF" }}>{snack.message}</Text>
       </Snackbar>
     </View>
   );

@@ -4,7 +4,7 @@ const getLoginStyle = colors =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background, // Dynamic Background
+      backgroundColor: colors.background,
     },
     scrollContainer: {
       flexGrow: 1,
@@ -20,13 +20,13 @@ const getLoginStyle = colors =>
     welcomeText: {
       fontSize: 28,
       fontWeight: 'bold',
-      color: colors.text, // Dynamic Text
+      color: colors.text,
       marginBottom: 8,
       fontFamily: 'serif',
     },
     tagline: {
       fontSize: 16,
-      color: colors.textSecondary, // Dynamic Secondary Text
+      color: colors.textSecondary,
       marginBottom: 40,
       fontFamily: 'serif',
     },
@@ -37,8 +37,9 @@ const getLoginStyle = colors =>
         alignSelf: "flex-end",
         marginBottom: 24,
     },
+    
     forgotText: {
-        color: colors.theme, // Dynamic Theme Color
+        color: colors.theme,
         fontWeight: "600",
         fontSize: 14,
         fontFamily: 'serif',
@@ -50,19 +51,16 @@ const getLoginStyle = colors =>
       marginBottom: 24,
       marginTop: 10,
     },
-    
     row: {
       flexDirection: "row",
       alignItems: "center",
     },
-    
     rememberText: {
       color: colors.text,
       fontSize: 14,
       marginLeft: 8,
       fontFamily: 'serif',
     },
-    
     primaryBtn: {
       backgroundColor: colors.theme,
       height: 56,
@@ -77,7 +75,7 @@ const getLoginStyle = colors =>
       shadowRadius: 4,
     },
     primaryBtnText: {
-      color: '#fff', // Button text always white usually
+      color: '#fff',
       fontSize: 18,
       fontWeight: 'bold',
       fontFamily: 'serif',
@@ -90,30 +88,44 @@ const getLoginStyle = colors =>
     dividerLine: {
       flex: 1,
       height: 1,
-      backgroundColor: colors.border, // Dynamic Border
+      backgroundColor: colors.border,
     },
     dividerText: {
       marginHorizontal: 10,
-      color: colors.textDisabled, // Placeholder/Disabled color
+      color: colors.textDisabled,
       fontSize: 12,
       fontFamily: 'serif',
     },
+
+    // --- UPDATED GOOGLE BUTTON STYLES ---
     googleBtn: {
-      backgroundColor: colors.surface, // Surface color for cards/buttons
+      backgroundColor: colors.theme, 
       height: 56,
       borderRadius: 12,
+      flexDirection: 'row', // Aligns Icon and Text horizontally
       justifyContent: 'center',
       alignItems: 'center',
       marginBottom: 30,
       borderWidth: 1,
       borderColor: colors.border,
+      // Add Shadow/Elevation for better UI
+      elevation: 2,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 3,
+    },
+    googleIconWrapper: {
+      marginRight: 12, // Gap between Icon and Text
     },
     googleBtnText: {
-      color: colors.text,
+      color: colors.white,
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: 'bold',
       fontFamily: 'serif',
     },
+    // -------------------------------------
+
     footerContainer: {
       flexDirection: 'row',
       justifyContent: 'center',
@@ -132,10 +144,7 @@ const getLoginStyle = colors =>
     },
     loaderContainer: {
       position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
+      top: 0, left: 0, right: 0, bottom: 0,
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -144,15 +153,11 @@ const getLoginStyle = colors =>
     loader: {
       justifyContent: 'center',
       alignItems: 'center',
-      // backgroundColor: Colors.black_bg_Theme,
       padding: 20,
       borderRadius: 10,
       shadowColor: '#000',
       shadowOpacity: 0.2,
       shadowOffset: { width: 0, height: 4 },
-      // elevation: 6,
-      // borderWidth: 1,
-      // borderColor: '#333',
     },
   });
 
