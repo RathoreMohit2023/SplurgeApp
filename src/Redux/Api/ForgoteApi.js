@@ -7,18 +7,20 @@ const Url = `${BASE_URL}${Forgote_Url}`;
 
 export const ForgoteApi = createAsyncThunk(
     'ForgoteApi',
-    async (PosttData) => {
+    async (PosttData, { rejectWithValue }) => {
 
-        const token = await AsyncStorage.getItem('Token');
-        const parseToken = JSON.parse(token)
-        const headers = {
-            "Content-Type" : "multiPart/form-data",
-            "Authorization" : `Bearer ${parseToken}`
-        }
+        // const token = await AsyncStorage.getItem('Token');
+        // const parseToken = JSON.parse(token)
+        // const headers = {
+        //     "Content-Type" : "multiPart/form-data",
+        //     "Authorization" : `Bearer ${parseToken}`
+        // }
 
         try{
             const response = await axios.post(Url, PosttData, {
-                headers
+                headers: {
+                    "Content-Type": "application/json",
+                },
             })
             console.log("Response from ForgoteApi:", response.data);
       
@@ -27,6 +29,9 @@ export const ForgoteApi = createAsyncThunk(
         }
         catch(error){
             console.log('Error in ForgoteApi:', error.response.data)
+            return rejectWithValue(
+                error?.response?.data || "Something went wrong"
+            );
         }
     }
 );

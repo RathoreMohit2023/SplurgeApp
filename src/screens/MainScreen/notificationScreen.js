@@ -67,7 +67,7 @@ const NotificationScreen = ({ navigation }) => {
     formData.append("receiver_id", receiver_id);
     formData.append("status", "accepted");
     formData.append("note", "Payment settled successfully");
-    formData.append("settle_payment_id", settle_payment_id);
+    formData.append("settle_payment_id", settle_payment_id);                     
 
     try {
       const result = await dispatch(SettleUpRespondApi({ formData, token })).unwrap();

@@ -4,7 +4,7 @@ export const Img_url = 'https://stage.techsimba.in/splurge/public/uploads/users/
 
 export const Login_Url = 'login';
 export const SignUp_Url = 'register';
-export const Forgote_Url = '';
+export const Forgote_Url = 'forgot-password';
 
 // POST API
 export const AddTransaction_Url = 'add-transaction';

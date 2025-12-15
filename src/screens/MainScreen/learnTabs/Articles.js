@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FileText, CheckCircle2, Clock } from "lucide-react-native";
+import { FileText } from "lucide-react-native";
 
-import getArticlesStyle from "../../../styles/MainScreen/learnTabs/ArticleStyles"; // Import Style Function
+import getArticlesStyle from "../../../styles/MainScreen/learnTabs/ArticleStyles"; 
 import { ThemeContext } from "../../../components/ThemeContext";
 import { useNavigation } from '@react-navigation/native';
 import { GetArticleApi } from '../../../Redux/Api/GetArticleApi';

@@ -7,13 +7,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StatusBar
+  StatusBar,
+  Alert
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 import CustomInput from "../../components/CustomInput";
 import getForgotPasswordStyle from "../../styles/authenthication/forgoteStyle"; // Import Style Function
 import { ThemeContext } from "../../components/ThemeContext"; // Import Context
+import { useDispatch, useSelector } from "react-redux";
+import { ForgoteApi } from "../../Redux/Api/ForgoteApi";
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -24,7 +27,11 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  // const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const { forgoteLoading, isError, message } = useSelector((state) => state.Forgote)
 
   useEffect(() => {
     Animated.parallel([
@@ -41,12 +48,39 @@ const ForgotPasswordScreen = ({ navigation }) => {
     ]).start();
   }, []);
 
-  const handleSend = () => {
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleSend = async () => {
     if (!email || !email.includes("@")) {
       setEmailError("Please enter a valid email address.");
       return;
     }
-    setIsSubmitted(true);
+
+    const result = await dispatch(
+      ForgoteApi({
+        email: email,
+      })
+    );
+
+    if(ForgoteApi.fulfilled.match(result)){
+      Alert.alert("Success", 
+        "Forgote password email sent successfully",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("signIn")
+          },
+        ]
+      );
+    }else {
+      Alert.alert("Error",
+        message || "Something went wrong, please resend the email"
+      );
+    }
+    // setIsSubmitted(true);
   };
 
   return (
@@ -61,7 +95,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+        // keyboardShouldPersistTaps="handled"
       >
         <TouchableOpacity 
           style={styles.backButton} 
@@ -76,8 +110,8 @@ const ForgotPasswordScreen = ({ navigation }) => {
             { opacity: fade, transform: [{ translateY: slide }] }
           ]}
         >
-          {!isSubmitted ? (
-            <>
+          {/* {!isSubmitted ? ( */}
+            {/* <> */}
               <View style={styles.iconContainer}>
                 <View style={styles.iconGlow} />
                 <Icon name="lock-reset" size={64} color={colors.theme} />
@@ -85,7 +119,8 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
               <Text style={styles.title}>Reset Password</Text>
               <Text style={styles.subtitle}>
-                Enter the email associated with your account and we’ll send you an email with instructions to reset your password.
+                {/* Enter the email associated with your account and we’ll send you an email with instructions to reset your password. */}
+                Please enter the email address linked to your account. A secure password will be sent to your email to help you regain access.
               </Text>
 
               <View style={styles.form}>
@@ -94,23 +129,27 @@ const ForgotPasswordScreen = ({ navigation }) => {
                   value={email}
                   onChangeText={(text) => {
                     setEmail(text);
-                    if (emailError) setEmailError("");
+                    // if (emailError) setEmailError("");
+                    setEmailError("");
                   }}
-                  leftIcon="email-outline"
+                  // leftIcon="email-outline"
                   keyboardType="email-address"
                   error={emailError}
-                  // Pass colors props to CustomInput if supported
                 />
 
                 <TouchableOpacity 
                   style={styles.primaryBtn} 
                   onPress={handleSend}
-                  activeOpacity={0.8}
+                  disabled={forgoteLoading}
+                  // activeOpacity={0.8}
                 >
-                  <Text style={styles.primaryBtnText}>Send Instructions</Text>
+                  <Text style={styles.primaryBtnText}>
+                    {/* Send Instructions */}
+                    {forgoteLoading ? "Sending..." : "Send Instructions"}
+                  </Text>
                 </TouchableOpacity>
               </View>
-            </>
+            {/* </>
           ) : (
             <>
               <View style={styles.iconContainer}>
@@ -141,7 +180,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
                 <Text style={styles.resendText}>Did not receive the email? Resend</Text>
               </TouchableOpacity>
             </>
-          )}
+          )} */}
         </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
