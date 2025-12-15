@@ -116,7 +116,7 @@ const getAddGroupMemberModalStyle = (colors) => StyleSheet.create({
   cancelText: {
     color: colors.textSecondary,
     fontWeight: "600",
-    fontSize: 15,
+    fontSize: 13,
     fontFamily : 'serif',
   },
   addBtn: {
@@ -136,7 +136,7 @@ const getAddGroupMemberModalStyle = (colors) => StyleSheet.create({
   addBtnText: {
     color: "#FFF", // Button text usually white
     fontWeight: "700",
-    fontSize: 15,
+    fontSize: 13,
     fontFamily : 'serif',
   },
   // Yeh styles aap apni getAddGroupMemberModalStyle function ke andar add karein

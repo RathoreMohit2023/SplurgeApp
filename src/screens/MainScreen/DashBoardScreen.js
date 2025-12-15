@@ -110,6 +110,10 @@ const DashBoardScreen = ({ navigation }) => {
   const [toastMsg, setToastMsg] = useState('');
 
   const { LoginData } = useSelector(state => state.Login);
+    // Redux State
+    const { GetUserDetailsData, GetUserDetailsLoading } = useSelector(
+      state => state.GetUserDetails,
+    );
   const { GetWishlistData, GetWishlistLoading } = useSelector(state => state.GetWishlist);
   const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
   const { GetMonthlyBudgetData, GetMonthlyBudgetloading } = useSelector(state => state.GetMonthlyBudget);
@@ -350,7 +354,7 @@ const DashBoardScreen = ({ navigation }) => {
             {
               LoginData?.user?.profile_photo ? (
                 <Image
-                                 source={{ uri: Img_url +  LoginData?.user?.profile_photo }}
+                                 source={{ uri: Img_url +  GetUserDetailsData?.user_details[0]?.profile_photo }}
                                  style={styles.profileImage}
                                />
               ) : (

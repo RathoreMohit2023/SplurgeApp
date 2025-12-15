@@ -7,6 +7,8 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView, // Imported
+  Platform, // Imported
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { 
@@ -16,8 +18,8 @@ import {
   ChevronDown, 
   Check, 
 } from "lucide-react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+// Imports
 import CustomInput from "../components/CustomInput"; 
 import SelectionModal from "../components/SelectionModal"; 
 import getAddGroupExpenseModalStyle from "../styles/Modals/AddGroupExpenseModalStyle";
@@ -65,15 +67,13 @@ const AddGroupExpenseModal = ({
 
   const handleSave = () => {
     if (validate()) {
-      // Data ko parent component ko bhej dein
       onSubmit({
         description,
         amount: parseFloat(amount),
-        paidBy, // Payer ka naam
-        splitAmong, // User IDs ka array
+        paidBy,
+        splitAmong,
         date,
       });
-      // Parent component API response ke baad modal ko close karega
     }
   };
 
@@ -108,16 +108,24 @@ const AddGroupExpenseModal = ({
       onRequestClose={resetForm}
       statusBarTranslucent={true}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAwareScrollView
-            enableOnAndroid={true}
-            extraScrollHeight={20}
-            keyboardShouldPers-istTaps="handled"
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.overlay}
-        >
+      {/* WRAPPER: KeyboardAvoidingView is the main overlay now */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.overlay}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.modalContainer}>
-            <View style={styles.header}>
+            
+            {/* Header: Kept outside ScrollView to stay fixed at top */}
+            
+
+            {/* ScrollView: Only for form content */}
+            <ScrollView 
+              showsVerticalScrollIndicator={false} 
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.header}>
               <View>
                 <Text style={styles.title}>Add Group Expense</Text>
                 <Text style={styles.subtitle}>Track shared costs efficiently</Text>
@@ -126,8 +134,6 @@ const AddGroupExpenseModal = ({
                 <X size={20} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
-
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
               <View style={styles.inputWrapper}>
                 <CustomInput
                   label="Description"
@@ -155,11 +161,16 @@ const AddGroupExpenseModal = ({
                   error={errors.amount}
                 />
               </View>
+
+              {/* Payer Selector */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Paid By</Text>
                 <TouchableOpacity 
                   style={[styles.selectorCard, errors.paidBy && styles.errorBorder]}
-                  onPress={() => setShowPayerModal(true)}
+                  onPress={() => {
+                      Keyboard.dismiss();
+                      setShowPayerModal(true);
+                  }}
                   activeOpacity={0.7}
                 >
                   <View style={styles.selectorLeft}>
@@ -174,6 +185,8 @@ const AddGroupExpenseModal = ({
                   <ChevronDown size={20} color={colors.textSecondary} />
                 </TouchableOpacity>
               </View>
+
+              {/* Split Selector */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Split Among</Text>
                 <View style={styles.splitContainer}>
@@ -203,11 +216,16 @@ const AddGroupExpenseModal = ({
                 </View>
                 {errors.split && <Text style={styles.errorText}>{errors.split}</Text>}
               </View>
+
+              {/* Date Selector */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Date</Text>
                 <TouchableOpacity 
                   style={styles.selectorCard}
-                  onPress={() => setShowCalendar(true)}
+                  onPress={() => {
+                      Keyboard.dismiss();
+                      setShowCalendar(true);
+                  }}
                   activeOpacity={0.7}
                 >
                   <View style={styles.selectorLeft}>
@@ -222,13 +240,16 @@ const AddGroupExpenseModal = ({
                   <ChevronDown size={20} color={colors.textSecondary} />
                 </TouchableOpacity>
               </View>
+
               <TouchableOpacity style={styles.submitBtn} onPress={handleSave}>
                 <Text style={styles.submitBtnText}>Add Expense</Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
-        </KeyboardAwareScrollView>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+
+      {/* Helper Modals */}
       <SelectionModal
         visible={showPayerModal}
         onClose={() => setShowPayerModal(false)}
@@ -237,6 +258,7 @@ const AddGroupExpenseModal = ({
         title="Who paid for this?"
         selectedItem={paidBy}
       />
+
       <Modal
         transparent={true}
         visible={showCalendar}

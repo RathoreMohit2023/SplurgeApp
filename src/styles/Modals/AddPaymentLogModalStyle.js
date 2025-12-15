@@ -1,36 +1,46 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const { height } = Dimensions.get("window");
 
 const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)", // Overlay dark hi rehta hai
+    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
+    // KeyboardAvoidingView ke liye zaroori hai
+    width: "100%",
+    height: "100%", 
   },
   modalContainer: {
     width: "100%",
     maxWidth: 400,
-    backgroundColor: colors.surface, // Dynamic: White (Light) / Dark Grey (Dark)
+    backgroundColor: colors.surface,
     borderRadius: 24,
     padding: 24,
+    // Max height set karenge taaki keyboard aane par adjust ho sake
+    maxHeight: height * 0.85, 
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
     shadowRadius: 20,
     elevation: 10,
+    display: 'flex',
+    flexDirection: 'column',
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 25,
+    marginBottom: 15, // Thoda kam kiya space save karne ke liye
+    flexShrink: 0, // Header shrink nahi hona chahiye
   },
   modalTitle: {
     fontSize: 22,
     fontFamily: 'serif',
     fontWeight: "700",
-    color: colors.text, // Dynamic Text
+    color: colors.text,
   },
   modalSubtitle: {
     fontSize: 13,
@@ -40,11 +50,11 @@ const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
   },
   closeIconBtn: {
     padding: 8,
-    backgroundColor: colors.background, // Dynamic button bg
+    backgroundColor: colors.background,
     borderRadius: 12,
   },
   scrollContent: {
-    // paddingBottom: 10,
+    paddingBottom: 20, // Scroll ke neeche thodi jagah
   },
   inputGroup: {
     marginBottom: 16,
@@ -63,7 +73,7 @@ const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: colors.background, // Inset look
+    backgroundColor: colors.background,
     height: 56,
     borderRadius: 16,
     paddingHorizontal: 12,
@@ -109,6 +119,7 @@ const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
     marginTop: 10,
     justifyContent: "space-between",
     gap: 12,
+    flexShrink: 0, // Buttons shrink nahi hone chahiye
   },
   cancelButton: {
     flex: 1,
@@ -143,7 +154,7 @@ const getAddPaymentLogModalStyle = (colors) => StyleSheet.create({
     fontSize: 16,
     fontFamily: 'serif',
     fontWeight: "700",
-    color: "#fff", // Button text usually white
+    color: "#fff",
   },
 
   /* Calendar Overlay */

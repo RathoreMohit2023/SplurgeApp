@@ -6,6 +6,7 @@ import {
   Animated,
   ScrollView,
   StatusBar,
+  KeyboardAvoidingView,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -161,18 +162,10 @@ const SignUp = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAwareScrollView
-      contentContainerStyle={{
-        flexGrow: 1,
-        paddingHorizontal: 24,
-        paddingBottom: 40 + insets.bottom,
-        backgroundColor: colors.background,
-      }}
-      enableOnAndroid={true}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
-      style={{ backgroundColor: colors.background }}
-    >
+    <KeyboardAvoidingView
+            style={{ flex: 1, paddingHorizontal: 15, backgroundColor: colors.background }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
       <StatusBar 
         barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'} 
         backgroundColor={colors.background} 
@@ -324,7 +317,7 @@ const SignUp = ({ navigation }) => {
         showCancel={false}
       />
 
-    </KeyboardAwareScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

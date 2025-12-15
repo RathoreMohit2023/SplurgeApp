@@ -6,9 +6,12 @@ import {
   Animated,
   Image,
   StatusBar,
-  ScrollView
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { darkLogo, MainLogo } from "../../Assets/Images";
 import CustomInput from "../../components/CustomInput"; 
 import getLoginStyle from "../../styles/authenthication/LoginStyle";
@@ -48,7 +51,6 @@ const SignInScreen = ({ navigation }) => {
     }).start();
   }, [fade]);
 
-  // ... (Your existing validateInputs and useEffect for loadSavedCredentials remain the same) ...
   const validateInputs = () => {
     let isValid = true;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -95,8 +97,6 @@ const SignInScreen = ({ navigation }) => {
   }, []);  
 
   const handleSignIn = async () => {
-     // ... (Your existing handleSignIn logic) ...
-     // For brevity, keeping your existing logic structure
      setEmailError('');
      setPasswordError('');
  
@@ -156,136 +156,115 @@ const SignInScreen = ({ navigation }) => {
       };
 
       console.log("postData:", postData);
-      // try {
-      //   const result = await dispatch(LoginApi(formData));
-      //   const response = result?.payload;
-  
-      //   if (
-      //     response?.token ||
-      //     response?.status === 200 ||
-      //     response?.message?.toLowerCase().includes('success')
-      //   ) {
-      //     setToastMsg(response?.message || 'Login Successful');
-      //     setShowToast(true);
-  
-      //     if (rememberMe) {
-      //       await AsyncStorage.setItem("savedEmail", email);
-      //       await AsyncStorage.setItem("savedPassword", password);
-      //     } else {
-      //       await AsyncStorage.removeItem("savedEmail");
-      //       await AsyncStorage.removeItem("savedPassword");
-      //     }
-          
-      //     setTimeout(() => {
-      //       navigation.replace('MainScreen');
-      //     }, 1500);
-      //   } else {
-      //     setToastMsg(response?.message || 'Invalid credentials');
-      //     setShowToast(true);
-      //   }
+      
+      // Logic for backend API call with google data goes here
+      
     } catch (error) {
      setToastMsg('Something went wrong. Please try again.');
       setShowToast(true);
-     
     }
   };
 
   return (
-    <KeyboardAwareScrollView
-      contentContainerStyle={styles.container}
-      enableOnAndroid={true}
-      extraScrollHeight={20}
-      style={{ backgroundColor: colors.background }}
-    >
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar
         barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={colors.background}
       />
-
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+      
+      {/* 
+        KeyboardAvoidingView adjusts the view height when the keyboard opens.
+        behavior: "padding" works best on iOS.
+        behavior: "height" works best on Android.
+      */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <Animated.View
-          style={{ width: '100%', opacity: fade, alignItems: 'center' }}
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Image source={appLogo} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.welcomeText}>Welcome Back!</Text>
-          <Text style={styles.tagline}>Spend smarter. Live better.</Text>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <Animated.View
+              style={{ width: '100%', opacity: fade, alignItems: 'center' }}
+            >
+              <Image source={appLogo} style={styles.logo} resizeMode="contain" />
+              <Text style={styles.welcomeText}>Welcome Back!</Text>
+              <Text style={styles.tagline}>Spend smarter. Live better.</Text>
 
-          <View style={styles.formContainer}>
-            <CustomInput
-              label="Email"
-              value={email}
-              onChangeText={text => {
-                setEmail(text);
-                setEmailError('');
-              }}
-              leftIcon="email-outline"
-              keyboardType="email-address"
-              error={emailError}
-            />
-
-            <CustomInput
-              label="Password"
-              value={password}
-              onChangeText={text => {
-                setPassword(text);
-                setPasswordError('');
-              }}
-              leftIcon="lock-outline"
-              password={true}
-              error={passwordError}
-            />
-
-            <View style={styles.rowBetween}>
-              <View style={styles.row}>
-                <CheckBox
-                  value={rememberMe}
-                  onValueChange={(val) => setRememberMe(val)}
-                  tintColors={{ true: colors.theme, false: colors.text }}
+              <View style={styles.formContainer}>
+                <CustomInput
+                  label="Email"
+                  value={email}
+                  onChangeText={text => {
+                    setEmail(text);
+                    setEmailError('');
+                  }}
+                  leftIcon="email-outline"
+                  keyboardType="email-address"
+                  error={emailError}
                 />
-                <Text style={styles.rememberText}>Remember Me</Text>
+
+                <CustomInput
+                  label="Password"
+                  value={password}
+                  onChangeText={text => {
+                    setPassword(text);
+                    setPasswordError('');
+                  }}
+                  leftIcon="lock-outline"
+                  password={true}
+                  error={passwordError}
+                />
+
+                <View style={styles.rowBetween}>
+                  <View style={styles.row}>
+                    <CheckBox
+                      value={rememberMe}
+                      onValueChange={(val) => setRememberMe(val)}
+                      tintColors={{ true: colors.theme, false: colors.text }}
+                    />
+                    <Text style={styles.rememberText}>Remember Me</Text>
+                  </View>
+
+                  <TouchableOpacity onPress={() => navigation.navigate("forgotePassword")}>
+                    <Text style={styles.forgotText}>Forgot Password?</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn}>
+                  <Text style={styles.primaryBtnText}>
+                    {LoginLoading ? 'Please wait...' : 'Sign In'}
+                  </Text>
+                </TouchableOpacity>
+
+                <View style={styles.dividerContainer}>
+                  <View style={styles.dividerLine} />
+                  <Text style={styles.dividerText}>OR</Text>
+                  <View style={styles.dividerLine} />
+                </View>
+
+                <TouchableOpacity onPress={handleGoogleSignIn} style={styles.googleBtn} activeOpacity={0.8}>
+                  <View style={styles.googleIconWrapper}>
+                    <Icon name="google" size={24} color={colors.white} />
+                  </View>
+                  <Text style={styles.googleBtnText}>Continue with Google</Text>
+                </TouchableOpacity>
+
+                <View style={styles.footerContainer}>
+                  <Text style={styles.footerText}>Don't have an account? </Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('signUp')}>
+                    <Text style={styles.signUpText}>Sign Up</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
-              <TouchableOpacity onPress={() => navigation.navigate("forgotePassword")}>
-                <Text style={styles.forgotText}>Forgot Password?</Text>
-              </TouchableOpacity>
-            </View>
-
-
-            <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn}>
-              <Text style={styles.primaryBtnText}>
-                {LoginLoading ? 'Please wait...' : 'Sign In'}
-              </Text>
-            </TouchableOpacity>
-
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>OR</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* --------- UPDATED GOOGLE BUTTON --------- */}
-            <TouchableOpacity onPress={handleGoogleSignIn} style={styles.googleBtn} activeOpacity={0.8}>
-              <View style={styles.googleIconWrapper}>
-                {/* You can change color to "#DB4437" for Google Red, or use colors.text */}
-                <Icon name="google" size={24} color={colors.white} />
-              </View>
-              <Text style={styles.googleBtnText}>Continue with Google</Text>
-            </TouchableOpacity>
-            {/* ----------------------------------------- */}
-
-            <View style={styles.footerContainer}>
-              <Text style={styles.footerText}>Don't have an account? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('signUp')}>
-                <Text style={styles.signUpText}>Sign Up</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Animated.View>
-      </ScrollView>
       {LoginLoading && <DashedLoader color={colors.primary} size={100} />}
       
       <ToastMessage
@@ -293,7 +272,7 @@ const SignInScreen = ({ navigation }) => {
         message={toastMsg}
         onHide={() => setShowToast(false)}
       />
-    </KeyboardAwareScrollView>
+    </View>
   );
 };
 

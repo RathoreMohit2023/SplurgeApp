@@ -6,6 +6,9 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { 
@@ -19,11 +22,8 @@ import {
 // Imports
 import CustomInput from "../components/CustomInput";
 import SelectionModal from "../components/SelectionModal";
-import getAddPaymentLogModalStyle from "../styles/Modals/AddPaymentLogModalStyle"; // Import Style Function
-import { ThemeContext } from "../components/ThemeContext"; // Import Context
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
-
+import getAddPaymentLogModalStyle from "../styles/Modals/AddPaymentLogModalStyle";
+import { ThemeContext } from "../components/ThemeContext";
 
 const TYPE_OPTIONS = [
   { label: "They owe me", value: "they_owe_me" },
@@ -31,10 +31,7 @@ const TYPE_OPTIONS = [
 ];
 
 const AddPaymentLogModal = ({ visible, onClose, friends = [], onSave }) => {
-  // 1. Context Hook
   const { colors } = useContext(ThemeContext);
-
-  // 2. Styles Memoization
   const styles = useMemo(() => getAddPaymentLogModalStyle(colors), [colors]);
 
   // --- Form State ---
@@ -80,6 +77,7 @@ const AddPaymentLogModal = ({ visible, onClose, friends = [], onSave }) => {
   };
 
   const handleOpenFriendSelect = () => {
+    Keyboard.dismiss(); // Close keyboard before opening another modal
     const friendNames = friends?.map((f) => f.fullname);
     setSelectionData(friendNames);
     setSelectionTitle("Select Friend");
@@ -88,6 +86,7 @@ const AddPaymentLogModal = ({ visible, onClose, friends = [], onSave }) => {
   };
 
   const handleOpenTypeSelect = () => {
+    Keyboard.dismiss();
     const typeLabels = TYPE_OPTIONS.map((t) => t.label);
     setSelectionData(typeLabels);
     setSelectionTitle("Select Type");
@@ -119,138 +118,145 @@ const AddPaymentLogModal = ({ visible, onClose, friends = [], onSave }) => {
       transparent 
       onRequestClose={onClose}
       statusBarTranslucent={true}
-
     >
-      <KeyboardAwareScrollView
-        showsVerticalScrollIndicator={false}
-        enableOnAndroid={true}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.overlay}
-      >
-        <View style={styles.modalContainer}>
-          
-          {/* Header */}
-          <View style={styles.header}>
-            <View>
-              <Text style={styles.modalTitle}>New Payment Log</Text>
-              <Text style={styles.modalSubtitle}>Track debts and credits</Text>
-            </View>
-            <TouchableOpacity onPress={resetForm} style={styles.closeIconBtn}>
-              {/* Dynamic Icon */}
-              <X size={24} color={colors.textSecondary} />
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView 
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
-          >
+       {/* 
+          FIX: KeyboardAvoidingView is now the main wrapper.
+          style is used instead of contentContainerStyle.
+       */}
+       <KeyboardAvoidingView
+         style={styles.overlay}
+         behavior={Platform.OS === "ios" ? "padding" : "height"}
+       >
+        {/* Optional: Dismiss keyboard when tapping outside */}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.modalContainer}>
             
-            {/* --- FRIEND SELECTOR --- */}
-            <View style={styles.inputGroup}>
-                <Text style={styles.label}>With whom?</Text>
-                <TouchableOpacity
-                  style={[styles.modernSelector, errors.friend && styles.errorBorder]}
-                  onPress={handleOpenFriendSelect}
-                  activeOpacity={0.7}
-                >
-                <View style={styles.selectorLeft}>
-                    {/* Fixed color badge for distinction */}
-                    <View style={[styles.iconBadge, { backgroundColor: '#E3F2FD' }]}>
-                        <User size={20} color="#2196F3" />
-                    </View>
-                    <Text style={[styles.selectorValue, !friend && styles.placeholderText]}>
-                      {friend?.label || "Select Friend"}
-                    </Text>
-                </View>
-                <ChevronDown size={20} color={colors.textSecondary} />
-                </TouchableOpacity>
-                {errors.friend && <Text style={styles.errorText}>{errors.friend}</Text>}
-            </View>
-
-            {/* --- TYPE SELECTOR --- */}
-            <View style={styles.inputGroup}>
-                <Text style={styles.label}>Type</Text>
-                <TouchableOpacity
-                  style={[styles.modernSelector, errors.type && styles.errorBorder]}
-                  onPress={handleOpenTypeSelect}
-                  activeOpacity={0.7}
-                >
-                <View style={styles.selectorLeft}>
-                    <View style={[styles.iconBadge, { backgroundColor: '#F3E5F5' }]}>
-                        <ArrowRightLeft size={20} color="#9C27B0" />
-                    </View>
-                    <Text style={[styles.selectorValue, !type && styles.placeholderText]}>
-                      {type?.label || "Select Type"}
-                    </Text>
-                </View>
-                <ChevronDown size={20} color={colors.textSecondary} />
-                </TouchableOpacity>
-                {errors.type && <Text style={styles.errorText}>{errors.type}</Text>}
-            </View>
-
-            {/* --- DATE SELECTOR --- */}
-            <View style={styles.inputGroup}>
-                <Text style={styles.label}>Date</Text>
-                <TouchableOpacity
-                  style={styles.modernSelector}
-                  onPress={() => setShowCalendar(true)}
-                  activeOpacity={0.7}
-                >
-                <View style={styles.selectorLeft}>
-                    <View style={[styles.iconBadge, { backgroundColor: '#E8F5E9' }]}>
-                        <CalendarIcon size={20} color="#4CAF50" />
-                    </View>
-                    <Text style={styles.selectorValue}>
-                      {date.toDateString()}
-                    </Text>
-                </View>
-                <ChevronDown size={20} color={colors.textSecondary} />
-                </TouchableOpacity>
-            </View>
-
-            {/* --- AMOUNT & DESCRIPTION --- */}
-            <View style={styles.inputGroup}>
-                 <CustomInput
-                    label="Amount"
-                    value={amount}
-                    onChangeText={(text) => {
-                        setAmount(text);
-                        setErrors((prev) => ({ ...prev, amount: "" }));
-                    }}
-                    keyboardType="numeric"
-                    leftIcon="currency-inr"
-                    error={errors.amount}
-                />
-            </View>
-
-            <View style={styles.inputGroup}>
-                <CustomInput
-                    label="Description"
-                    value={description}
-                    onChangeText={(text) => {
-                        setDescription(text);
-                        setErrors((prev) => ({ ...prev, description: "" }));
-                    }}
-                    leftIcon="text"
-                    error={errors.description}
-                />
-            </View>
-
-            {/* --- ACTION BUTTONS --- */}
-            <View style={styles.actionRow}>
-              <TouchableOpacity style={styles.cancelButton} onPress={resetForm}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+            {/* Header (Outside ScrollView so it sticks) */}
+            <View style={styles.header}>
+              <View>
+                <Text style={styles.modalTitle}>New Payment Log</Text>
+                <Text style={styles.modalSubtitle}>Track debts and credits</Text>
+              </View>
+              <TouchableOpacity onPress={resetForm} style={styles.closeIconBtn}>
+                <X size={24} color={colors.textSecondary} />
               </TouchableOpacity>
+            </View>
+
+            {/* ScrollView wraps Inputs and Buttons */}
+            <ScrollView 
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled" // Important for touch events
+            >
               
-              <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                <Text style={styles.saveButtonText}>Save Log</Text>
-              </TouchableOpacity>
-            </View>
+              {/* --- FRIEND SELECTOR --- */}
+              <View style={styles.inputGroup}>
+                  <Text style={styles.label}>With whom?</Text>
+                  <TouchableOpacity
+                    style={[styles.modernSelector, errors.friend && styles.errorBorder]}
+                    onPress={handleOpenFriendSelect}
+                    activeOpacity={0.7}
+                  >
+                  <View style={styles.selectorLeft}>
+                      <View style={[styles.iconBadge, { backgroundColor: '#E3F2FD' }]}>
+                          <User size={20} color="#2196F3" />
+                      </View>
+                      <Text style={[styles.selectorValue, !friend && styles.placeholderText]}>
+                        {friend?.label || "Select Friend"}
+                      </Text>
+                  </View>
+                  <ChevronDown size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                  {errors.friend && <Text style={styles.errorText}>{errors.friend}</Text>}
+              </View>
 
-          </ScrollView>
-        </View>
-      </KeyboardAwareScrollView>
+              {/* --- TYPE SELECTOR --- */}
+              <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Type</Text>
+                  <TouchableOpacity
+                    style={[styles.modernSelector, errors.type && styles.errorBorder]}
+                    onPress={handleOpenTypeSelect}
+                    activeOpacity={0.7}
+                  >
+                  <View style={styles.selectorLeft}>
+                      <View style={[styles.iconBadge, { backgroundColor: '#F3E5F5' }]}>
+                          <ArrowRightLeft size={20} color="#9C27B0" />
+                      </View>
+                      <Text style={[styles.selectorValue, !type && styles.placeholderText]}>
+                        {type?.label || "Select Type"}
+                      </Text>
+                  </View>
+                  <ChevronDown size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                  {errors.type && <Text style={styles.errorText}>{errors.type}</Text>}
+              </View>
+
+              {/* --- DATE SELECTOR --- */}
+              <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Date</Text>
+                  <TouchableOpacity
+                    style={styles.modernSelector}
+                    onPress={() => {
+                        Keyboard.dismiss();
+                        setShowCalendar(true);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                  <View style={styles.selectorLeft}>
+                      <View style={[styles.iconBadge, { backgroundColor: '#E8F5E9' }]}>
+                          <CalendarIcon size={20} color="#4CAF50" />
+                      </View>
+                      <Text style={styles.selectorValue}>
+                        {date.toDateString()}
+                      </Text>
+                  </View>
+                  <ChevronDown size={20} color={colors.textSecondary} />
+                  </TouchableOpacity>
+              </View>
+
+              {/* --- AMOUNT & DESCRIPTION --- */}
+              <View style={styles.inputGroup}>
+                   <CustomInput
+                      label="Amount"
+                      value={amount}
+                      onChangeText={(text) => {
+                          setAmount(text);
+                          setErrors((prev) => ({ ...prev, amount: "" }));
+                      }}
+                      keyboardType="numeric"
+                      leftIcon="currency-inr"
+                      error={errors.amount}
+                  />
+              </View>
+
+              <View style={styles.inputGroup}>
+                  <CustomInput
+                      label="Description"
+                      value={description}
+                      onChangeText={(text) => {
+                          setDescription(text);
+                          setErrors((prev) => ({ ...prev, description: "" }));
+                      }}
+                      leftIcon="text"
+                      error={errors.description}
+                  />
+              </View>
+
+              {/* --- ACTION BUTTONS (Inside ScrollView now) --- */}
+              <View style={styles.actionRow}>
+                <TouchableOpacity style={styles.cancelButton} onPress={resetForm}>
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                  <Text style={styles.saveButtonText}>Save Log</Text>
+                </TouchableOpacity>
+              </View>
+
+            </ScrollView>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
 
       {/* --- REUSABLE SELECTION MODAL --- */}
       <SelectionModal
@@ -281,7 +287,6 @@ const AddPaymentLogModal = ({ visible, onClose, friends = [], onSave }) => {
                   selectedColor: colors.theme,
                 },
               }}
-              // Applying Dynamic Theme to Calendar
               theme={{
                 calendarBackground: colors.surface,
                 textSectionTitleColor: colors.textSecondary,

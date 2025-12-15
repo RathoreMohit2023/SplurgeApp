@@ -1,4 +1,6 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const { height } = Dimensions.get("window");
 
 const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
   overlay: {
@@ -7,11 +9,14 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
+    // KeyboardAvoidingView ke liye full width/height
+    width: "100%",
+    height: "100%",
   },
   modalContainer: {
     width: "100%",
     maxWidth: 400,
-    backgroundColor: colors.surface, // Dynamic Surface
+    backgroundColor: colors.surface,
     borderRadius: 24,
     padding: 24,
     borderWidth: 1,
@@ -21,19 +26,23 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 24,
     elevation: 10,
-    maxHeight: "90%",
+    // Max height set karenge taaki keyboard aane par overflow na ho
+    maxHeight: height * 0.85, 
+    display: 'flex',
+    flexDirection: 'column',
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 24,
+    marginBottom: 20,
+    flexShrink: 0, // Header shrink nahi hona chahiye
   },
   title: {
     fontSize: 20,
     fontFamily : 'serif',
     fontWeight: "700",
-    color: colors.text, // Dynamic Text
+    color: colors.text,
     marginBottom: 2,
   },
   subtitle: {
@@ -73,7 +82,7 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: colors.background, // Inset look
+    backgroundColor: colors.background,
     borderRadius: 16,
     padding: 12,
     borderWidth: 1,
@@ -93,7 +102,7 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
     marginRight: 12,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.tintedThemeColor, // Light Theme Tint
+    backgroundColor: colors.tintedThemeColor,
   },
   selectorLabel: {
     fontSize: 11,
@@ -130,7 +139,7 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
     marginBottom: 4,
   },
   splitItemSelected: {
-    backgroundColor: colors.tintedThemeColor, // Highlight selected item
+    backgroundColor: colors.tintedThemeColor,
     borderColor: colors.theme,
     borderWidth: 1,
   },
@@ -160,7 +169,7 @@ const getAddGroupExpenseModalStyle = (colors) => StyleSheet.create({
     fontWeight: "700",
   },
   avatarTextSelected: {
-    color: "#FFF", // Text inside selected avatar
+    color: "#FFF",
   },
   splitName: {
     fontSize: 14,

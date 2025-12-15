@@ -165,6 +165,7 @@ const LedgerTab = () => {
             fetchTransactions();
         } else {
             setToastMsg(result.message || "Failed to delete transaction.");
+            fetchTransactions();
         }
     } catch (error) {
         setToastMsg("Something went wrong. Please try again.");

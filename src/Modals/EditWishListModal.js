@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   Modal,
   Text,
+  KeyboardAvoidingView,
 } from "react-native";
 import { X, RotateCcw } from "lucide-react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -97,13 +98,9 @@ const EditWishListModal = ({ visible, onClose, onSave, itemToEdit }) => {
             </View>
           </View>
 
-          <KeyboardAwareScrollView
-            enableOnAndroid={true}
-            extraScrollHeight={20}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          >
+          <KeyboardAvoidingView
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                      >
             <View style={styles.form}>
               <CustomInput
                 label="Item Name"
@@ -147,7 +144,7 @@ const EditWishListModal = ({ visible, onClose, onSave, itemToEdit }) => {
             <TouchableOpacity style={[styles.saveBtn, { marginTop: 20 }]} onPress={handleSave}>
               <Text style={styles.saveBtnText}>Update Item</Text>
             </TouchableOpacity>
-          </KeyboardAwareScrollView>
+          </KeyboardAvoidingView>
         </View>
       </View>
     </Modal>

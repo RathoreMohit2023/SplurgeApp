@@ -247,7 +247,7 @@ const PersonalInfoScreen = ({ navigation }) => {
       if (result?.status === true) {
         showSnack(result?.message);
         fetchInitialData();
-        navigation.goBack();
+        setTimeout(() => navigation.goBack(), 500);
       } else {
         showSnack(result?.message);
         fetchInitialData();

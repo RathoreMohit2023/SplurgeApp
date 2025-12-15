@@ -1,5 +1,5 @@
 import React, { useState, useContext, useMemo } from "react";
-import { View, TouchableOpacity, Modal, Text } from "react-native";
+import { View, TouchableOpacity, Modal, Text, KeyboardAvoidingView } from "react-native";
 import {
   X,
   ShoppingBag,
@@ -108,13 +108,9 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
             </View>
           </View>
 
-          <KeyboardAwareScrollView
-                      enableOnAndroid={true}
-                      extraScrollHeight={20}
-                      keyboardShouldPersistTaps="handled"
-                      showsVerticalScrollIndicator={false}
-                      contentContainerStyle={{ paddingBottom: 20 }}
-                    >
+        <KeyboardAvoidingView
+               behavior={Platform.OS === "ios" ? "padding" : "height"}
+             >
             <View style={styles.form}>
             <TouchableOpacity
                 onPress={() => setCategoryModalVisible(true)}
@@ -171,7 +167,7 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
             <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
               <Text style={styles.saveBtnText}>Save Transaction</Text>
             </TouchableOpacity>
-          </KeyboardAwareScrollView>
+          </KeyboardAvoidingView>
         </View>
       </View>
 
