@@ -6,12 +6,10 @@ import {
   Animated,
   Image,
   StatusBar,
-  Alert,
   ScrollView
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { darkLogo, MainLogo } from "../../Assets/Images";
-// import { getData } from "../../Redux/storage"; 
 import CustomInput from "../../components/CustomInput"; 
 import getLoginStyle from "../../styles/authenthication/LoginStyle";
 import { ThemeContext } from "../../components/ThemeContext";
@@ -22,6 +20,9 @@ import DashedLoader from "../../components/DashedLoader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CheckBox from "@react-native-community/checkbox";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+// IMPORTS: Add Vector Icons
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SignInScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -47,6 +48,7 @@ const SignInScreen = ({ navigation }) => {
     }).start();
   }, [fade]);
 
+  // ... (Your existing validateInputs and useEffect for loadSavedCredentials remain the same) ...
   const validateInputs = () => {
     let isValid = true;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -89,51 +91,52 @@ const SignInScreen = ({ navigation }) => {
         console.log("Error loading saved credentials", error);
       }
     };
-  
     loadSavedCredentials();
   }, []);  
 
   const handleSignIn = async () => {
-    setEmailError('');
-    setPasswordError('');
-
-    if (!validateInputs()) return;
-
-    const formData = new FormData();
-    formData.append('email', email.trim());
-    formData.append('password', password);
-
-    try {
-      const result = await dispatch(LoginApi(formData));
-      const response = result?.payload;
-
-      if (
-        response?.token ||
-        response?.status === 200 ||
-        response?.message?.toLowerCase().includes('success')
-      ) {
-        setToastMsg(response?.message || 'Login Successful');
-        setShowToast(true);
-
-        if (rememberMe) {
-          await AsyncStorage.setItem("savedEmail", email);
-          await AsyncStorage.setItem("savedPassword", password);
-        } else {
-          await AsyncStorage.removeItem("savedEmail");
-          await AsyncStorage.removeItem("savedPassword");
-        }
-        
-        setTimeout(() => {
-          navigation.replace('MainScreen');
-        }, 1500);
-      } else {
-        setToastMsg(response?.message || 'Invalid credentials');
-        setShowToast(true);
-      }
-    } catch (error) {
-      setToastMsg('Something went wrong. Please try again.');
-      setShowToast(true);
-    } 
+     // ... (Your existing handleSignIn logic) ...
+     // For brevity, keeping your existing logic structure
+     setEmailError('');
+     setPasswordError('');
+ 
+     if (!validateInputs()) return;
+ 
+     const formData = new FormData();
+     formData.append('email', email.trim());
+     formData.append('password', password);
+ 
+     try {
+       const result = await dispatch(LoginApi(formData));
+       const response = result?.payload;
+ 
+       if (
+         response?.token ||
+         response?.status === 200 ||
+         response?.message?.toLowerCase().includes('success')
+       ) {
+         setToastMsg(response?.message || 'Login Successful');
+         setShowToast(true);
+ 
+         if (rememberMe) {
+           await AsyncStorage.setItem("savedEmail", email);
+           await AsyncStorage.setItem("savedPassword", password);
+         } else {
+           await AsyncStorage.removeItem("savedEmail");
+           await AsyncStorage.removeItem("savedPassword");
+         }
+         
+         setTimeout(() => {
+           navigation.replace('MainScreen');
+         }, 1500);
+       } else {
+         setToastMsg(response?.message || 'Invalid credentials');
+         setShowToast(true);
+       }
+     } catch (error) {
+       setToastMsg('Something went wrong. Please try again.');
+       setShowToast(true);
+     } 
   };
 
 
@@ -153,35 +156,36 @@ const SignInScreen = ({ navigation }) => {
       };
 
       console.log("postData:", postData);
-      
-
       // try {
-      //   AsyncStorage.setItem('userLoginData', JSON.stringify(postData));
-      // } catch (error) {
-      //   console.error('Error saving login data:', error);
-      // }
-
-      // dispatch(googleLoginApi(postData)).then(async data => {
-      //   if (data?.payload?.status === true) {
-      //     setModalToastVisible(true);
-      //     await AsyncStorage.setItem(
-      //       'User',
-      //       JSON.stringify(data.payload?.user),
-      //     );
-      //     await AsyncStorage.setItem(
-      //       'Token',
-      //       JSON.stringify(data.payload?.token),
-      //     );
-      //     dispatch(UserDetailsApi(data.payload?.token));
+      //   const result = await dispatch(LoginApi(formData));
+      //   const response = result?.payload;
+  
+      //   if (
+      //     response?.token ||
+      //     response?.status === 200 ||
+      //     response?.message?.toLowerCase().includes('success')
+      //   ) {
+      //     setToastMsg(response?.message || 'Login Successful');
+      //     setShowToast(true);
+  
+      //     if (rememberMe) {
+      //       await AsyncStorage.setItem("savedEmail", email);
+      //       await AsyncStorage.setItem("savedPassword", password);
+      //     } else {
+      //       await AsyncStorage.removeItem("savedEmail");
+      //       await AsyncStorage.removeItem("savedPassword");
+      //     }
+          
       //     setTimeout(() => {
-      //       setModalToastVisible(false);
-      //     }, 1000);
+      //       navigation.replace('MainScreen');
+      //     }, 1500);
       //   } else {
-      //     setLoginFailed(true);
+      //     setToastMsg(response?.message || 'Invalid credentials');
+      //     setShowToast(true);
       //   }
-      // });
     } catch (error) {
-     console.log("Error:", error);
+     setToastMsg('Something went wrong. Please try again.');
+      setShowToast(true);
      
     }
   };
@@ -235,13 +239,6 @@ const SignInScreen = ({ navigation }) => {
               error={passwordError}
             />
 
-            {/* <TouchableOpacity 
-              onPress={() => navigation.navigate("forgotePassword")}
-              style={styles.forgotContainer}
-            >
-              <Text style={styles.forgotText}>Forgot Password?</Text>
-            </TouchableOpacity> */}
-
             <View style={styles.rowBetween}>
               <View style={styles.row}>
                 <CheckBox
@@ -270,9 +267,15 @@ const SignInScreen = ({ navigation }) => {
               <View style={styles.dividerLine} />
             </View>
 
-            <TouchableOpacity onPress={handleGoogleSignIn} style={styles.googleBtn}>
+            {/* --------- UPDATED GOOGLE BUTTON --------- */}
+            <TouchableOpacity onPress={handleGoogleSignIn} style={styles.googleBtn} activeOpacity={0.8}>
+              <View style={styles.googleIconWrapper}>
+                {/* You can change color to "#DB4437" for Google Red, or use colors.text */}
+                <Icon name="google" size={24} color={colors.white} />
+              </View>
               <Text style={styles.googleBtnText}>Continue with Google</Text>
             </TouchableOpacity>
+            {/* ----------------------------------------- */}
 
             <View style={styles.footerContainer}>
               <Text style={styles.footerText}>Don't have an account? </Text>
