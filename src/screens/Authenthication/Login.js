@@ -12,12 +12,12 @@ import {
   TouchableWithoutFeedback,
   Keyboard
 } from "react-native";
-import { darkLogo, MainLogo } from "../../Assets/Images";
+import { darkLogo, googleLogo, MainLogo } from "../../Assets/Images";
 import CustomInput from "../../components/CustomInput"; 
 import getLoginStyle from "../../styles/authenthication/LoginStyle";
 import { ThemeContext } from "../../components/ThemeContext";
 import { useDispatch, useSelector } from "react-redux";
-import { LoginApi } from "../../Redux/Api/LoginApi";
+import { GoogleLoginApi, LoginApi } from "../../Redux/Api/LoginApi";
 import ToastMessage from '../../components/ToastMessage';
 import DashedLoader from "../../components/DashedLoader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -105,7 +105,7 @@ const SignInScreen = ({ navigation }) => {
      const formData = new FormData();
      formData.append('email', email.trim());
      formData.append('password', password);
- 
+     
      try {
        const result = await dispatch(LoginApi(formData));
        const response = result?.payload;
@@ -145,19 +145,48 @@ const SignInScreen = ({ navigation }) => {
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
       GoogleSignin.signOut();
       const userInfo = await GoogleSignin.signIn();
+      console.log("userInfo:", userInfo);
+      
 
       const user = userInfo?.data?.user;
-      const postData = {
-        first_name: user?.givenName,
-        last_name: user?.familyName,
-        email: user?.email,
-        google_id: user?.id,
-        password: user?.givenName,
-      };
 
-      console.log("postData:", postData);
+      const formData = new FormData();
+      formData.append('email', user?.email);
+      formData.append('fullname', user?.givenName + ' ' + user?.familyName);
+
+      console.log("formData:", formData);
       
-      // Logic for backend API call with google data goes here
+      try {
+        const result = await dispatch(GoogleLoginApi(formData));
+        const response = result?.payload;
+  
+        if (
+          response?.token ||
+          response?.status === 200 ||
+          response?.message?.toLowerCase().includes('success')
+        ) {
+          setToastMsg(response?.message || 'Login Successful');
+          setShowToast(true);
+  
+          if (rememberMe) {
+            await AsyncStorage.setItem("savedEmail", email);
+            await AsyncStorage.setItem("savedPassword", password);
+          } else {
+            await AsyncStorage.removeItem("savedEmail");
+            await AsyncStorage.removeItem("savedPassword");
+          }
+          
+          setTimeout(() => {
+            navigation.replace('MainScreen');
+          }, 1500);
+        } else {
+          setToastMsg(response?.message || 'Invalid credentials');
+          setShowToast(true);
+        }
+      } catch (error) {
+        setToastMsg('Something went wrong. Please try again.');
+        setShowToast(true);
+      } 
       
     } catch (error) {
      setToastMsg('Something went wrong. Please try again.');
@@ -172,14 +201,9 @@ const SignInScreen = ({ navigation }) => {
         backgroundColor={colors.background}
       />
       
-      {/* 
-        KeyboardAvoidingView adjusts the view height when the keyboard opens.
-        behavior: "padding" works best on iOS.
-        behavior: "height" works best on Android.
-      */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : "padding"}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
@@ -202,6 +226,8 @@ const SignInScreen = ({ navigation }) => {
                     setEmail(text);
                     setEmailError('');
                   }}
+                  autoCapitalize="none"
+
                   leftIcon="email-outline"
                   keyboardType="email-address"
                   error={emailError}
@@ -248,9 +274,9 @@ const SignInScreen = ({ navigation }) => {
 
                 <TouchableOpacity onPress={handleGoogleSignIn} style={styles.googleBtn} activeOpacity={0.8}>
                   <View style={styles.googleIconWrapper}>
-                    <Icon name="google" size={24} color={colors.white} />
-                  </View>
+                   <Image source={googleLogo} style={styles.googleIcon} />
                   <Text style={styles.googleBtnText}>Continue with Google</Text>
+                  </View>
                 </TouchableOpacity>
 
                 <View style={styles.footerContainer}>

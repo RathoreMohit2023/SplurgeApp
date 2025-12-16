@@ -356,6 +356,12 @@ const getGroupSettleStyle = (colors) => StyleSheet.create({
     progressContainer: {
         marginTop: 16,
     },
+    noRecentContainer: {
+        marginTop: 16,
+        // alignItems: 'center',
+        paddingVertical: 12,
+        borderRadius: 12,
+    },
     progressLabel: {
         color: colors.textSecondary,
         fontSize: 11,

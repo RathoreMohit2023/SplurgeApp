@@ -103,11 +103,25 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         textAlign: 'right',
         fontWeight: 'bold',
     },
+    descriptionContainer: {
+        backgroundColor: colors.tintedThemeColor,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    groupTitle: {
+        color: colors.text,
+        fontSize: 18,
+        fontWeight: '700',
+        marginBottom: 8,
+        fontFamily: 'serif',
+    },
     description: {
         color: colors.textSecondary,
         fontSize: 14,
-        marginBottom: 20,
-        lineHeight: 20,
+        fontFamily: 'serif',
     },
 
     // --- Sections ---

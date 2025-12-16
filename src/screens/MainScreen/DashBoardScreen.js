@@ -128,11 +128,6 @@ const DashBoardScreen = ({ navigation }) => {
   const isLoading =
     GetTransactionLoading || GetWishlistLoading || GetMonthlyBudgetloading;
     
-  useEffect(() => {
-    if (GetUserDetailsData?.status === true) {
-      setUserData(GetUserDetailsData?.user_details[0]);
-    }
-  }, [GetUserDetailsData]);
 
   const fetchApi = async () => {
     if (LoginData?.token && LoginData?.user?.id) {
@@ -160,6 +155,13 @@ const DashBoardScreen = ({ navigation }) => {
   useEffect(() => {
     fetchApi();
   }, [LoginData]);
+
+  useEffect(() => {
+    if (GetUserDetailsData?.status === true) {
+      setUserData(GetUserDetailsData?.user_details[0]);
+    }
+  }, [GetUserDetailsData]);
+
 
   const allTransactions = GetTransactionData?.get_transactions || [];
 
