@@ -14,6 +14,9 @@ const MainApp = () => {
 
   const handleNewNotification = (remoteMessage) => {
     if (!remoteMessage) return;
+    
+    const currentUserId = LoginData?.user?.id || LoginData?.user_id;
+    if (!currentUserId) return; 
 
     const newNotif = {
       id: remoteMessage.messageId,
@@ -23,9 +26,11 @@ const MainApp = () => {
       time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
       read: false,
       data: remoteMessage.data,
+      userId: currentUserId, 
     };
 
     dispatch(addNotification(newNotif));
+    
     if (LoginData?.token) {
       dispatch(GetPaymentLogApi(LoginData.token));
     }
@@ -53,7 +58,7 @@ const MainApp = () => {
 
       return () => fg();
     })();
-  }, []);
+  }, [LoginData]);
 
   return (
     <PaperProvider>

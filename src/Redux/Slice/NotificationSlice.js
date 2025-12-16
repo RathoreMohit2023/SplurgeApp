@@ -17,9 +17,12 @@ const NotificationSlice = createSlice({
         state.Notifications[index].read = true;
       }
     },
-    markAllAsRead: (state) => {
+    markAllAsRead: (state, action) => {
+      const userId = action.payload;
       state.Notifications.forEach(n => {
-        n.read = true;
+        if (n.userId === userId) {
+          n.read = true;
+        }
       });
     },
     updateNotificationStatus: (state, action) => {
@@ -30,8 +33,13 @@ const NotificationSlice = createSlice({
         state.Notifications[index].read = true;
       }
     },
-    clearNotifications: (state) => {
-      state.Notifications = [];
+    clearNotifications: (state, action) => {
+      const userId = action.payload;
+      if (userId) {
+        state.Notifications = state.Notifications.filter(n => n.userId !== userId);
+      } else {
+        state.Notifications = [];
+      }
     }
   },
 });

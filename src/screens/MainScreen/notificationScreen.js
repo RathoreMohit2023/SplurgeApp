@@ -21,14 +21,12 @@ import {
   X,
 } from "lucide-react-native";
 
-// Imports
 import getNotificationStyle from "../../styles/MainScreen/NotificationStyle";
 import { ThemeContext } from "../../components/ThemeContext";
 import { markAsRead, clearNotifications, updateNotificationStatus } from "../../Redux/Slice/NotificationSlice";
 import { SettleUpRespondApi } from "../../Redux/Api/SettleUpRespondApi";
 import { GetPaymentLogApi } from "../../Redux/Api/GetPaymentLogApi";
 
-// Icon Helper
 const getIcon = (type, colors) => {
   switch (type) {
     case "settle_request": return <Wallet size={20} color={colors.primary} />;
@@ -42,7 +40,6 @@ const getIcon = (type, colors) => {
 const NotificationScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   
-  // Pass both colors and themeType to style generator
   const styles = useMemo(() => getNotificationStyle(colors, themeType), [colors, themeType]);
   
   const insets = useSafeAreaInsets();
@@ -54,9 +51,22 @@ const NotificationScreen = ({ navigation }) => {
   const { LoginData } = useSelector((state) => state.Login || {});
   const rawNotifications = useSelector((state) => state.Notifications.Notifications);
 
+  const currentUserId = LoginData?.user?.id;
+
+  const userNotifications = useMemo(() => {
+    if (!rawNotifications || !currentUserId) return [];
+    return rawNotifications.filter(item => item.userId === currentUserId);
+  }, [rawNotifications, currentUserId]);
+
   const fetchInitialData = () => {
     if (LoginData?.token) {
       dispatch(GetPaymentLogApi(LoginData.token));
+    }
+  };
+
+  const handleClearAll = () => {
+    if (currentUserId) {
+      dispatch(clearNotifications(currentUserId));
     }
   };
 
@@ -114,10 +124,11 @@ const NotificationScreen = ({ navigation }) => {
     }
   };
 
+  // ✅ 4. Sections ab 'userNotifications' use karega
   const sections = useMemo(() => {
-    if (!rawNotifications || rawNotifications.length === 0) return [];
-    return [{ title: "New", data: rawNotifications }];
-  }, [rawNotifications]);
+    if (!userNotifications || userNotifications.length === 0) return [];
+    return [{ title: "New", data: userNotifications }];
+  }, [userNotifications]);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -189,10 +200,11 @@ const NotificationScreen = ({ navigation }) => {
         <View style={{ width: 40 }} />
       </View>
 
-      {rawNotifications.length > 0 && (
+      {/* ✅ Use userNotifications length check */}
+      {userNotifications.length > 0 && (
         <View style={styles.actionsRow}>
           <Text style={styles.subHeaderLabel}>RECENT</Text>
-          <TouchableOpacity onPress={() => dispatch(clearNotifications())} style={styles.clearBtn}>
+          <TouchableOpacity onPress={handleClearAll} style={styles.clearBtn}>
             <Trash2 size={14} color={colors.error} />
             <Text style={styles.clearBtnText}>Clear All</Text>
           </TouchableOpacity>
