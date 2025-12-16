@@ -125,7 +125,7 @@ const AddPaymentLogModal = ({ visible, onClose, friends = [], onSave }) => {
        */}
        <KeyboardAvoidingView
          style={styles.overlay}
-         behavior={Platform.OS === "ios" ? "padding" : "height"}
+         behavior={Platform.OS === "ios" ? "padding" : "padding"}
        >
         {/* Optional: Dismiss keyboard when tapping outside */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

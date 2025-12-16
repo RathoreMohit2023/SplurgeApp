@@ -21,15 +21,25 @@ const AppHeader = ({
   const headerStyle = useMemo(() => getHeaderStyle(colors), [colors]);
   const dispatch = useDispatch();
 
+  const { LoginData } = useSelector((state) => state.Login || {});
   const notificationList = useSelector((state) => state.Notifications.Notifications);
-  const unreadCount = notificationList.filter((n) => !n.read).length;
+
+  const currentUserId = LoginData?.user?.id;
+
+  const unreadCount = useMemo(() => {
+    if (!notificationList || !currentUserId) return 0;
+    return notificationList.filter((n) => n.userId === currentUserId && !n.read).length;
+  }, [notificationList, currentUserId]);
 
   const iconColor = colors.theme; 
   const handleThemeToggle = onThemeTogglePress || toggleTheme;
   const appLogo = themeType === "dark" ? darkLogo : MainLogo;
 
   const handleNotificationClick = () => {
-    dispatch(markAllAsRead());
+    if (currentUserId) {
+      dispatch(markAllAsRead(currentUserId));
+    }
+
     if (onNotificationPress) {
       onNotificationPress();
     } else {
