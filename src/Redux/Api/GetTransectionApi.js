@@ -21,7 +21,8 @@ export const GetTransectionApi = createAsyncThunk(
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetTransection Api error:", error);
+     console.log('Error in GetTransectionApi:', error.response.data);
+     
     }
   }
 );

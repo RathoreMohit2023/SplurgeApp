@@ -129,7 +129,7 @@ const NotificationScreen = ({ navigation }) => {
     if (!userNotifications || userNotifications.length === 0) return [];
     return [{ title: "New", data: userNotifications }];
   }, [userNotifications]);
-
+  
   const renderItem = ({ item }) => (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -213,7 +213,7 @@ const NotificationScreen = ({ navigation }) => {
 
       <SectionList
         sections={sections}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={renderItem}
         contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20 }]}
         showsVerticalScrollIndicator={false}
