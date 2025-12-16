@@ -101,14 +101,14 @@ const PDFViewer = ({ route, navigation }) => {
       {/* ----------- HEADER BAR ----------- */}
       <View
         style={{
-          height: 65,
+          height: 80,
           backgroundColor: colors.card,
           flexDirection: "row",
-          alignItems: "flex-end",
-          paddingHorizontal: 15,
+          alignItems: "center",
+          paddingHorizontal: 10,
           elevation: 8,
           shadowColor: "#000",
-          shadowOpacity: 0.1,
+          shadowOpacity: 0.1,  
           shadowRadius: 4,
           shadowOffset: { width: 0, height: 2 },
           zIndex: 1000,

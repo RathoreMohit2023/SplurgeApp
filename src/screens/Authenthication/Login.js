@@ -128,7 +128,7 @@ const SignInScreen = ({ navigation }) => {
          
          setTimeout(() => {
            navigation.replace('MainScreen');
-         }, 1500);
+         }, 500);
        } else {
          setToastMsg(response?.message || 'Invalid credentials');
          setShowToast(true);

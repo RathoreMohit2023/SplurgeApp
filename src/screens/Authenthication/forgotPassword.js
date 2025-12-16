@@ -17,6 +17,8 @@ import getForgotPasswordStyle from "../../styles/authenthication/forgoteStyle"; 
 import { ThemeContext } from "../../components/ThemeContext"; // Import Context
 import { useDispatch, useSelector } from "react-redux";
 import { ForgoteApi } from "../../Redux/Api/ForgoteApi";
+import { Snackbar } from "react-native-paper";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -27,9 +29,19 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  // const [isSubmitted, setIsSubmitted] = useState(false);
-
+  const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
+  const [snack, setSnack] = useState({
+    visible: false,
+    message: "",
+  });
+
+  const showSnack = (message) => {
+    setSnack({
+      visible: true,
+      message,
+    })
+  };
 
   const { forgoteLoading, isError, message } = useSelector((state) => state.Forgote)
 
@@ -54,33 +66,40 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
 
   const handleSend = async () => {
-    if (!email || !email.includes("@")) {
+    if (!email || !validateEmail(email)) {
       setEmailError("Please enter a valid email address.");
       return;
-    }
+    } 
+
+    setEmailError("");
 
     const result = await dispatch(
       ForgoteApi({
-        email: email,
+        email: email.trim(),
       })
     );
 
-    if(ForgoteApi.fulfilled.match(result)){
-      Alert.alert("Success", 
-        "Forgote password email sent successfully",
-        [
-          {
-            text: "OK",
-            onPress: () => navigation.navigate("signIn")
-          },
-        ]
-      );
-    }else {
-      Alert.alert("Error",
-        message || "Something went wrong, please resend the email"
-      );
+    if(ForgoteApi.rejected.match(result)){
+      // Alert.alert("Error", 
+      //   "Something went wrong. Please try again.",
+      // );
+      showSnack("Something went wrong. Please try again.");
+      return;
+    };
+
+    const response = result.payload;
+
+    if(!response?.success === false){
+      setEmailError("Please enter the correct register email ID");
+      return;
     }
-    // setIsSubmitted(true);
+
+    showSnack(response.message || "Reset password email sent successfully");
+
+    setTimeout(() => {
+      setSnack({ visible: false, message: "" });
+      navigation.navigate("signIn");
+    }, 2000);
   };
 
   return (
@@ -145,44 +164,33 @@ const ForgotPasswordScreen = ({ navigation }) => {
                 >
                   <Text style={styles.primaryBtnText}>
                     {/* Send Instructions */}
-                    {forgoteLoading ? "Sending..." : "Send Instructions"}
+                    {forgoteLoading ? "Sending..." : "Send Password"}
                   </Text>
                 </TouchableOpacity>
               </View>
-            {/* </>
-          ) : (
-            <>
-              <View style={styles.iconContainer}>
-                <View style={[styles.iconGlow, { backgroundColor: colors.success }]} />
-                <Icon name="email-check-outline" size={64} color={colors.success} />
-              </View>
-
-              <Text style={styles.title}>Check your mail</Text>
-              <Text style={styles.subtitle}>
-                We have sent password recovery instructions to your email.
-              </Text>
-
-              <View style={styles.emailHighlight}>
-                <Text style={styles.emailText}>{email}</Text>
-              </View>
-
-              <TouchableOpacity 
-                style={styles.primaryBtn} 
-                onPress={() => navigation.navigate("signIn")} 
-              >
-                <Text style={styles.primaryBtnText}>Back to Login</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.resendBtn} 
-                onPress={() => setIsSubmitted(false)}
-              >
-                <Text style={styles.resendText}>Did not receive the email? Resend</Text>
-              </TouchableOpacity>
-            </>
-          )} */}
         </Animated.View>
       </ScrollView>
+
+      <Snackbar
+        visible={snack.visible}
+        onDismiss={() => setSnack({visible: false, message: ""})}
+        duration={2000}
+        style={{
+          backgroundColor:colors.card,
+          marginBottom: insets?.bottom ? insets.bottom + 80 : 80,
+        }}
+        theme={{colors: { inversePrimary: colors.theme} }}
+        action={{
+          label: "Ok",
+          textColor: colors.theme,
+          onPress: () => setSnack({
+            visible:false,
+            message: ""
+          }),
+        }}
+      >
+        <Text style={{ color: colors.text}}>{snack.message}</Text>
+      </Snackbar>
     </KeyboardAvoidingView>
   );
 };
