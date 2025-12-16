@@ -110,7 +110,7 @@ const AddGroupExpenseModal = ({
     >
       {/* WRAPPER: KeyboardAvoidingView is the main overlay now */}
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : "padding"}
         style={styles.overlay}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

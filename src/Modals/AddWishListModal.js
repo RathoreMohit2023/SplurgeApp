@@ -91,7 +91,7 @@ const AddWishListModal = ({ visible, onClose, onSave }) => {
           </View>
 
          <KeyboardAvoidingView
-                       behavior={Platform.OS === "ios" ? "padding" : "height"}
+                       behavior={Platform.OS === "ios" ? "padding" : "padding"}
                      >
             <View style={styles.form}>
               <CustomInput

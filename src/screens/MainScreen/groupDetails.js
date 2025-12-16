@@ -83,14 +83,12 @@ const GroupDetails = ({ navigation }) => {
     message: '',
     btnText: '',
   });
-  
 
-  // --- 1. Fetch Data ---
   const fetchGroupData = () => {
     if (LoginData?.token && group?.id) {
-      dispatch(GetGroupMembersApi(LoginData.token));
       dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
-      dispatch(GetGroupsApi(LoginData.token));
+      dispatch(GetGroupMembersApi(LoginData.token));
+      // dispatch(GetGroupsApi(LoginData.token));
     }
   };
 
@@ -127,8 +125,9 @@ const GroupDetails = ({ navigation }) => {
     return groupMembers.find(m => m.user_id === LoginData?.user?.id);
   }, [groupMembers, LoginData]);
 
-
-  const isCurrentUserAdmin = currentUserMemberObj?.role === 'admin' || group?.group_admin == LoginData?.user?.id;
+  const isCurrentUserAdmin =
+    currentUserMemberObj?.role === 'admin' ||
+    group?.group_admin == LoginData?.user?.id;
 
   // --- 6. Calculations (Settlements & Stats) ---
   const { totalSpent, remaining, percentage, memberStats, settlements } =
@@ -249,10 +248,11 @@ const GroupDetails = ({ navigation }) => {
       ).unwrap();
       if (result?.status === true || result?.status === 'true') {
         showSnack(result?.message || 'Members added successfully!');
-        fetchGroupData();
+        dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
         setModalVisible(false);
       } else {
         showSnack(result?.message || 'Failed to add members.');
+        dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
       }
     } catch (error) {
       showSnack(error?.message || 'Something went wrong.');
@@ -288,9 +288,10 @@ const GroupDetails = ({ navigation }) => {
       if (result?.status === true || result?.status === 'true') {
         showSnack('Expense added successfully!');
         setExpenseFormOpen(false);
-        fetchGroupData();
+        dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
       } else {
         showSnack(result?.message || 'Failed.');
+        dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
       }
     } catch (error) {
       showSnack(error?.message || 'Something went wrong.');
@@ -335,12 +336,16 @@ const GroupDetails = ({ navigation }) => {
         // If I removed myself, go back
         if (deleteMember.user_id === LoginData?.user?.id) {
           navigation.goBack();
+          dispatch(GetGroupsApi(LoginData.token));
         } else {
-          fetchGroupData();
+          dispatch(
+            GetGroupExpenseApi({ token: LoginData.token, id: group.id }),
+          );
+          dispatch(GetGroupsApi(LoginData.token));
         }
       } else {
         showSnack(result?.message || 'Failed.');
-        fetchGroupData();
+        dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
       }
     } catch (error) {
       showSnack(error?.message || 'Something went wrong.');
@@ -557,12 +562,10 @@ const GroupDetails = ({ navigation }) => {
                         </View>
 
                         <View style={styles.memberStatsRow}>
-                          {
-                            group?.group_admin == member?.user_id ? (
-                              <Text style={styles.adminText}>
-                                Admin
-                              </Text>
-                            ) : ( <Text
+                          {group?.group_admin == member?.user_id ? (
+                            <Text style={styles.adminText}>Admin</Text>
+                          ) : (
+                            <Text
                               style={
                                 member?.role === 'admin'
                                   ? styles.adminText
@@ -571,9 +574,9 @@ const GroupDetails = ({ navigation }) => {
                             >
                               {member.role?.charAt(0).toUpperCase() +
                                 member.role?.slice(1)}
-                            </Text>)
-                          }
-                         
+                            </Text>
+                          )}
+
                           {Math.abs(balance) > 0.5 && (
                             <Text
                               style={[

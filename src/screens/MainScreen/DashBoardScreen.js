@@ -109,29 +109,41 @@ const DashBoardScreen = ({ navigation }) => {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [userData, setUserData] = useState({});
-  
-  
+
   const { LoginData } = useSelector(state => state.Login);
   // Redux State
   const { GetUserDetailsData, GetUserDetailsLoading } = useSelector(
     state => state.GetUserDetails,
   );
-  console.log("GetUserDetailsData:", GetUserDetailsData);
-  const { GetWishlistData, GetWishlistLoading } = useSelector(state => state.GetWishlist);
-  const { GetTransactionData, GetTransactionLoading } = useSelector(state => state.GetTransaction);
-  const { GetMonthlyBudgetData, GetMonthlyBudgetloading } = useSelector(state => state.GetMonthlyBudget);
+  const { GetWishlistData, GetWishlistLoading } = useSelector(
+    state => state.GetWishlist,
+  );
+  const { GetTransactionData, GetTransactionLoading } = useSelector(
+    state => state.GetTransaction,
+  );
+  const { GetMonthlyBudgetData, GetMonthlyBudgetloading } = useSelector(
+    state => state.GetMonthlyBudget,
+  );
   const { fcmToken } = useSelector(state => state.Fcm);
-  const isLoading = GetTransactionLoading || GetWishlistLoading || GetMonthlyBudgetloading;
+  const isLoading =
+    GetTransactionLoading || GetWishlistLoading || GetMonthlyBudgetloading;
+    
+  useEffect(() => {
+    if (GetUserDetailsData?.status === true) {
+      setUserData(GetUserDetailsData?.user_details[0]);
+    }
+  }, [GetUserDetailsData]);
+
   const fetchApi = async () => {
     if (LoginData?.token && LoginData?.user?.id) {
-      const fcmLocalToken = await AsyncStorage.getItem("fcm_token");
+      const fcmLocalToken = await AsyncStorage.getItem('fcm_token');
       const token = LoginData.token;
       const userId = LoginData.user.id;
       const DeviceToken = fcmToken ? fcmToken : fcmLocalToken;
       const postData = {
         user_id: userId,
         device_token: DeviceToken,
-      }
+      };
       dispatch(GetUserDetailsApi(token));
       dispatch(GetCategoriesApi(token));
       dispatch(GetWishlistApi({ token, id: userId }));
@@ -141,19 +153,13 @@ const DashBoardScreen = ({ navigation }) => {
       dispatch(GetGroupsApi(token));
       dispatch(GetvideoApi(token));
       dispatch(GetFounderApi(token));
-      dispatch(DeviceTokenApi({postData, token}));
+      dispatch(DeviceTokenApi({ postData, token }));
     }
   };
-  
+
   useEffect(() => {
     fetchApi();
   }, [LoginData]);
-
-  useEffect(() => {
-    if (GetUserDetailsData?.user_details) {
-      setUserData(GetUserDetailsData?.user_details[0]);
-    }
-  },[])
 
   const allTransactions = GetTransactionData?.get_transactions || [];
 
@@ -360,19 +366,16 @@ const DashBoardScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('PersonalInfoScreen')}
         >
           <View style={styles.profilePlaceholder}>
-            {
-              LoginData?.user?.profile_photo ? (
-                <Image
-                                 source={{ uri: Img_url +  userData?.profile_photo }}
-                                 style={styles.profileImage}
-                               />
-              ) : (
-                <Text style={styles.profileInitials}>
+            {LoginData?.user?.profile_photo ? (
+              <Image
+                source={{ uri: Img_url + userData?.profile_photo }}
+                style={styles.profileImage}
+              />
+            ) : (
+              <Text style={styles.profileInitials}>
                 {LoginData?.user?.fullname?.charAt(0)?.toUpperCase() || 'U'}
               </Text>
-              )
-            }
-            
+            )}
           </View>
         </TouchableOpacity>
       </View>
@@ -489,50 +492,49 @@ const DashBoardScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.sectionContainer}>
-  <View style={styles.rowBetween}>
-    <Text style={styles.sectionTitle}>Recent Transactions</Text>
-    <TouchableOpacity onPress={() => setShowTransactions(true)}>
-      <Text style={styles.linkText}>See All</Text>
-    </TouchableOpacity>
-  </View>
+        <View style={styles.rowBetween}>
+          <Text style={styles.sectionTitle}>Recent Transactions</Text>
+          <TouchableOpacity onPress={() => setShowTransactions(true)}>
+            <Text style={styles.linkText}>See All</Text>
+          </TouchableOpacity>
+        </View>
 
-  {recentTransactions.length > 0 ? (
-    [...recentTransactions].reverse().map(item => {
-      const IconComponent = categoryIcons[item.category] || DollarSign;
-      return (
-        <View key={item.id} style={styles.transactionRow}>
-          <View style={styles.transactionInfo}>
-            <View style={styles.iconCircle}>
-              <IconComponent size={20} color={colors.white} />
-            </View>
+        {recentTransactions.length > 0 ? (
+          [...recentTransactions].reverse().map(item => {
+            const IconComponent = categoryIcons[item.category] || DollarSign;
+            return (
+              <View key={item.id} style={styles.transactionRow}>
+                <View style={styles.transactionInfo}>
+                  <View style={styles.iconCircle}>
+                    <IconComponent size={20} color={colors.white} />
+                  </View>
 
-            <View style={styles.transactionDetails}>
-              <Text style={styles.transactionTitle} numberOfLines={2}>
-                {item.description}
-              </Text>
-              <Text style={styles.transactionSub}>
-                {item.category} • {formatDate(item.date)}
-              </Text>
-            </View>
-          </View>
+                  <View style={styles.transactionDetails}>
+                    <Text style={styles.transactionTitle} numberOfLines={2}>
+                      {item.description}
+                    </Text>
+                    <Text style={styles.transactionSub}>
+                      {item.category} • {formatDate(item.date)}
+                    </Text>
+                  </View>
+                </View>
 
-          <View>
-            <Text style={styles.transactionAmount}>
-              -₹{Number(item.amount).toLocaleString()}
+                <View>
+                  <Text style={styles.transactionAmount}>
+                    -₹{Number(item.amount).toLocaleString()}
+                  </Text>
+                </View>
+              </View>
+            );
+          })
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              No transactions for this month yet.
             </Text>
           </View>
-        </View>
-      );
-    })
-  ) : (
-    <View style={styles.emptyContainer}>
-      <Text style={styles.emptyText}>
-        No transactions for this month yet.
-      </Text>
-    </View>
-  )}
-</View>
-
+        )}
+      </View>
 
       <View style={styles.sectionContainer}>
         <View style={styles.rowBetween}>

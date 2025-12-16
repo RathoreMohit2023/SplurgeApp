@@ -65,7 +65,7 @@ const CreateGroupModal = ({ visible, onClose, onSubmit }) => {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : ""}
+          behavior={Platform.OS === "ios" ? "padding" : "padding"}
           style={styles.overlay}
         >
           {/* Main Modal Card */}

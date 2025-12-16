@@ -27,6 +27,9 @@ const HelpSupport = ({ navigation }) => {
     state => state.HelpAndSupport
   );
 
+  console.log(HelpAndSupportData, 'HelpAndSupportData');
+  
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -180,7 +183,7 @@ const HelpSupport = ({ navigation }) => {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Follow us on social media</Text>
+          {/* <Text style={styles.footerText}>Follow us on social media</Text>
           <View style={styles.socialRow}>
             {['twitter', 'facebook', 'instagram', 'linkedin'].map(icon => (
               <TouchableOpacity key={icon} style={styles.socialIcon}>
@@ -191,7 +194,7 @@ const HelpSupport = ({ navigation }) => {
                 />
               </TouchableOpacity>
             ))}
-          </View>
+          </View> */}
           <Text style={styles.copyright}>
             © 2025 Splurge Inc. All rights reserved.
           </Text>
