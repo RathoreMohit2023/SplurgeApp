@@ -26,7 +26,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 // IMPORTS: Add Vector Icons
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
+        
 const SignInScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
   const styles = useMemo(() => getLoginStyle(colors), [colors]);
@@ -45,7 +45,7 @@ const SignInScreen = ({ navigation }) => {
 
   useEffect(() => {
     Animated.timing(fade, {
-      toValue: 1,
+      toValue: 1,   
       duration: 900,
       useNativeDriver: true,
     }).start();

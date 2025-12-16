@@ -144,7 +144,7 @@ const AddPaymentLogModal = ({ visible, onClose, friends = [], onSave }) => {
 
             {/* ScrollView wraps Inputs and Buttons */}
             <ScrollView 
-              showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}  
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled" // Important for touch events
             >

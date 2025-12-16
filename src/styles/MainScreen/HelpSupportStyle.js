@@ -30,6 +30,11 @@ const getHelpSupportStyle = (colors) => StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  logo: {
+    width: 140,
+    height: 120,
+    marginBottom: 20,
+  },
   appName: {
     fontSize: 28,
     fontWeight: '800',

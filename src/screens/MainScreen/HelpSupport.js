@@ -5,7 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
-  StatusBar
+  StatusBar,
+  Image
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -16,6 +17,7 @@ import { ThemeContext } from "../../components/ThemeContext";
 import { HelpAndSupportApi } from '../../Redux/Api/HelpAndSupportApi';
 import { useDispatch, useSelector } from 'react-redux';
 import DashedLoader from '../../components/DashedLoader';
+import { darkLogo, MainLogo } from "../../Assets/Images";
 
 const HelpSupport = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -25,9 +27,13 @@ const HelpSupport = ({ navigation }) => {
   const { LoginData } = useSelector(state => state.Login);
   const { HelpAndSupportLoading, HelpAndSupportData } = useSelector(
     state => state.HelpAndSupport
-  );
+  );     
+
+  console.log("HelpSupportData:", HelpAndSupportData);
+  
 
   const dispatch = useDispatch();
+  const appLogo = themeType === "dark" ? darkLogo : MainLogo;
 
   useEffect(() => {
     dispatch(HelpAndSupportApi(LoginData?.token));
@@ -126,14 +132,15 @@ const HelpSupport = ({ navigation }) => {
       >
         {/* Branding */}
         <View style={styles.brandSection}>
-          <View style={styles.logoContainer}>
+          {/* <View style={styles.logoContainer}>
             <MaterialCommunityIcons
               name="wallet-giftcard"
               size={40}
               color={colors.theme}
             />
-          </View>
-          <Text style={styles.appName}>Splurge</Text>
+          </View> */}
+          <Image source={appLogo} style={styles.logo} resizeMode="contain" />
+          {/* <Text style={styles.appName}>Splurge</Text> */}
           <Text style={styles.aboutText}>
             Empowering you to track expenses, save money, and spend wisely.
             We are dedicated to providing the best financial tools for your lifestyle.
