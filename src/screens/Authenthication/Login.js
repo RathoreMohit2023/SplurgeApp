@@ -145,6 +145,8 @@ const SignInScreen = ({ navigation }) => {
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
       GoogleSignin.signOut();
       const userInfo = await GoogleSignin.signIn();
+      console.log("userInfo:", userInfo);
+      
 
       const user = userInfo?.data?.user;
       const postData = {

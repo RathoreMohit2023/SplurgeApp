@@ -249,6 +249,7 @@ const GroupDetails = ({ navigation }) => {
       if (result?.status === true || result?.status === 'true') {
         showSnack(result?.message || 'Members added successfully!');
         dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
+        dispatch(GetGroupMembersApi(LoginData.token));
         setModalVisible(false);
       } else {
         showSnack(result?.message || 'Failed to add members.');
@@ -332,20 +333,20 @@ const GroupDetails = ({ navigation }) => {
       if (result?.status === true || result?.status === 'true') {
         showSnack(result?.message);
         setAlertVisible(false);
+        dispatch(GetGroupMembersApi(LoginData.token));
 
         // If I removed myself, go back
         if (deleteMember.user_id === LoginData?.user?.id) {
           navigation.goBack();
-          dispatch(GetGroupsApi(LoginData.token));
         } else {
           dispatch(
             GetGroupExpenseApi({ token: LoginData.token, id: group.id }),
           );
-          dispatch(GetGroupsApi(LoginData.token));
         }
       } else {
         showSnack(result?.message || 'Failed.');
         dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
+        
       }
     } catch (error) {
       showSnack(error?.message || 'Something went wrong.');
