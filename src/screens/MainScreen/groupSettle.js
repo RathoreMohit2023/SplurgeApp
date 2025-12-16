@@ -40,6 +40,7 @@ import { AddPaymentLogApi } from '../../Redux/Api/AddPaymentLogApi';
 import { GetPaymentLogApi } from '../../Redux/Api/GetPaymentLogApi';
 import { Img_url } from '../../Redux/NWConfig';
 import { SettleUpApi } from '../../Redux/Api/SettleUpApi';
+import { RemainderApi } from '../../Redux/Api/RemainderApi';
 
 const GroupSettle = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -403,8 +404,26 @@ const GroupSettle = ({ navigation }) => {
     }
   };
 
-  const handleRemind = friend => {
-    showSnack(`Reminder sent to ${friend.fullname}`);
+  const handleRemind = async (friend) => {
+    console.log("friend:", friend);
+    
+    const token = LoginData?.token;
+    const formData = new FormData();
+    formData.append('sender_id', LoginData?.user?.id);
+    formData.append('receiver_id', friend.id);
+    formData.append('settled_amount', friend.owes);
+    
+    try {
+      const result = await dispatch(RemainderApi({ formData, token })).unwrap();
+      if (result?.status === true || result?.status === 'true') {
+        showSnack(result?.message);
+      } else {
+        showSnack(result?.message);
+        fetchInitialData();
+      }
+    } catch (error) {
+      showSnack('Something went wrong. Please try again.');
+    }
   };
 
   const handleOpenSettle = friend => {
@@ -585,7 +604,7 @@ const GroupSettle = ({ navigation }) => {
                           style={{ marginRight: 6 }}
                         />
                         <Text style={styles.remindButtonText}>Remind</Text>
-                      </TouchableOpacity>
+                      </TouchableOpacity> 
                     )}
                     <TouchableOpacity
                       onPress={() => handleOpenSettle(friend)}
@@ -737,7 +756,7 @@ const GroupSettle = ({ navigation }) => {
                 contentContainerStyle={{ paddingBottom: 10 }}
               >
                 {recentActivityLogs.length === 0 ? (
-                  <View style={styles.groupCard}>
+                  <View style={styles.noRecentContainer}>
                     <Text style={styles.progressLabel}>
                       No recent activity found.
                     </Text>

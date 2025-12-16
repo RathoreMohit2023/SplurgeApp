@@ -44,6 +44,7 @@ import { GetGroupExpenseApi } from '../../Redux/Api/GetGroupExpenseApi';
 import { DeleteGroupMemberApi } from '../../Redux/Api/DeleteGroupMembersApi';
 import { Img_url } from '../../Redux/NWConfig';
 import { GetGroupsApi } from '../../Redux/Api/GetGroupsAPi';
+import { DeleteGroupApi } from '../../Redux/Api/DeleteGroupApi';
 
 const GroupDetails = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -77,6 +78,7 @@ const GroupDetails = ({ navigation }) => {
   const [groupMembers, setGroupMembers] = useState([]);
   const [groupExpenses, setGroupExpenses] = useState([]);
   const [alertVisible, setAlertVisible] = useState(false);
+  const [actionType, setActionType] = useState('');
   const [deleteMember, setDeleteMember] = useState(null);
   const [alertConfig, setAlertConfig] = useState({
     title: '',
@@ -320,6 +322,39 @@ const GroupDetails = ({ navigation }) => {
     setAlertVisible(true);
   };
 
+  const handleDeleteGroupPrompt = () => {
+    setActionType('group');
+    setAlertConfig({
+      title: 'Delete Group',
+      message:
+        'Are you sure you want to permanently delete this group? All data and expenses will be lost.',
+      btnText: 'Delete Group',
+    });
+    setAlertVisible(true);
+  };
+
+  const finalDeleteGroup = async () => {
+    const token = LoginData?.token;
+    if (!token || !group?.id) return showSnack('Missing info.');
+    try {
+      const result = await dispatch(
+        DeleteGroupApi({ token, id: group.id }),
+      ).unwrap();
+
+      if (result?.status === true || result?.status === 'true') {
+        showSnack(result?.message || 'Group deleted successfully');
+        setAlertVisible(false);
+        dispatch(GetGroupsApi(LoginData.token));
+        navigation.goBack();
+      } else {
+        showSnack(result?.message || 'Failed to delete group.');
+        dispatch(GetGroupsApi(LoginData.token));
+      }
+    } catch (error) {
+      showSnack(error?.message || 'Something went wrong.');
+    }
+  };
+
   const finalDeleteMember = async () => {
     const token = LoginData?.token;
     const apiPayload = {
@@ -346,7 +381,6 @@ const GroupDetails = ({ navigation }) => {
       } else {
         showSnack(result?.message || 'Failed.');
         dispatch(GetGroupExpenseApi({ token: LoginData.token, id: group.id }));
-        
       }
     } catch (error) {
       showSnack(error?.message || 'Something went wrong.');
@@ -431,9 +465,12 @@ const GroupDetails = ({ navigation }) => {
           </View>
         </View>
 
-        {group?.description && (
-          <Text style={styles.description}>{group.description}</Text>
-        )}
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.groupTitle}>Group Description</Text>
+          {group?.description && (
+            <Text style={styles.description}>{group.description}</Text>
+          )}
+        </View>
 
         {/* Settlements */}
         {settlements.length > 0 && (
@@ -674,6 +711,35 @@ const GroupDetails = ({ navigation }) => {
             })
           )}
         </View>
+        {isCurrentUserAdmin && (
+          <View style={{ padding: 16, marginTop: 10 }}>
+            <TouchableOpacity
+              onPress={handleDeleteGroupPrompt}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fee2e2',
+                padding: 12,
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: colors.error,
+              }}
+            >
+              <Trash2 size={20} color={colors.error} />
+              <Text
+                style={{
+                  color: colors.error,
+                  marginLeft: 8,
+                  fontWeight: '600',
+                  fontSize: 16,
+                }}
+              >
+                Delete Group
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
 
       {/* Modals & Alerts */}
@@ -685,7 +751,9 @@ const GroupDetails = ({ navigation }) => {
         cancelText="Cancel"
         confirmText={alertConfig.btnText}
         onCancel={() => setAlertVisible(false)}
-        onConfirm={finalDeleteMember}
+        onConfirm={
+          actionType === 'group' ? finalDeleteGroup : finalDeleteMember
+        }
       />
 
       <AddGroupMemberModal

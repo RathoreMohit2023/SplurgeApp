@@ -3,6 +3,7 @@ export const BASE_URL = 'https://stage.techsimba.in/splurge/public/api/';
 export const Img_url = 'https://stage.techsimba.in/splurge/public/uploads/users/';
 
 export const Login_Url = 'login';
+export const Google_Url = 'google-login';
 export const SignUp_Url = 'register';
 export const Forgote_Url = 'forgot-password';
 
@@ -14,6 +15,7 @@ export const DeleteWishlist_Url = 'delete-wishlist/';
 export const DeleteTransaction_Url = 'delete-transaction/';
 export const DeleteGroupMember_Url = 'delete-group-members';
 export const DeleteGroupExpense_url = 'delete-group-expense/';
+export const DeleteGroup_url = 'delete-group/';
 export const AddPaymentLog_Url = 'add-payment-log';
 export const AddFriend_Url = 'add-friend';
 export const AddGroup_Url = 'add-group';
@@ -26,6 +28,7 @@ export const EditTransection_Url = 'edit-transaction/';
 export const AddMonthlyBudget_Url = 'add-monthly-budget';
 export const EditMonthlyBudget_Url = 'edit-monthly-budget/';
 export const DeviceToken_Url = 'save-device-token';
+export const Remainder_Url = 'settle/payment-reminder';
 
 //  GET API
 export const GetTransection_Url = 'get-transactions/';

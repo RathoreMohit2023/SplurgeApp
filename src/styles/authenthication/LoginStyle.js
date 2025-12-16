@@ -115,7 +115,13 @@ const getLoginStyle = colors =>
       shadowOpacity: 0.1,
       shadowRadius: 3,
     },
+    googleIcon: {
+      width: 24,
+      height: 24,
+      marginRight: 12,
+    },
     googleIconWrapper: {
+      flexDirection: 'row',
       marginRight: 12, // Gap between Icon and Text
     },
     googleBtnText: {

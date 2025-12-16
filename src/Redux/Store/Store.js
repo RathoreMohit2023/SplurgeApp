@@ -50,6 +50,8 @@ import DeviceTokenReducer from '../Slice/DeviceTokenSlice';
 import FcmReducer from '../Slice/FcmSlice';
 import NotificationReducer from '../Slice/NotificationSlice';
 import SettleUpRespondReducer from '../Slice/SettleUpRespondSlice';
+import DeleteGroupReducer from '../Slice/DeleteGroupSlice';
+import RemainderReducer from '../Slice/RemainderSlice';
 
 const rootReducer = combineReducers({
   Login: LoginReducer,
@@ -91,7 +93,9 @@ const rootReducer = combineReducers({
   DeviceToken : DeviceTokenReducer,
   Fcm: FcmReducer,
   Notifications: NotificationReducer,
-  SettleUpRespond : SettleUpRespondReducer
+  SettleUpRespond : SettleUpRespondReducer,
+  DeleteGroup : DeleteGroupReducer,
+  Remainder : RemainderReducer
 });
 
 const persistConfig = {

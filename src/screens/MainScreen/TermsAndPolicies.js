@@ -55,9 +55,20 @@ const TermsAndPolicies = ({ navigation }) => {
 
   const support = HelpAndSupportData?.support?.[0] || {};
   
+  // Ensure we have an array of emails, even if the API sends a string or is empty
+  const emailList = useMemo(() => {
+    if (Array.isArray(support.email)) {
+      return support.email;
+    } else if (typeof support.email === 'string') {
+      return [support.email];
+    }
+    return [];
+  }, [support.email]);
 
-  const handleEmailSupport = () => {
-    Linking.openURL(`mailto:${support.email}`);
+  const handleEmailSupport = (emailAddress) => {
+    if (emailAddress) {
+      Linking.openURL(`mailto:${emailAddress}`);
+    }
   };
 
   return (
@@ -88,20 +99,33 @@ const TermsAndPolicies = ({ navigation }) => {
 
         <View style={styles.contactSection}>
           <Text style={styles.contactHeader}>Have Questions?</Text>
-          <TouchableOpacity 
-            style={styles.contactCard} 
-            onPress={handleEmailSupport}
-            activeOpacity={0.8}
-          >
-            <View style={[styles.iconContainer, { backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'transparent' }]}>
-              <MaterialCommunityIcons name="email-outline" size={24} color="#FFF" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.contactTitle}>Contact Support</Text>
-              <Text style={styles.contactSubtitle}> {support.email || "Email not available"}</Text> 
-            </View>
-            <MaterialCommunityIcons name="chevron-right" size={24} color="rgba(255,255,255,0.7)" />
-          </TouchableOpacity>
+          
+          {emailList?.length > 0 ? (
+            emailList?.map((email, index) => (
+              <TouchableOpacity 
+                key={index}
+                style={[styles.contactCard, { marginBottom: 12 }]} 
+                onPress={() => handleEmailSupport(email)}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.iconContainer, { backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'transparent' }]}>
+                  <MaterialCommunityIcons name="email-outline" size={24} color="#FFF" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.contactTitle}>Contact Support</Text>
+                  <Text style={styles.contactSubtitle}>{email}</Text> 
+                </View>
+                <MaterialCommunityIcons name="chevron-right" size={24} color="rgba(255,255,255,0.7)" />
+              </TouchableOpacity>
+            ))
+          ) : (
+             <View style={styles.contactCard}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.contactSubtitle}>No support email available</Text> 
+                </View>
+             </View>
+          )}
+
         </View>
 
         <View style={{ height: 40 }} />
