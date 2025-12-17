@@ -96,8 +96,7 @@ const ComparisonTab = () => {
         formattedWishlist.length > 0
       ) {
         setIsAiLoading(true);
-        // const result = await GeminiService({ totalSpent, wishlist: formattedWishlist, interests });
-        const result = [];
+        const result = await GeminiService({ totalSpent, wishlist: formattedWishlist, interests });
         setAiData(result);
         setIsAiLoading(false);
       } else {
