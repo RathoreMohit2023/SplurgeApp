@@ -16,11 +16,11 @@ export const GetvideoApi = createAsyncThunk(
           }
         }
       )
-      console.log("Response from GetvideoApi:", response.data);
+      // console.log("Response from GetvideoApi:", response.data);
       return response.data;
     } catch (error) {
-      console.log('❌ Error in GetvideoApi:', error.response ? error.response.data : error.message);
-      throw error;
+      // console.log('❌ Error in GetvideoApi:', error.response ? error.response.data : error.message);
+      return error.response.data;
     }
   }
 );

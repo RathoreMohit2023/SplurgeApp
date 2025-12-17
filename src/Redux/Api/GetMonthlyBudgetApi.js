@@ -16,12 +16,13 @@ export const GetMonthlyBudgetApi = createAsyncThunk(
       const response = await axios.get(url + id, {
         headers,
       });
-      console.log("GetMonthlyBudgetApi response:", response.data);
+      // console.log("GetMonthlyBudgetApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetMonthlyBudgetApi Api error:", error.response?.data);
+      // console.error("GetMonthlyBudgetApi Api error:", error.response?.data);
+      return error?.response?.data;
     }
   }
 );

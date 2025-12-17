@@ -104,7 +104,7 @@ const PersonalInfoScreen = ({ navigation }) => {
           }
         }
       } catch (err) {
-        console.log('Error parsing interests:', err);
+        // console.log('Error parsing interests:', err);
       }
 
       setForm({

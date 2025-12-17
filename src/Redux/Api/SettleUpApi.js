@@ -16,7 +16,7 @@ export const SettleUpApi = createAsyncThunk(
       const response = await axios.post(url, formData, {
         headers
       });
-      console.log("Response from SettleUpApi:", response.data);
+      // console.log("Response from SettleUpApi:", response.data);
       
       const result = response.data;
       return result;

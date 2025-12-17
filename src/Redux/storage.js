@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
         await AsyncStorage.setItem(key, JSON.stringify(Value));
     }
     catch(error){
-        console.log("Error storing Data", error)
+        // console.log("Error storing Data", error)
     }
 };
 
@@ -14,7 +14,7 @@ export const getData = async (key) => {
       const value = await AsyncStorage.getItem(key);
       return value != null ? JSON.parse(value) : null;
     } catch (e) {
-      console.log("Error reading data", e);
+      // console.log("Error reading data", e);
     }
 };
 

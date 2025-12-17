@@ -16,12 +16,13 @@ export const PrivacyPolicyApi = createAsyncThunk(
       const response = await axios.get(url, {
         headers,
       });
-      console.log("PrivacyPolicyApiApi response:", response.data);
+      // console.log("PrivacyPolicyApiApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("PrivacyPolicyApiApi error:", error);
+      // console.error("PrivacyPolicyApiApi error:", error);
+      return error?.response?.data;
     }
   }
 );

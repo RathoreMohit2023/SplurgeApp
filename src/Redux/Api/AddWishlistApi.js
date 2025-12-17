@@ -16,7 +16,7 @@ export const AddWishlistApi = createAsyncThunk(
       const response = await axios.post(url, formData, {
         headers
       });
-      console.log("Response from AddWishlistApi:", response.data);
+      // console.log("Response from AddWishlistApi:", response.data);
       
       const result = response.data;
       return result;

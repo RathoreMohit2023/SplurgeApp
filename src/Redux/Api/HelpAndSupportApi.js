@@ -16,12 +16,13 @@ export const HelpAndSupportApi = createAsyncThunk(
       const response = await axios.get(url, {
         headers,                
       });
-      console.log("HelpAndSupportApi response:", response.data);
+      // console.log("HelpAndSupportApi response:", response.data);
       
       const result = response.data;   
       return result;
     } catch (error) {
-      console.error("HelpAndSupportApi error:", error);
+      // console.error("HelpAndSupportApi error:", error);
+      return error?.response?.data;
     }
   }
 );

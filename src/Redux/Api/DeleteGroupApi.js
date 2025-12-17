@@ -17,7 +17,7 @@ export const DeleteGroupApi = createAsyncThunk(
       });
 
       const result = response.data;
-      console.log("DeleteGroupApi result", result);
+      // console.log("DeleteGroupApi result", result);
       
       return result;
     } catch (error) {

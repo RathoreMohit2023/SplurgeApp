@@ -16,12 +16,13 @@ export const GetTransectionApi = createAsyncThunk(
       const response = await axios.get(url + id, {
         headers,
       });
-      console.log("GetTransectionApi response:", response.data);
+      // console.log("GetTransectionApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-     console.log('Error in GetTransectionApi:', error.response.data);
+    //  console.log('Error in GetTransectionApi:', error.response.data);
+    return error?.response?.data;
      
     }
   }

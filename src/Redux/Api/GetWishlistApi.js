@@ -16,12 +16,13 @@ export const GetWishlistApi = createAsyncThunk(
       const response = await axios.get(url + id, {
         headers,
       });
-      console.log("GetWishlistApi response:", response.data);
+      // console.log("GetWishlistApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetWishlist Api error:", error.response?.data);
+      // console.error("GetWishlist Api error:", error.response?.data);
+      return error?.response?.data;
     }
   }
 );

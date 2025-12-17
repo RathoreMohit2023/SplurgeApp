@@ -16,12 +16,13 @@ export const GetPaymentLogApi = createAsyncThunk(
       const response = await axios.get(url, {
         headers,
       });
-      console.log("GetPaymentLogApi response:", response.data);
+      // console.log("GetPaymentLogApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetPaymentLogApi error:", error);
+      // console.error("GetPaymentLogApi error:", error);
+      return error?.response?.data;
     }
   }
 );

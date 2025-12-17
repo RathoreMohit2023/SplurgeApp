@@ -16,12 +16,12 @@ export const  EditTransectionApi = createAsyncThunk(
       const response = await axios.post(url + id, formData, {
         headers
       });
-      console.log("Response from  EditTransectionApi:", response.data);
+      // console.log("Response from  EditTransectionApi:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.log('Error in  EditTransectionApi:', error.response.data);
+      // console.log('Error in  EditTransectionApi:', error.response.data);
     }
   }
 );

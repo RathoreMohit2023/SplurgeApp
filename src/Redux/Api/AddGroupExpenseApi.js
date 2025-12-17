@@ -15,12 +15,12 @@ export const AddGroupExpenseApi = createAsyncThunk(
       const response = await axios.post(url + groupId, payload, {
         headers
       });
-      console.log("Response from AddGroupExpenseApi:", response.data);
+      // console.log("Response from AddGroupExpenseApi:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.log('Error in AddGroupExpenseApi:', error.response.data);
+      // console.log('Error in AddGroupExpenseApi:', error.response.data);
       
      return error?.response?.data
     }

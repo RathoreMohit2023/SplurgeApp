@@ -29,10 +29,8 @@ const HelpSupport = ({ navigation }) => {
     state => state.HelpAndSupport
   );     
 
-  console.log("HelpSupportData:", HelpAndSupportData);
   
 
-  console.log(HelpAndSupportData, 'HelpAndSupportData');
   
 
   const dispatch = useDispatch();

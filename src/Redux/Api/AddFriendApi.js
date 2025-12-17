@@ -12,14 +12,14 @@ export const AddFriendApi = createAsyncThunk(
         "Content-Type" : "multipart/form-data",
         "Authorization": `Bearer ${token}`, 
     }
-    console.log("formData:", formData);
-    console.log("token:", token);
+    // console.log("formData:", formData);
+    // console.log("token:", token);
     
     try {
       const response = await axios.post(url, formData, {
         headers
       });
-      console.log("Response from AddFriendApi:", response.data);
+      // console.log("Response from AddFriendApi:", response.data);
       
       const result = response.data;
       return result;

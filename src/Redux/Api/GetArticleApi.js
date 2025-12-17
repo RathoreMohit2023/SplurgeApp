@@ -17,10 +17,10 @@ export const GetArticleApi = createAsyncThunk(
           }
         }
       )
-      console.log("Response from GetArticleApi:", response.data);
+      // console.log("Response from GetArticleApi:", response.data);
       return response.data;
     } catch (error) {
-      console.log('Error in GetArticleApi:', error.response.data);
+      // console.log('Error in GetArticleApi:', error.response.data);
     }
   }
 );

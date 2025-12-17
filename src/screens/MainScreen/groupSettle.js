@@ -72,7 +72,6 @@ const GroupSettle = ({ navigation }) => {
 
   const [friends, setFriends] = useState([]);
   const [groups, setGroups] = useState([]);
-  console.log(groups, 'groups');
   
 
   const [groupMemberCounts, setGroupMemberCounts] = useState({});
@@ -251,7 +250,7 @@ const GroupSettle = ({ navigation }) => {
           });
           setGroupExpenses(allExpenses);
         } catch (error) {
-          console.log('Expense fetch error', error);
+          // console.log('Expense fetch error', error);
         }
       };
       fetchExpenses();
@@ -297,7 +296,7 @@ const GroupSettle = ({ navigation }) => {
         message: `Join Splurge with my code: ${userCode}`,
       });
     } catch (error) {
-      console.log("Sharing Error:", error);
+      // console.log("Sharing Error:", error);
     }
   };
 
@@ -405,7 +404,6 @@ const GroupSettle = ({ navigation }) => {
   };
 
   const handleRemind = async (friend) => {
-    console.log("friend:", friend);
     
     const token = LoginData?.token;
     const formData = new FormData();
@@ -437,7 +435,6 @@ const GroupSettle = ({ navigation }) => {
     formData.append('sender_id', LoginData?.user?.id);
     formData.append('receiver_id', selectedFriend.id);
     formData.append('settled_amount', data.amount);
-    console.log(formData, 'formData');
     
     try {
       const result = await dispatch(SettleUpApi({ formData, token })).unwrap();
