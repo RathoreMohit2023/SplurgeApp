@@ -4,7 +4,7 @@ const ANDROID_STATUSBAR = Platform.OS === 'android'
   ? StatusBar.currentHeight || 24
   : 0;
 
-const HEADER_TOP_PADDING = ANDROID_STATUSBAR; // 🔥 fixed & safe
+const HEADER_TOP_PADDING = ANDROID_STATUSBAR + 10; // 🔥 fixed & safe
 const HEADER_BOTTOM_PADDING = 14;
 
 const getHeaderStyle = colors =>

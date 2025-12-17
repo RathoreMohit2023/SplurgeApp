@@ -10,6 +10,14 @@ const LoginSlice = createSlice({
     LoginData: null, // array se better object
   },
 
+  // 1. Add the 'reducers' key for synchronous actions
+  reducers: {
+    // Define the logout action
+    logout: (state) => {
+      state.LoginData = null; // Set LoginData back to its initial state
+    },
+  },
+
   extraReducers: (builder) => {
     /* ================= NORMAL LOGIN ================= */
     builder.addCase(LoginApi.pending, (state) => {
@@ -46,5 +54,8 @@ const LoginSlice = createSlice({
     });
   },
 });
+
+// 2. Export the newly created action from the slice's actions
+export const { logout } = LoginSlice.actions;
 
 export default LoginSlice.reducer;
