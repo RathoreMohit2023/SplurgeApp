@@ -23,6 +23,7 @@ import {
   ArrowRightLeft,
   IndianRupee,
   LogOut,
+  History,
 } from 'lucide-react-native';
 import { useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -53,6 +54,7 @@ const GroupDetails = ({ navigation }) => {
   const route = useRoute();
   const insets = useSafeAreaInsets();
   const group = route?.params?.group;
+  const [isStillMember, setIsStillMember] = useState(true);
 
   // Redux Selectors
   const { GetFriendsData } = useSelector(state => state.GetFriends || {});
@@ -85,6 +87,8 @@ const GroupDetails = ({ navigation }) => {
     message: '',
     btnText: '',
   });
+  console.log(groupMembers, 'groupMembers');
+  
 
   const fetchGroupData = () => {
     if (LoginData?.token && group?.id) {
@@ -99,14 +103,33 @@ const GroupDetails = ({ navigation }) => {
   }, [group]);
 
   // --- 2. Process Group Members ---
+  // --- 2. Process Group Members ---
   useEffect(() => {
-    if (GetGroupMembersData?.members && group?.id) {
+    // Check if the data is loaded and is an array
+    if (GetGroupMembersData?.members && Array.isArray(GetGroupMembersData.members) && group?.id) {
       const filteredMembers = GetGroupMembersData.members.filter(
         member => String(member.group_id) === String(group.id),
       );
       setGroupMembers(filteredMembers);
+  
+      // *** ADD THIS LOGIC ***
+      // After updating members, verify if the current user is still in the list.
+      const currentUserIsMember = filteredMembers.some(
+        member => member.user_id === LoginData?.user?.id
+      );
+      
+      // Only update the status if the API call is not loading to avoid incorrect states
+      if (!GetGroupMembersLoading) {
+          setIsStillMember(currentUserIsMember);
+      }
+      // *** END OF ADDED LOGIC ***
+  
+    } else if (!GetGroupMembersLoading) {
+      // If members data is null or not an array after loading, user is not a member.
+      setGroupMembers([]);
+      setIsStillMember(false);
     }
-  }, [GetGroupMembersData, group]);
+  }, [GetGroupMembersData, group, LoginData?.user?.id, GetGroupMembersLoading]); // Add dependencies
 
   // --- 3. Process Expenses ---
   useEffect(() => {
@@ -373,10 +396,12 @@ const GroupDetails = ({ navigation }) => {
         // If I removed myself, go back
         if (deleteMember.user_id === LoginData?.user?.id) {
           navigation.goBack();
+          dispatch(GetGroupsApi(LoginData.token));
         } else {
           dispatch(
             GetGroupExpenseApi({ token: LoginData.token, id: group.id }),
           );
+          dispatch(GetGroupsApi(LoginData.token));
         }
       } else {
         showSnack(result?.message || 'Failed.');
@@ -392,19 +417,20 @@ const GroupDetails = ({ navigation }) => {
 
     let list = friendList.filter(friend => !memberUserIds.has(friend.id));
 
-    if (LoginData?.user?.id && !memberUserIds.has(LoginData.user.id)) {
-      const currentUserObj = {
-        id: LoginData.user.id,
-        fullname: `${LoginData.user.fullname} (You)`, // Adding (You) for clarity
-        email: LoginData.user.email,
-        mobile: LoginData.user.mobile,
-        profile_photo: LoginData.user.profile_photo,
-      };
-      list = [currentUserObj, ...list];
-    }
+    // if (LoginData?.user?.id && !memberUserIds.has(LoginData.user.id)) {
+    //   const currentUserObj = {
+    //     id: LoginData.user.id,
+    //     fullname: `${LoginData.user.fullname} (You)`, // Adding (You) for clarity
+    //     email: LoginData.user.email,
+    //     mobile: LoginData.user.mobile,
+    //     profile_photo: LoginData.user.profile_photo,
+    //   };
+    //   list = [currentUserObj, ...list];
+    // }
 
     return list;
   }, [friendList, groupMembers, LoginData]);
+  
 
   const showSnack = message => setSnack({ visible: true, message });
   const handleBack = () =>
@@ -427,7 +453,16 @@ const GroupDetails = ({ navigation }) => {
           {group?.group_name || 'Group Details'}
         </Text>
       </View>
-
+      {!isStillMember && !GetGroupMembersLoading ? (
+      <View style={styles.centeredMessageContainer}>
+        <Text style={styles.centeredMessageText}>
+          You are no longer a member of this group.
+        </Text>
+        <TouchableOpacity onPress={handleBack} style={styles.goBackButton}>
+          <Text style={styles.goBackButtonText}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    ) : (
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
@@ -466,7 +501,17 @@ const GroupDetails = ({ navigation }) => {
         </View>
 
         <View style={styles.descriptionContainer}>
+          <View style={styles.groupTitleContainer}>
           <Text style={styles.groupTitle}>Group Description</Text>
+
+          <TouchableOpacity
+              onPress={fetchGroupData}
+              style={styles.headerIconBtn}
+            >
+              <History size={20} color={colors.white} />
+            </TouchableOpacity>
+            </View>
+          
           {group?.description && (
             <Text style={styles.description}>{group.description}</Text>
           )}
@@ -590,19 +635,16 @@ const GroupDetails = ({ navigation }) => {
                             <TouchableOpacity
                               onPress={() => handleDeleteMember(member)}
                             >
-                              {isMe ? (
-                                <LogOut size={18} color={colors.error} /> // Icon for leaving
+                              {isMe  ? (
+                                <LogOut size={18} color={colors.error} /> 
                               ) : (
-                                <Trash2 size={18} color={colors.error} /> // Icon for kicking
+                                <Trash2 size={18} color={colors.error} /> 
                               )}
                             </TouchableOpacity>
                           )}
                         </View>
 
                         <View style={styles.memberStatsRow}>
-                          {group?.group_admin == member?.user_id ? (
-                            <Text style={styles.adminText}>Admin</Text>
-                          ) : (
                             <Text
                               style={
                                 member?.role === 'admin'
@@ -613,8 +655,6 @@ const GroupDetails = ({ navigation }) => {
                               {member.role?.charAt(0).toUpperCase() +
                                 member.role?.slice(1)}
                             </Text>
-                          )}
-
                           {Math.abs(balance) > 0.5 && (
                             <Text
                               style={[
@@ -741,7 +781,7 @@ const GroupDetails = ({ navigation }) => {
           </View>
         )}
       </ScrollView>
-
+    )}
       {/* Modals & Alerts */}
       <CustomAlert
         visible={alertVisible}

@@ -30,6 +30,7 @@ import { ThemeContext } from '../../components/ThemeContext';
 import { useSelector } from 'react-redux';
 import { Img_url } from '../../Redux/NWConfig';
 import CustomAlert from '../../components/CustomAlert'; // Adjust the path if necessary
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const ProfileScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -133,6 +134,7 @@ const ProfileScreen = ({ navigation }) => {
   const confirmLogout = () => {
     setLogoutAlertVisible(false);
     navigation.navigate('signIn');
+    GoogleSignin.signOut();
   };
 
   const profileImages = useMemo(() => {

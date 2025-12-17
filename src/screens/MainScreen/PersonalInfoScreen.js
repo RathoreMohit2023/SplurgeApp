@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
   StyleSheet,
+  PermissionsAndroid,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -128,10 +129,42 @@ const PersonalInfoScreen = ({ navigation }) => {
     }
   }, [GetInterestData, clickedInterest]);
 
+
+  const requestMediaPermissions = async () => {
+    if (Platform.OS !== 'android') return true;
+  
+    try {
+      if (Platform.Version >= 33) {
+        const result = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+        ]);
+  
+        return (
+          result['android.permission.CAMERA'] === PermissionsAndroid.RESULTS.GRANTED &&
+          result['android.permission.READ_MEDIA_IMAGES'] === PermissionsAndroid.RESULTS.GRANTED
+        );
+      } else {
+        const result = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        ]);
+  
+        return (
+          result['android.permission.CAMERA'] === PermissionsAndroid.RESULTS.GRANTED &&
+          result['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED
+        );
+      }
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  };
+
   // --- Image Handling ---
   const handleImageResponse = response => {
     if (response.didCancel || response.errorMessage) return;
-    const asset = response.assets[0];
+    const asset = response?.assets[0];
     setProfileImage(asset.uri);
     setPhotoFile({
       uri: asset.uri,
@@ -140,14 +173,18 @@ const PersonalInfoScreen = ({ navigation }) => {
     });
   };
 
-  const openCamera = () => {
+  const openCamera = async() => {
+    const granted = await requestMediaPermissions();
+  if (!granted) return;
     launchCamera(
       { mediaType: 'photo', saveToPhotos: true, quality: 0.8 },
       handleImageResponse,
     );
   };
 
-  const openGallery = () => {
+  const openGallery = async () => {
+    const granted = await requestMediaPermissions();
+  if (!granted) return;
     launchImageLibrary(
       { mediaType: 'photo', quality: 0.8 },
       handleImageResponse,
@@ -246,14 +283,15 @@ const PersonalInfoScreen = ({ navigation }) => {
       const result = await dispatch(EditProfileApi({ formData, token })).unwrap();
       if (result?.status === true) {
         showSnack(result?.message);
-        fetchInitialData();
+         dispatch(GetUserDetailsApi(LoginData.token));
         setTimeout(() => navigation.goBack(), 500);
       } else {
         showSnack(result?.message);
-        fetchInitialData();
+         dispatch(GetUserDetailsApi(LoginData.token));
       }
     } catch (error) {
       showSnack('Something went wrong. Please try again.');
+      dispatch(GetUserDetailsApi(LoginData.token));
     }
   };
 
@@ -358,7 +396,7 @@ const PersonalInfoScreen = ({ navigation }) => {
                 }}
                 activeOpacity={0.8}
               >
-                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1}}>
                   <MaterialCommunityIcons
                     name="heart-outline"
                     size={22}

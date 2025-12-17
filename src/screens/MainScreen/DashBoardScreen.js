@@ -115,6 +115,7 @@ const DashBoardScreen = ({ navigation }) => {
   const { GetUserDetailsData, GetUserDetailsLoading } = useSelector(
     state => state.GetUserDetails,
   );
+  
   const { GetWishlistData, GetWishlistLoading } = useSelector(
     state => state.GetWishlist,
   );
@@ -155,12 +156,14 @@ const DashBoardScreen = ({ navigation }) => {
   useEffect(() => {
     fetchApi();
   }, [LoginData]);
+  console.log(GetUserDetailsLoading, 'GetUserDetailsLoading in dashboard');
+  
 
   useEffect(() => {
     if (GetUserDetailsData?.status === true) {
       setUserData(GetUserDetailsData?.user_details[0]);
     }
-  }, [GetUserDetailsData]);
+  }, [GetUserDetailsData, GetUserDetailsLoading]);
 
 
   const allTransactions = GetTransactionData?.get_transactions || [];
@@ -370,7 +373,7 @@ const DashBoardScreen = ({ navigation }) => {
           <View style={styles.profilePlaceholder}>
             {LoginData?.user?.profile_photo ? (
               <Image
-                source={{ uri: Img_url + userData?.profile_photo }}
+                source={{ uri: Img_url + GetUserDetailsData?.user_details[0]?.profile_photo }}
                 style={styles.profileImage}
               />
             ) : (

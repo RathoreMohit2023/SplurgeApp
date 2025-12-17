@@ -6,7 +6,7 @@ import {
   TextInput,
   StatusBar,
   Image,
-  Share
+  Share,
 } from 'react-native';
 import { Text, Avatar, Snackbar, ProgressBar } from 'react-native-paper';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -41,6 +41,7 @@ import { GetPaymentLogApi } from '../../Redux/Api/GetPaymentLogApi';
 import { Img_url } from '../../Redux/NWConfig';
 import { SettleUpApi } from '../../Redux/Api/SettleUpApi';
 import { RemainderApi } from '../../Redux/Api/RemainderApi';
+import { AddGroupMemberApi } from '../../Redux/Api/AddGroupMemberApi';
 
 const GroupSettle = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -72,7 +73,6 @@ const GroupSettle = ({ navigation }) => {
 
   const [friends, setFriends] = useState([]);
   const [groups, setGroups] = useState([]);
-  
 
   const [groupMemberCounts, setGroupMemberCounts] = useState({});
   const [myGroupIds, setMyGroupIds] = useState([]);
@@ -102,9 +102,10 @@ const GroupSettle = ({ navigation }) => {
   // --- 1. Friend List Calculation Logic (Bi-Directional) ---
   useEffect(() => {
     const rawFriends = GetFriendsData?.friends || [];
-    const logs = GetPaymentLogData?.payment_logs
-    ?.filter(log => log.status !== 'settled'
-    ) || [];
+    const logs =
+      GetPaymentLogData?.payment_logs?.filter(
+        log => log.status !== 'settled',
+      ) || [];
 
     if (rawFriends.length > 0) {
       const balanceMap = {};
@@ -155,11 +156,11 @@ const GroupSettle = ({ navigation }) => {
   const recentActivityLogs = useMemo(() => {
     if (!GetPaymentLogData?.payment_logs || !userId) return [];
 
-    const relevantLogs = GetPaymentLogData?.payment_logs
-    .filter(log =>
-      (String(log.user_id) === String(userId) ||
-       String(log.friend_id) === String(userId)) &&
-      log.status !== 'settled'
+    const relevantLogs = GetPaymentLogData?.payment_logs.filter(
+      log =>
+        (String(log.user_id) === String(userId) ||
+          String(log.friend_id) === String(userId)) &&
+        log.status !== 'settled',
     );
 
     const mappedLogs = relevantLogs.map(log => {
@@ -188,7 +189,7 @@ const GroupSettle = ({ navigation }) => {
         isIncoming: isIncoming,
         createdByMe: String(log.user_id) === String(userId),
         friendId: log.friend_id,
-        userId : log.user_id
+        userId: log.user_id,
       };
     });
 
@@ -315,7 +316,7 @@ const GroupSettle = ({ navigation }) => {
     formData.append('friend_code', friendCode);
     try {
       const result = await dispatch(AddFriendApi({ formData, token })).unwrap();
-      if (result?.status === true || result?.status === 'true') {
+      if (result?.status === true) {
         showSnack(result?.message);
         setFriendCode('');
         dispatch(
@@ -382,38 +383,81 @@ const GroupSettle = ({ navigation }) => {
       showSnack('Please provide group name and budget');
       return;
     }
+  
     const token = LoginData?.token;
+    const userId = LoginData?.user?.id;
+  
+    if (!token || !userId) return;
+  
+    const finalMembersPayload = [
+      {
+        user_id: userId,
+        role: 'admin',
+      },
+    ];
+  
     const formData = new FormData();
-    formData.append('user_id', LoginData?.user?.id);
+    formData.append('user_id', userId);
     formData.append('group_name', data.groupName);
     formData.append('group_budget', data.budget);
     formData.append('description', data.description || '');
+  
     try {
-      const result = await dispatch(AddGroupApi({ formData, token })).unwrap();
-      if (result?.status === true || result?.status === 'true') {
-        showSnack(result?.message);
-        fetchInitialData();
-        setGroupFormOpen(false);
-      } else {
-        showSnack(result?.message);
-        fetchInitialData();
+      // ✅ 1️⃣ Create Group
+      const createGroupRes = await dispatch(
+        AddGroupApi({ formData, token })
+      ).unwrap();
+  
+      if (!createGroupRes?.status) {
+        showSnack(createGroupRes?.message);
+        return;
       }
+  
+      const groupId = createGroupRes?.group?.id;
+  
+      // ✅ 2️⃣ Add Admin as Member
+      const addMemberRes = await dispatch(
+        AddGroupMemberApi({
+          payload: {
+            group_id: groupId,
+            members: finalMembersPayload,
+          },
+          token,
+        })
+      ).unwrap();
+  
+      if (addMemberRes?.status) {
+        dispatch(GetGroupMembersApi(token));
+      }
+  
+      // ✅ 3️⃣ Fetch group expense using correct groupId
+      dispatch(
+        GetGroupExpenseApi({
+          token,
+          id: groupId,
+        })
+      );
+  
+      showSnack(createGroupRes?.message);
+      fetchInitialData();
+      setGroupFormOpen(false);
+  
     } catch (error) {
+      console.log('Create group error:', error);
       showSnack('Something went wrong. Please try again.');
     }
   };
-
-  const handleRemind = async (friend) => {
-    
+  
+  const handleRemind = async friend => {
     const token = LoginData?.token;
     const formData = new FormData();
     formData.append('sender_id', LoginData?.user?.id);
     formData.append('receiver_id', friend.id);
     formData.append('settled_amount', friend.owes);
-    
+
     try {
       const result = await dispatch(RemainderApi({ formData, token })).unwrap();
-      if (result?.status === true || result?.status === 'true') {
+      if (result?.status === true) {
         showSnack(result?.message);
       } else {
         showSnack(result?.message);
@@ -429,16 +473,16 @@ const GroupSettle = ({ navigation }) => {
     setSettleModalOpen(true);
   };
 
-  const handleSettleUpSave = async(data) => {
+  const handleSettleUpSave = async data => {
     const token = LoginData?.token;
     const formData = new FormData();
     formData.append('sender_id', LoginData?.user?.id);
     formData.append('receiver_id', selectedFriend.id);
     formData.append('settled_amount', data.amount);
-    
+
     try {
       const result = await dispatch(SettleUpApi({ formData, token })).unwrap();
-      if (result?.status === true || result?.status === 'true') {
+      if (result?.status === true) {
         showSnack(result?.message);
         fetchInitialData();
         setGroupFormOpen(false);
@@ -450,6 +494,16 @@ const GroupSettle = ({ navigation }) => {
       showSnack('Something went wrong. Please try again.');
     }
   };
+
+  const isUserAdminInAnyGroup = groups?.some(
+    g => String(g.group_admin) === String(userId)
+  );
+  const isUserMemberInAnyGroup = GetGroupMembersData?.members?.some(
+    m => String(m.user_id) === String(userId)
+  );
+  const showNoGroups =
+  !isUserAdminInAnyGroup && !isUserMemberInAnyGroup;
+
 
   return (
     <View style={styles.container}>
@@ -471,7 +525,10 @@ const GroupSettle = ({ navigation }) => {
               <Text style={styles.title}>Group Settle</Text>
               <Text style={styles.subtitle}>Split bills, not friendships.</Text>
             </View>
-            <TouchableOpacity onPress={fetchInitialData} style={styles.headerIconBtn}>
+            <TouchableOpacity
+              onPress={fetchInitialData}
+              style={styles.headerIconBtn}
+            >
               <History size={22} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
@@ -601,7 +658,7 @@ const GroupSettle = ({ navigation }) => {
                           style={{ marginRight: 6 }}
                         />
                         <Text style={styles.remindButtonText}>Remind</Text>
-                      </TouchableOpacity> 
+                      </TouchableOpacity>
                     )}
                     <TouchableOpacity
                       onPress={() => handleOpenSettle(friend)}
@@ -631,11 +688,14 @@ const GroupSettle = ({ navigation }) => {
                 <Text style={styles.linkText}>Create New</Text>
               </TouchableOpacity>
             </View>
-            {groups?.length === 0 && (
-              <View style={styles.groupCard}>
-                <Text style={styles.progressLabel}>No groups found.</Text>
-              </View>
-            )}
+            {showNoGroups && (
+  <View style={styles.groupCard}>
+    <Text style={styles.progressLabel}>No groups found.</Text>
+  </View>
+)}
+
+
+
             {groups?.map(group => {
               const isAdmin = String(group.group_admin) === String(userId);
               const isMember = myGroupIds.includes(group.id);

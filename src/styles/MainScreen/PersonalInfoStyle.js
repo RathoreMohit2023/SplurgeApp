@@ -73,6 +73,9 @@ const getPersonalInfoStyle = (colors) => StyleSheet.create({
     flex: 1,
     marginRight: 10,
   },
+  dropdownWrapper: {
+    marginBottom: 10,
+  },
   // --- New Chip Styles ---
   chipsContainer: {
     flexDirection: 'row',

@@ -86,6 +86,7 @@ const AddTransactionModal = ({ visible, onClose, onSave }) => {
     onClose();
   };
 
+
   return (
     <Modal
       animationType="slide"

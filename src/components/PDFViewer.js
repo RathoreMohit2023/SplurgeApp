@@ -118,14 +118,14 @@ const PDFViewer = ({ route, navigation }) => {
           onPress={() => navigation.goBack()}
           style={{ padding: 5 }}
         >
-          <ArrowLeft size={26} color={colors.textPrimary} />
+          <ArrowLeft size={26} color={colors.text} />
         </TouchableOpacity>
 
         <Text
           style={{
             fontSize: 18,
             fontWeight: "600",
-            color: colors.textPrimary,
+            color: colors.text,
             marginLeft: 15
           }}
         >

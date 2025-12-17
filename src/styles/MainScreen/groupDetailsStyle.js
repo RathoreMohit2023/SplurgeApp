@@ -111,6 +111,12 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         borderWidth: 1,
         borderColor: colors.border,
     },
+    groupTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
     groupTitle: {
         color: colors.text,
         fontSize: 18,
@@ -357,6 +363,37 @@ const getGroupDetailsStyle = (colors) => StyleSheet.create({
         fontSize: 14,
         color: colors.textSecondary,
         marginTop: 4,
+    },
+
+    centeredMessageContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+      },
+      centeredMessageText: {
+        fontSize: 18,
+        color: colors.text,
+        textAlign: 'center',
+        marginBottom: 20,
+      },
+      goBackButton: {
+        backgroundColor: colors.theme,
+        paddingVertical: 12,
+        paddingHorizontal: 30,
+        borderRadius: 8,
+      },
+      goBackButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+      },
+      headerIconBtn: {
+        padding: 5,
+        backgroundColor: colors.theme,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: colors.border,
     },
 });
 
