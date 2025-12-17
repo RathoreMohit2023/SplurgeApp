@@ -17,12 +17,12 @@ export const DeleteWishlistApi = createAsyncThunk(
       });
 
       const result = response.data;
-      console.log("DeleteWishlistApi result", result);
+      // console.log("DeleteWishlistApi result", result);
       
       return result;
     } catch (error) {
-      console.error("DeleteWishlistApi error:", error.response.data);
-     throw error;
+      // console.error("DeleteWishlistApi error:", error.response.data);
+     return error.response.data;
     }
   }
 );

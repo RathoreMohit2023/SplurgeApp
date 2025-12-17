@@ -16,12 +16,13 @@ export const GetFriendsApi = createAsyncThunk(
       const response = await axios.get(url + id, {
         headers,
       });
-      console.log("GetFriendsApi response:", response.data);
+      // console.log("GetFriendsApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetFriendsApi Api error:", error);
+      // console.error("GetFriendsApi Api error:", error);
+      return error?.response?.data;
     }
   }
 );

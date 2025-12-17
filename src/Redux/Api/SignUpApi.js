@@ -17,7 +17,7 @@ export const SignUpApi = createAsyncThunk(
 
         try{
             const response = await axios.post(Url, PostData, { headers});
-            console.log("Response from LoginApi:", response.data);
+            // console.log("Response from LoginApi:", response.data);
 
             const result = response.data
             return result;

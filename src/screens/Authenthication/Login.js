@@ -90,7 +90,7 @@ const SignInScreen = ({ navigation }) => {
           setRememberMe(true);
         }
       } catch (error) {
-        console.log("Error loading saved credentials", error);
+        // console.log("Error loading saved credentials", error);
       }
     };
     loadSavedCredentials();
@@ -145,16 +145,12 @@ const SignInScreen = ({ navigation }) => {
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
       GoogleSignin.signOut();
       const userInfo = await GoogleSignin.signIn();
-      console.log("userInfo:", userInfo);
-      
-
       const user = userInfo?.data?.user;
 
       const formData = new FormData();
       formData.append('email', user?.email);
       formData.append('fullname', user?.givenName + ' ' + user?.familyName);
 
-      console.log("formData:", formData);
       
       try {
         const result = await dispatch(GoogleLoginApi(formData));

@@ -17,10 +17,10 @@ export const GetFounderApi = createAsyncThunk(
           }
         }
       )
-      console.log("Response from GetFounderApi:", response.data);
+      // console.log("Response from GetFounderApi:", response.data);
       return response.data;
     } catch (error) {
-      console.log('❌ Error in GetFounderApi:', error.response ? error.response.data : error.message);
+      // console.log('❌ Error in GetFounderApi:', error.response ? error.response.data : error.message);
       throw error;
     }
   }

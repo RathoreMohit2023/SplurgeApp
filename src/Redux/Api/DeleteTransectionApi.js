@@ -17,12 +17,12 @@ export const DeleteTransactionApi = createAsyncThunk(
       });
 
       const result = response.data;
-      console.log("DeleteTransactionApi result", result);
+      // console.log("DeleteTransactionApi result", result);
       
       return result;
     } catch (error) {
-      console.error("DeleteTransactionApi error:", error.response.data);
-     throw error;
+      // console.error("DeleteTransactionApi error:", error.response.data);
+    return error.response.data;
     }
   }
 );

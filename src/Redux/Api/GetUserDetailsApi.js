@@ -16,12 +16,13 @@ export const GetUserDetailsApi = createAsyncThunk(
       const response = await axios.get(url, {
         headers,
       });
-      console.log("GetUserDetailsApi response:", response.data);
+      // console.log("GetUserDetailsApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetUserDetailsApi Api error:", error);
+      // console.error("GetUserDetailsApi Api error:", error);
+      return error?.response?.data;
     }
   }
 );

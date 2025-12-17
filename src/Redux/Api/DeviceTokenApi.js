@@ -17,7 +17,7 @@ export const DeviceTokenApi = createAsyncThunk(
       const response = await axios.post(url, postData, {
         headers
       });
-      console.log("Response from DeviceTokenApi:", response.data);
+      // console.log("Response from DeviceTokenApi:", response.data);
       
       const result = response.data;
       return result;

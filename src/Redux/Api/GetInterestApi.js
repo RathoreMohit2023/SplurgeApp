@@ -15,12 +15,13 @@ export const GetInterestApi = createAsyncThunk(
       const response = await axios.get(url, {
         headers,
       });
-      console.log("GetInterestApi response:", response.data);
+      // console.log("GetInterestApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetInterestApi error:", error.response);
+      // console.error("GetInterestApi error:", error.response);
+      return error?.response?.data;
     }
   }
 );

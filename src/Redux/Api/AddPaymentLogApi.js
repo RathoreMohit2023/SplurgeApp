@@ -17,7 +17,7 @@ export const AddPaymentLogApi = createAsyncThunk(
       const response = await axios.post(url, formData, {
         headers
       });
-      console.log("Response from AddPaymentLogApi:", response.data);
+      // console.log("Response from AddPaymentLogApi:", response.data);
       
       const result = response.data;
       return result;

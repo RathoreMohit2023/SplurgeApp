@@ -17,7 +17,7 @@ export const DeleteGroupMemberApi = createAsyncThunk(
       const response = await axios.post(url, payload, {
         headers
       });
-      console.log("Response from DeleteGroupMemberApi:", response.data);
+      // console.log("Response from DeleteGroupMemberApi:", response.data);
       
       const result = response.data;
       return result;

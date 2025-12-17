@@ -16,7 +16,7 @@ export const RemainderApi = createAsyncThunk(
       const response = await axios.post(url, formData, {
         headers
       });
-      console.log("Response from RemainderApi:", response.data);
+      // console.log("Response from RemainderApi:", response.data);
       
       const result = response.data;
       return result;

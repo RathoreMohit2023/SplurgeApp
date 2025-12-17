@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react"; // useRef import karein
 import { NavigationContainer } from '@react-navigation/native';
 import RootNavigator from "../src/navigation/rootNavigator";
 import { PaperProvider } from "react-native-paper";
@@ -16,6 +16,16 @@ const MainApp = () => {
   const dispatch = useDispatch();
 
   const currentUserId = LoginData?.user?.id || LoginData?.user_id;
+  
+  // 1. Current User ID aur Token ko Ref mein store karein
+  const currentUserRef = useRef(currentUserId);
+  const tokenRef = useRef(LoginData?.token);
+
+  // 2. Jab bhi LoginData change ho, Ref update karein
+  useEffect(() => {
+    currentUserRef.current = currentUserId;
+    tokenRef.current = LoginData?.token;
+  }, [currentUserId, LoginData]);
 
   const unreadCount = useMemo(() => {
     if (!Notifications || !currentUserId) return 0;
@@ -31,16 +41,21 @@ const MainApp = () => {
           await notifee.setBadgeCount(0);
         }
       } catch (error) {
-        console.log("Badge Error:", error);
+        // console.log("Badge Error:", error);
       }
     };
     updateBadge();
   }, [unreadCount, currentUserId]);
 
+  // 3. Notification Handler ab Ref ki value use karega
   const handleNewNotification = (remoteMessage) => {
     if (!remoteMessage) return;
     
-    if (!currentUserId) return; 
+    // Yahan Ref use karein, taaki latest value mile bina re-render ke
+    const userId = currentUserRef.current;
+    const token = tokenRef.current;
+
+    if (!userId) return; 
 
     const newNotif = {
       id: remoteMessage.messageId,
@@ -50,17 +65,19 @@ const MainApp = () => {
       time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
       read: false,
       data: remoteMessage.data,
-      userId: currentUserId, 
+      userId: userId, 
     };
 
     dispatch(addNotification(newNotif));
     
-    if (LoginData?.token) {
-      dispatch(GetPaymentLogApi(LoginData.token));
+    if (token) {
+      dispatch(GetPaymentLogApi(token));
     }
   };
 
   useEffect(() => {
+    let unsubscribeForeground = null;
+
     (async () => {
       const granted = await requestPermissions();
       if (!granted) return;
@@ -68,7 +85,7 @@ const MainApp = () => {
       const token = await getFCMToken();
       dispatch(setFcmToken(token));
 
-      const fg = onForegroundMessage(msg => {
+      unsubscribeForeground = onForegroundMessage(msg => {
         handleNewNotification(msg);
       });
 
@@ -79,10 +96,14 @@ const MainApp = () => {
       onNotificationOpened(msg => {
         handleNewNotification(msg);
       });
-
-      return () => fg();
     })();
-  }, [LoginData]);
+
+    return () => {
+      if (unsubscribeForeground) {
+        unsubscribeForeground();
+      }
+    };
+  }, []);
 
   return (
     <PaperProvider>

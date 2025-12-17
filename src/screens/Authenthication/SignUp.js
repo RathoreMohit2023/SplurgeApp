@@ -134,7 +134,6 @@ const SignUp = ({ navigation }) => {
 
     try {
       const result = await dispatch(SignUpApi(postData)).unwrap();
-      console.log("Response from SignUpApi:", result);
       
       if (result?.status === true) {
         setAlertConfig({

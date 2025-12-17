@@ -16,12 +16,13 @@ export const GetCategoriesApi = createAsyncThunk(
       const response = await axios.get(url, {
         headers,
       });
-      console.log("GetCategoriesApi response:", response.data);
+      // console.log("GetCategoriesApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetCategoriesApi Api error:", error);
+      // console.error("GetCategoriesApi Api error:", error);
+      return error?.response?.data;
     }
   }
 );

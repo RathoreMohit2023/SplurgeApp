@@ -17,12 +17,13 @@ export const AddTransactionApi = createAsyncThunk(
       const response = await axios.post(url, formData, {
         headers
       });
-      console.log("Response from AddTransactionApi:", response.data);
+      // console.log("Response from AddTransactionApi:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.log('Error in AddTransactionApi:', error.response.data);
+      // console.log('Error in AddTransactionApi:', error.response.data);
+      return error?.response?.data;
     }
   }
 );

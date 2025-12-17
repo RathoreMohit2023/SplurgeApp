@@ -15,7 +15,7 @@ export const AddGroupMemberApi = createAsyncThunk(
       const response = await axios.post(url, payload, {
         headers
       });
-      console.log("Response from AddGroupMemberApi:", response.data);
+      // console.log("Response from AddGroupMemberApi:", response.data);
       
       const result = response.data;
       return result;

@@ -22,13 +22,13 @@ export const ForgoteApi = createAsyncThunk(
                     "Content-Type": "application/json",
                 },
             })
-            console.log("Response from ForgoteApi:", response.data);
+            // console.log("Response from ForgoteApi:", response.data);
       
             const result = response.data;
             return result;
         }
         catch(error){
-            console.log('Error in ForgoteApi:', error.response.data)
+            // console.log('Error in ForgoteApi:', error.response.data)
             return rejectWithValue(
                 error?.response?.data || "Something went wrong"
             );

@@ -15,11 +15,11 @@ export const EditProfileApi = createAsyncThunk(
       const response = await axios.post(url, formData, {
         headers,
       });
-      console.log('Response from EditProfileApi:', response.data);
+      // console.log('Response from EditProfileApi:', response.data);
       const result = response.data;
       return result;
     } catch (error) {
-      console.log('Error in EditProfileApi:', error.response.data);
+      // console.log('Error in EditProfileApi:', error.response.data);
       
       return error?.response?.data;
     }

@@ -16,12 +16,13 @@ export const GetGroupMembersApi = createAsyncThunk(
       const response = await axios.get(url, {
         headers,
       });
-      console.log("GetGroupMembersApi response:", response.data);
+      // console.log("GetGroupMembersApi response:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.error("GetGroupMembersApi error:", error);
+      // console.error("GetGroupMembersApi error:", error);
+      return error?.response?.data;
     }
   }
 );

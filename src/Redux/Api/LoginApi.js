@@ -8,7 +8,6 @@ const GoogleUrl = `${BASE_URL}${Google_Url}`
 export const LoginApi = createAsyncThunk(
   'LoginApi',
   async (PostData) => {
-    console.log("PostData:", PostData);
     
     const headers = {
         "Content-Type" : "multipart/form-data",
@@ -17,12 +16,13 @@ export const LoginApi = createAsyncThunk(
       const response = await axios.post(url, PostData, {
         headers
       });
-      console.log("Response from LoginApi:", response.data);
+      // console.log("Response from LoginApi:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.log('Error in LoginApi:', error.response.data);
+      // console.log('Error in LoginApi:', error.response.data);
+      return error?.response?.data;
     }
   }
 );
@@ -37,12 +37,13 @@ export const GoogleLoginApi = createAsyncThunk(
       const response = await axios.post(GoogleUrl, PostData, {
         headers
       });
-      console.log("Response from GoogleLoginApi:", response.data);
+      // console.log("Response from GoogleLoginApi:", response.data);
       
       const result = response.data;
       return result;
     } catch (error) {
-      console.log('Error in GoogleLoginApi:', error.response.data);
+      // console.log('Error in GoogleLoginApi:', error.response.data);
+      return error?.response?.data;
     }
   }
 );

@@ -6,6 +6,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/Redux/Store/Store';
 import { Provider } from 'react-redux';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import NetworkWrapper from './src/components/NetworkWrapper'; 
 
 const App = () => {
   useEffect(() => {
@@ -21,7 +22,11 @@ const App = () => {
       <PersistGate loading={null} persistor={persistor}>
         <SafeAreaProvider>
           <ThemeProvider>
-            <MainApp />
+            
+            <NetworkWrapper>
+               <MainApp />
+            </NetworkWrapper>
+
           </ThemeProvider>
         </SafeAreaProvider>
       </PersistGate>

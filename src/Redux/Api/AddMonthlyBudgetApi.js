@@ -16,7 +16,7 @@ export const AddMonthlyBudgetApi = createAsyncThunk(
       const response = await axios.post(url, formData, {
         headers
       });
-      console.log("Response from AddMonthlyBudgetApi:", response.data);
+      // console.log("Response from AddMonthlyBudgetApi:", response.data);
       
       const result = response.data;
       return result;
