@@ -10,6 +10,9 @@ import { setFcmToken } from './Redux/Slice/FcmSlice';
 import { addNotification } from './Redux/Slice/NotificationSlice';
 import { GetPaymentLogApi } from "./Redux/Api/GetPaymentLogApi";
 
+import AuthNavigator from "./navigation/AuthNavigator";
+import AppNavigator from "./navigation/AppNavigator";
+
 const MainApp = () => {
   const { LoginData } = useSelector(state => state.Login);
   const { Notifications } = useSelector(state => state.Notifications);
@@ -108,7 +111,7 @@ const MainApp = () => {
   return (
     <PaperProvider>
       <NavigationContainer>
-        <RootNavigator />
+      {LoginData?.token ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>
     </PaperProvider>
   );

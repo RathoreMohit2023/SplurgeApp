@@ -109,13 +109,14 @@ const DashBoardScreen = ({ navigation }) => {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [userData, setUserData] = useState({});
+  console.log("userData:", userData);
+  
 
   const { LoginData } = useSelector(state => state.Login);
   // Redux State
   const { GetUserDetailsData, GetUserDetailsLoading } = useSelector(
     state => state.GetUserDetails,
   );
-  
   const { GetWishlistData, GetWishlistLoading } = useSelector(
     state => state.GetWishlist,
   );
@@ -363,7 +364,7 @@ const DashBoardScreen = ({ navigation }) => {
         <View>
           <Text style={styles.greetingText}>Good Morning,</Text>
           <Text style={styles.userName}>
-            {LoginData?.user?.fullname || 'User'}
+            {userData?.fullname || 'User'}
           </Text>
         </View>
         <TouchableOpacity
@@ -371,14 +372,14 @@ const DashBoardScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('PersonalInfoScreen')}
         >
           <View style={styles.profilePlaceholder}>
-            {LoginData?.user?.profile_photo ? (
+            {userData?.profile_photo ? (
               <Image
-                source={{ uri: Img_url + GetUserDetailsData?.user_details[0]?.profile_photo }}
+                source={{ uri: Img_url + userData?.profile_photo }}
                 style={styles.profileImage}
               />
             ) : (
               <Text style={styles.profileInitials}>
-                {LoginData?.user?.fullname?.charAt(0)?.toUpperCase() || 'U'}
+                {userData?.fullname?.charAt(0)?.toUpperCase() || 'U'}
               </Text>
             )}
           </View>
@@ -396,12 +397,12 @@ const DashBoardScreen = ({ navigation }) => {
             Total Spent ({dynamicStats.currentMonthName})
           </Text>
           <Text style={styles.heroValue}>
-            ₹{dynamicStats.totalSpentThisMonth?.toLocaleString()}
+            ₹{dynamicStats?.totalSpentThisMonth?.toLocaleString()}
           </Text>
         </View>
         <View style={styles.heroFooter}>
           <View style={styles.trendBadge}>
-            {dynamicStats.percentageChange >= 0 ? (
+            {dynamicStats?.percentageChange >= 0 ? (
               <TrendingUp size={14} color={colors.error} />
             ) : (
               <TrendingDown size={14} color={colors.success} />

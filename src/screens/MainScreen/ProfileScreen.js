@@ -27,10 +27,11 @@ import ImageViewer from '@react-native-ohos/react-native-image-zoom-viewer';
 
 import getProfileStyle from '../../styles/MainScreen/ProfileStyle';
 import { ThemeContext } from '../../components/ThemeContext';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Img_url } from '../../Redux/NWConfig';
 import CustomAlert from '../../components/CustomAlert'; // Adjust the path if necessary
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { logout } from '../../Redux/Slice/LoginSlice';
 
 const ProfileScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -38,6 +39,7 @@ const ProfileScreen = ({ navigation }) => {
   const { GetUserDetailsData } = useSelector(state => state.GetUserDetails);
   const { GetTransactionData } = useSelector(state => state.GetTransaction);
   const { GetFriendsData } = useSelector(state => state.GetFriends || {});
+  const dispatch = useDispatch();
   
   const [user, setUser] = useState('');
   const [snack, setSnack] = useState({ visible: false, message: '' });
@@ -122,7 +124,7 @@ const ProfileScreen = ({ navigation }) => {
   ];
 
   useEffect(() => {
-    if (GetUserDetailsData) {
+    if (GetUserDetailsData?.user_details?.length > 0) {
       setUser(GetUserDetailsData?.user_details[0]);
     }
   }, [GetUserDetailsData]);
@@ -131,10 +133,14 @@ const ProfileScreen = ({ navigation }) => {
     setLogoutAlertVisible(true);
   };
   
-  const confirmLogout = () => {
+  const confirmLogout = async () => {
     setLogoutAlertVisible(false);
-    navigation.navigate('signIn');
-    GoogleSignin.signOut();
+    try {
+      await GoogleSignin.signOut();
+      dispatch(logout());
+    } catch (error) {
+      console.error("Failed to sign out: ", error);
+    }
   };
 
   const profileImages = useMemo(() => {
