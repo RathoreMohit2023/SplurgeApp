@@ -24,8 +24,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CheckBox from "@react-native-community/checkbox";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
-// IMPORTS: Add Vector Icons
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// // IMPORTS: Add Vector Icons
+// import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
         
 const SignInScreen = ({ navigation }) => {
   const { colors, themeType } = useContext(ThemeContext);
@@ -166,9 +166,9 @@ const SignInScreen = ({ navigation }) => {
           response?.message?.toLowerCase().includes('success')
         ) {
           setToastMsg(response?.message || 'Login Successful');
-          setShowToast(true);
+          setShowToast(true); 
   
-          if (rememberMe) {
+          if (rememberMe) {  
             await AsyncStorage.setItem("savedEmail", email);
             await AsyncStorage.setItem("savedPassword", password);
           } else {
