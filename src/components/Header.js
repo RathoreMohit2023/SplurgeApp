@@ -10,7 +10,7 @@ import { markAllAsRead } from "../Redux/Slice/NotificationSlice";
 const AppHeader = ({
   navigation,
   title = "",                   
-  showBackButton = false,       
+  showBackButton = false,           
   showNotification = true,     
   showThemeToggle = true,       
   onBackPress,                  

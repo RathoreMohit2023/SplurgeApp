@@ -6,7 +6,7 @@ import VideoPlayer from "../components/VideoPlayer";
 const ModalVideoPlayer = ({ visible, onClose, videoUrl }) => {
 
   return (
-    <Modal
+    <Modal        
         visible={visible}
         animationType="slide"
         transparent

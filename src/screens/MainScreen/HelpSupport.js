@@ -109,7 +109,7 @@ const HelpSupport = ({ navigation }) => {
       : []),
   ];
 
-  return (
+  return (     
     <View style={styles.container}>
       <StatusBar
         barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'}

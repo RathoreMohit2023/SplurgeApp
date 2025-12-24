@@ -26,11 +26,28 @@ const Videos = () => {
 
   { /* Convert Video Link to thumbanail */}
   
+  // const getYoutubeId = (url) => {
+  //   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  //   const match = url.match(regExp);
+  //   return match && match[2].length === 11 ? match[2] : null;
+  // };
+
   const getYoutubeId = (url) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    if (!url) return null;
+  
+    // Handle YouTube Shorts
+    if (url.includes('/shorts/')) {
+      return url.split('/shorts/')[1].split('?')[0];
+    }
+  
+    // Handle normal YouTube URLs
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]{11}).*/;
     const match = url.match(regExp);
-    return match && match[2].length === 11 ? match[2] : null;
+  
+    return match ? match[2] : null;
   };
+  
   
   const getThumbnail = (url) => {
     const VideoID = getYoutubeId(url);
@@ -50,7 +67,8 @@ const Videos = () => {
           <TouchableOpacity 
             style={resourceStyle.itemCard}  
             activeOpacity={0.7}
-            onPress={() => setSelectedVideo(item.url)}
+            // onPress={() => setSelectedVideo(item.url)}
+            onPress={() => setSelectedVideo(getYoutubeId(item.url))}
           >
             <View style={resourceStyle.thumbnailBox}>
               <Image 

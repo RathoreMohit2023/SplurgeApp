@@ -4,7 +4,7 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import VideoScreen from "../../screens/MainScreen/learnTabs/Videos";
-import FounderScreen from "../../screens/MainScreen/learnTabs/founders";
+// import FounderScreen from "../../screens/MainScreen/learnTabs/founders";
 import ArticleScreen from "./learnTabs/Articles";
 import { ThemeContext } from "../../components/ThemeContext"; 
 import getResourceStyles from "../../styles/MainScreen/resourceStyle";
@@ -63,7 +63,7 @@ const ResourceScreen = () => {
                 paddingVertical: 0,
             },
             tabBarLabelStyle: {
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: '700',
                 textTransform: 'capitalize',
                 fontFamily: 'serif',
@@ -73,7 +73,7 @@ const ResourceScreen = () => {
           sceneContainerStyle={{ backgroundColor: colors.background }} // Content Background
         >
           <Tab.Screen name="Videos" component={VideoScreen} />
-          <Tab.Screen name="Founders" component={FounderScreen} />
+          {/* <Tab.Screen name="Founders" component={FounderScreen} /> */}
           <Tab.Screen name="Articles" component={ArticleScreen} />
         </Tab.Navigator>
       </View>

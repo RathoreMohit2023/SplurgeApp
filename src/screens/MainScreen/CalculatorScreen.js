@@ -31,7 +31,7 @@ const CalculatorScreen = () => {
     <View style={[styles.container, { paddingBottom: bottomPadding }]}>
       <StatusBar
         barStyle={themeType === 'dark' ? 'light-content' : 'dark-content'}
-        backgroundColor={colors.background}
+        backgroundColor={colors.background}   
       />
 
       <View style={styles.headerContainer}>
